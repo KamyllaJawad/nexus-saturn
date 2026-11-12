@@ -1,0 +1,14 @@
+flowchart TB
+  astro([Astronauta e comandante])
+  medico([Oficial médico])
+  fs([Flight surgeon em Houston])
+  fam([Família])
+  sys[AstroHealth OS<br/>monitoramento com IA local<br/>e humano no controle]
+  nave[[Sensores e sistemas da nave]]
+  dsn[[Rede de espaço profundo · DTN]]
+  astro -->|usa o relógio| sys
+  medico -->|decide protocolos no tablet| sys
+  fs -->|revisa e dá parecer| sys
+  fam -->|recebe status em frases| sys
+  sys -->|lê sinais e ambiente| nave
+  sys <-->|pacotes com atraso| dsn

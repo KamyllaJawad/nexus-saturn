@@ -1,0 +1,33 @@
+{
+  "tripulante_id": "sarah",
+  "m1": {
+    "classe": "fa",
+    "confianca": 0.87,
+    "atributos": ["rr_irregular_30s", "fc_media", "sdnn"],
+    "versao_modelo": "arritmia-borda-0.3"
+  },
+  "m2": {
+    "qualidade": "bom",
+    "confianca": 0.94,
+    "versao_modelo": "qualidade-0.2"
+  },
+  "m3": {
+    "estado": "critico",
+    "versao_z": "m3-z-0.1",
+    "metricas": {
+      "fc": {"z": 6.2, "faixa": "critico"},
+      "spo2": {"z": -4.1, "faixa": "critico"},
+      "hrv": {"z": -3.4, "faixa": "critico"},
+      "temperatura": {"z": 1.1, "faixa": "atencao"},
+      "sono": {"z": 0.2, "faixa": "padrao"},
+      "hidratacao": {"z": -0.8, "faixa": "padrao"}
+    },
+    "isolation_forest": {
+      "anomalo": true,
+      "score": 0.71,
+      "limiar": 0.62,
+      "evidencias": ["fc", "spo2"],
+      "versao_modelo": "m3-if-0.1"
+    }
+  }
+}

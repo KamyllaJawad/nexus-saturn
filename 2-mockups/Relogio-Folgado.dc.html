@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Relógio · relógio folgado? (M2)</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="demo.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#04060c}
+a{color:#00e5ff}a:hover{color:#7df3ff}
+</style>
+</helmet>
+<div style="width: 400px; height: 400px; box-sizing: border-box; padding: 40px; background: #04060c; display: flex; align-items: flex-start; justify-content: center; font-family: Inter, system-ui, sans-serif; color: #eef2f8;">
+<div class="dev" data-dev="watch-round">
+<div class="bezel-round frame"><button class="crown" aria-label="Coroa: próxima tela do relógio"></button><div data-render="watch-round"><div class="ws round lv0  evt-loose" style="--beat:0.83s"><div class="ws-in"><div class="w-tag warn">Leitura estranha</div><div class="w-big">SpO₂ 84%?</div><p class="w-text">Seu relógio está folgado?</p><button class="w-btn sm2">Ajustei o relógio</button><button class="w-btn ghost sm">Está firme</button><div class="w-dots"><button class="dot" data-arg="evt" aria-label="Evento" aria-current="true"><i></i></button><button class="dot" data-arg="home" aria-label="Início" aria-current="false"><i></i></button><button class="dot" data-arg="insight" aria-label="Insight da Cosmo" aria-current="false"><i></i></button><button class="dot" data-arg="chat" aria-label="Chat com a Cosmo" aria-current="false"><i></i></button><button class="dot" data-arg="game" aria-label="Missões da estufa" aria-current="false"><i></i></button><button class="dot" data-arg="elo" aria-label="Elo com a família" aria-current="false"><i></i></button><button class="dot" data-arg="sync" aria-label="Sincronia com a Terra" aria-current="false"><i></i></button><button class="dot" data-arg="vitals" aria-label="Sinais" aria-current="false"><i></i></button></div></div></div></div></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":400,"height":400}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html><html lang="pt-BR" class="dark"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Companion — Estado de Celebração de Meta (Terra-Órbita)</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'accent': '#00E5FF',
+        'optimal': '#10B981',
+        'attention': '#F59E0B',
+        'critical': '#EF4444',
+        'hydration': '#3B82F6',
+        'cycle': '#EC4899',
+        'sleep': '#8B5CF6',
+        'light-primary': '#006878',
+        'light-on-primary': '#FFFFFF',
+        'light-surface': '#080B14',
+        'light-on-surface': '#F3F4F6',
+        'dark-primary': '#00E5FF',
+        'dark-on-primary': '#051820',
+        'dark-surface': '#05070E',
+        'dark-on-surface': '#F8FAFC',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'DEFAULT': '12px',
+        'md': '16px',
+        'lg': '20px',
+        'xl': '28px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '12px',
+        'gutter-lg': '16px',
+        'gutter-xl': '20px',
+        'section': '24px',
+        'page-margin': '16px',
+      },
+      fontFamily: {
+        'display': ['"Space Grotesk"', 'sans-serif'],
+        'headline': ['"Space Grotesk"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg': ['28px', { lineHeight: '32px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['24px', { lineHeight: '28px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'headline-lg': ['20px', { lineHeight: '24px', letterSpacing: '-0.2px', fontWeight: '600' }],
+        'headline-lg-mobile': ['18px', { lineHeight: '22px', letterSpacing: '-0.2px', fontWeight: '600' }],
+        'body-md': ['13px', { lineHeight: '17px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['12px', { lineHeight: '16px', letterSpacing: '0.5px', fontWeight: '600' }],
+        'label-sm': ['10px', { lineHeight: '13px', letterSpacing: '0.2px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '150ms',
+        'pulse-vital': '1000ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'pulse-vital': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'pulse-vital': 'ease-in-out',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <style>
+    ::-webkit-scrollbar { display: none; }
+    @keyframes floatCheers {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(-1deg); }
+    }
+    .animate-float-cheers {
+      animation: floatCheers 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-black text-slate-100 font-body min-h-[884px] flex items-center justify-center p-2 selection:bg-emerald-500/30" data-stitch-vh="min-h-[884px]===min-h-screen">
+
+  <!-- Mobile Smartphone Frame -->
+  <main class="w-[390px] min-h-[844px] bg-[#07090F] border-[10px] border-[#1C202F] rounded-[50px] shadow-2xl relative overflow-hidden flex flex-col p-4">
+    
+    <!-- Phone Top Status Bar -->
+    <header class="flex items-center justify-between pt-1 px-4 pb-2 border-b border-slate-800/60">
+      <span class="font-display text-[14px] font-bold text-slate-200">09:52</span>
+      <div class="w-24 h-4 bg-black rounded-full mx-auto"></div>
+      <div class="flex items-center gap-1.5 text-slate-300 text-[13px]">
+        <span class="material-symbols-outlined text-[15px] text-optimal">check_circle</span>
+        <span class="material-symbols-outlined text-[15px]">battery_full</span>
+      </div>
+    </header>
+
+    <!-- State Switcher Header -->
+    <div class="flex items-center justify-between py-2 px-2 border-b border-slate-800/40 text-[11px]">
+      <a href="../mobile-companion-hub/MobileCompanionHub.html" class="text-slate-400 hover:text-slate-200 flex items-center gap-1">
+        <span class="material-symbols-outlined text-[14px]">arrow_back</span> Hub Principal
+      </a>
+      <div class="flex items-center gap-1">
+        <a href="../mobile-companion-syncing/MobileCompanionSyncing.html" class="text-slate-400 hover:text-cyan-300">
+          Ver Sincronizando
+        </a>
+        <span class="px-2 py-0.5 bg-emerald-500/20 text-optimal border border-optimal/40 rounded-full font-bold">
+          Meta Celebrada 🎉
+        </span>
+      </div>
+    </div>
+
+    <!-- MAIN CELEBRATION CONTENT -->
+    <div class="flex-1 flex flex-col items-center justify-center px-4 text-center my-auto">
+      
+      <!-- Celebratory Illustration: Toast between Earth Cup & Astronaut Flask -->
+      <div class="relative w-44 h-44 flex items-center justify-center mb-4 animate-float-cheers">
+        <div class="absolute inset-0 bg-gradient-to-tr from-blue-500/20 via-cyan-400/20 to-emerald-500/20 rounded-full blur-2xl"></div>
+
+        <svg viewBox="0 0 160 160" class="w-full h-full drop-shadow-[0_8px_24px_rgba(16,185,129,0.4)]">
+          <!-- Two floating flasks/glasses touching -->
+          <!-- Earth Glass (Blue) -->
+          <rect x="35" y="55" width="34" height="60" rx="10" fill="#1E3A8A" stroke="#38BDF8" stroke-width="2.5"></rect>
+          <path d="M37,85 Q52,90 67,85 L67,110 Q52,118 37,110 Z" fill="#0284C7" opacity="0.8"></path>
+          <!-- Steam / Cheers bubbles -->
+          <circle cx="50" cy="40" r="3" fill="#38BDF8"></circle>
+          <circle cx="60" cy="30" r="2" fill="#67E8F9"></circle>
+
+          <!-- Space Zero-G Hydro-Pouch (Cyan) -->
+          <rect x="85" y="45" width="40" height="70" rx="14" fill="#064E3B" stroke="#10B981" stroke-width="2.5"></rect>
+          <circle cx="105" cy="80" r="14" fill="#10B981" opacity="0.7"></circle>
+          <!-- Straw -->
+          <path d="M105,45 L105,25 L115,20" fill="none" stroke="#F8FAFC" stroke-width="3" stroke-linecap="round"></path>
+          
+          <!-- Sparkles of achievement -->
+          <circle cx="80" cy="48" r="4" fill="#FACC15"></circle>
+          <circle cx="80" cy="120" r="3" fill="#FACC15"></circle>
+        </svg>
+      </div>
+
+      <!-- Heading -->
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950 border border-optimal/50 text-optimal text-[11px] font-headline font-bold mb-2">
+        <span class="material-symbols-outlined text-[15px]">celebration</span>
+        <span>BRINDE HÍDRICO TERRA-ÓRBITA CONCLUÍDO</span>
+      </div>
+
+      <h2 class="font-headline text-[22px] font-bold text-slate-100">Meta Sincronizada com Sucesso!</h2>
+      
+      <p class="font-body text-[12.5px] text-slate-300 mt-2 max-w-[300px] leading-relaxed">
+        Você e a <strong>Ana na Terra</strong> atingiram a hidratação simultânea. O <strong>Hidro-Pod da Estufa</strong> na nave recebeu <strong>+500ml</strong> de nutrientes.
+      </p>
+
+      <!-- Achievement Stats Card -->
+      <div class="w-full mt-6 bg-slate-900/90 border border-emerald-500/40 rounded-2xl p-4 text-left space-y-2.5">
+        <div class="flex items-center justify-between">
+          <span class="font-headline text-[12px] font-bold text-slate-200">Recompensas Desbloqueadas</span>
+          <span class="text-optimal font-display text-[11px] font-bold">+250 XP Coletivo</span>
+        </div>
+
+        <div class="space-y-1.5 text-[11.5px]">
+          <div class="flex items-center gap-2 text-slate-300">
+            <span class="material-symbols-outlined text-optimal text-[18px]">water_drop</span>
+            <span>Equilíbrio osmótico da tripulação: <strong>100%</strong></span>
+          </div>
+          <div class="flex items-center gap-2 text-slate-300">
+            <span class="material-symbols-outlined text-cyan-400 text-[18px]">potted_plant</span>
+            <span>Estufa Artemis: <strong>Acelerou floração (+1 dia)</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="w-full mt-6 space-y-2">
+        <a href="../mobile-companion-hub/MobileCompanionHub.html" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-cyan-400 text-slate-950 font-headline text-[13px] font-bold rounded-2xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-[18px]">check</span>
+          Concluir e Voltar ao Painel
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Bottom Indicator -->
+    <footer class="pt-2 text-center text-[10px] text-slate-500">
+      Compartilhado via NASA Artemis Crew Network
+    </footer>
+
+  </main>
+
+
+</body></html>

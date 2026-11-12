@@ -1,0 +1,27 @@
+flowchart TB
+  subgraph bordo[A bordo da nave]
+    relogio[Relógio da tripulação<br/>Cosmo borda: arritmia e chat<br/>guarda dados sem link]
+    tablet[Tablet do médico<br/>painel de cada tripulante<br/>confirma e libera medicação]
+    sensores[Sensores de bordo<br/>patch, manguito, oxímetro<br/>dosímetro e CO₂]
+    subgraph servidor[Servidor da nave]
+      motor[Motor de decisões<br/>regras + estados]
+      cosmo[Cosmo nave<br/>LLM local + RAG]
+      dados[(Dados e auditoria)]
+      gw[Gateway DTN<br/>fila por prioridade]
+    end
+  end
+  link{{Link DTN · menos de 1 s a 22 min · blackouts de dias}}
+  subgraph terra[Na Terra]
+    srvT[Servidor da Terra<br/>filtro de privacidade]
+    console[Console de Houston<br/>Cosmo Terra: copiloto]
+    app[App da família]
+  end
+  relogio -->|rede local| motor
+  tablet -->|rede local| motor
+  sensores --> motor
+  motor --> cosmo
+  motor --> dados
+  motor --> gw
+  gw --> link --> srvT
+  srvT --> console
+  srvT -->|só frases, sem sinais vitais| app

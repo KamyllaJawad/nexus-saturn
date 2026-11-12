@@ -1,0 +1,18 @@
+sequenceDiagram
+  autonumber
+  participant R as Relógio (Sarah)
+  participant M as Motor + Cosmo (nave)
+  participant T as Tablet (Dr. Marcus)
+  participant G as Gateway DTN
+  participant H as Houston
+  R->>R: detecta FC 168 irregular e SpO₂ 88%
+  R->>R: alerta no pulso: pare e sente-se
+  R->>M: evento arritmia + ECG
+  M->>T: protocolo + evidências (nível 3)
+  M->>G: alerta P1
+  T->>M: confirma protocolo (assinado)
+  M->>R: médico a caminho
+  T->>M: libera antiarrítmico e define a dose
+  G--)H: alerta chega com atraso
+  H--)G: parecer
+  G->>T: parecer chega a bordo

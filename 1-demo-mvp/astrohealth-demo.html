@@ -1,0 +1,1638 @@
+<title>AstroHealth OS</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: barra de controle fixa + roteiro + palco com os 5 dispositivos + linha do tempo do sistema.
+   Tema único OLED escuro (escolha do design system AstroHealth OS). */
+:root{
+  --void:#04060c; --panel:#0a0f1c; --surface:#0f172a; --surface2:#162038;
+  --line:rgba(148,163,184,.13); --line2:rgba(148,163,184,.26);
+  --ink:#eef2f8; --ink2:#a6b2c7; --ink3:#6f7d96;
+  --accent:#00e5ff; --ok:#10b981; --warn:#f59e0b; --crit:#ef4444;
+  --water:#3b82f6; --cycle:#ec4899; --sleep:#8b5cf6;
+  --fd:"Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fb:"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fm:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --gut:max(16px, env(safe-area-inset-left, 0px));
+  --gutr:max(16px, env(safe-area-inset-right, 0px));
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--void);color:var(--ink)}
+body{
+  font-family:var(--fb);font-size:14px;line-height:1.45;
+  padding-left:var(--gut);padding-right:var(--gutr);padding-block:0 40px;
+  background:radial-gradient(1100px 520px at 50% -8%, rgba(0,229,255,.07), transparent 62%), var(--void);
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:#04060c}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:disabled{cursor:not-allowed;opacity:.45}
+h1,h2,h3,h4,p{margin:0}
+.ic{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:-.12em}
+.num{font-variant-numeric:tabular-nums}
+.c-ok{color:var(--ok)}.c-warn{color:var(--warn)}.c-crit{color:var(--crit)}.c-acc{color:var(--accent)}.c-water{color:var(--water)}.c-sleep{color:var(--sleep)}.c-cycle{color:var(--cycle)}
+
+/* ---------- Barra de controle ---------- */
+.bar{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:20;
+  margin-left:calc(-1 * var(--gut));margin-right:calc(-1 * var(--gutr));
+  padding:10px var(--gutr) 10px var(--gut);
+  background:rgba(4,6,12,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+  display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 22px;
+}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto;align-self:center}
+.brand-mark{width:30px;height:30px;color:var(--accent)}
+.brand b{display:block;font:600 16px/1.1 var(--fd);letter-spacing:-.01em}
+.brand small{display:block;font:500 10.5px var(--fm);color:var(--ink3);letter-spacing:.06em;text-transform:uppercase}
+.grp{display:flex;flex-direction:column;gap:4px;min-width:0;max-width:100%}
+.grp-l{font:500 10px var(--fm);letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+.seg{display:flex;gap:2px;padding:3px;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow-x:auto;max-width:100%;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg button{padding:6px 10px;border-radius:7px;font-size:12.5px;color:var(--ink2);white-space:nowrap;transition:background .15s,color .15s}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--surface2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line2)}
+.seg button.sc-emergency[aria-pressed="true"]{background:rgba(239,68,68,.16);color:#fecaca;box-shadow:inset 0 0 0 1px rgba(239,68,68,.55)}
+.seg button.sc-blackout[aria-pressed="true"]{background:rgba(245,158,11,.14);color:#fde68a;box-shadow:inset 0 0 0 1px rgba(245,158,11,.5)}
+.seg button.sc-normal[aria-pressed="true"]{box-shadow:inset 0 0 0 1px rgba(16,185,129,.5)}
+
+/* ---------- Roteiro ---------- */
+.story{max-width:1280px;margin:0 auto;padding:16px 0 14px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 24px;align-items:center}
+.story-step{font:500 11px var(--fm);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.story h2{font:600 19px/1.25 var(--fd);letter-spacing:-.01em;margin-top:2px;text-wrap:balance}
+.story p{color:var(--ink2);margin-top:4px;max-width:78ch}
+.story-ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:99px;font:600 13px var(--fd);border:1px solid var(--line2);color:var(--ink);background:var(--panel)}
+.pill:hover{border-color:var(--ink3)}
+.pill.primary{background:var(--accent);color:#03141a;border-color:transparent}
+.pill.primary:hover{filter:brightness(1.08)}
+.pill.quiet{color:var(--ink3)}
+.linkline{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 14px;font:400 12px var(--fm);color:var(--ink3)}
+.linkline b{color:var(--ink2);font-weight:500}
+
+/* ---------- Palco ---------- */
+.stage{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:30px 30px;padding:28px 0 8px;max-width:1440px;margin:0 auto}
+.dev{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0;max-width:100%}
+.dev-cap{display:flex;align-items:center;gap:8px;font:500 11px var(--fm);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+.where{padding:2px 7px;border-radius:99px;border:1px solid;font-size:10px;letter-spacing:.08em}
+.where.ship{color:var(--accent);border-color:rgba(0,229,255,.4)}
+.where.earth{color:#c4b5fd;border-color:rgba(139,92,246,.5)}
+.watches{display:flex;flex-direction:column;gap:22px;align-items:center}
+.stage[data-view="relogio"] .watches{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:40px;zoom:1.2}
+.stage[data-view="celular"] .dev[data-dev="phone"]{zoom:1.1}
+.dev[data-dev="desktop"]{flex-basis:100%;max-width:1280px;align-items:stretch}
+.dev[data-dev="desktop"] .dev-cap{align-self:center}
+.dev.focus .frame{box-shadow:0 0 0 2px var(--accent),0 0 46px rgba(0,229,255,.28)}
+.frame{transition:box-shadow .3s}
+
+/* ---------- Relógios ---------- */
+.bezel-round{width:320px;height:320px;border-radius:50%;padding:16px;position:relative;
+  background:radial-gradient(circle at 30% 22%,#2b3448,#0e131d 62%);box-shadow:inset 0 0 0 1px #2e3850,0 24px 50px rgba(0,0,0,.65)}
+.bezel-sq{width:264px;height:320px;border-radius:72px;padding:14px;position:relative;
+  background:linear-gradient(160deg,#2b3448,#0e131d 70%);box-shadow:inset 0 0 0 1px #2e3850,0 24px 50px rgba(0,0,0,.65)}
+.crown{position:absolute;right:-9px;top:50%;width:13px;height:40px;transform:translateY(-50%);border-radius:5px;background:linear-gradient(90deg,#3a4560,#1d2433);box-shadow:inset 0 0 0 1px #46526f}
+.bezel-sq .crown{top:34%}
+.side-btn{position:absolute;right:-6px;top:58%;width:8px;height:46px;border-radius:4px;background:#232b3d}
+.ws{position:relative;overflow:hidden;background:#000;color:var(--ink);--sc:var(--ok)}
+.ws.round{width:288px;height:288px;border-radius:50%}
+.ws.sq{width:236px;height:292px;border-radius:58px}
+.ws.lv1{--sc:var(--warn)}.ws.lv2{--sc:var(--crit)}
+.ws.is-alert{background:radial-gradient(circle at 50% 42%,rgba(239,68,68,.34),#000 72%)}
+.ws.is-alert.lv1{background:radial-gradient(circle at 50% 42%,rgba(245,158,11,.22),#000 72%)}
+.ws-in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center}
+.round .ws-in{padding:30px 40px}
+.sq .ws-in{padding:18px 16px 14px}
+.w-ring{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.w-ring .trk{fill:none;stroke:#1a2233;stroke-width:4}
+.w-ring .prg{fill:none;stroke:var(--sc);stroke-width:4;stroke-linecap:round;filter:drop-shadow(0 0 4px var(--sc));transition:stroke-dasharray .6s}
+.w-top{display:flex;align-items:center;justify-content:center;gap:6px;font:600 13px var(--fd);font-variant-numeric:tabular-nums}
+.w-chip{display:inline-flex;align-items:center;gap:4px;font:500 10px var(--fm);padding:2px 6px;border-radius:99px;border:1px solid var(--line2);color:var(--ink2)}
+.w-chip.local{color:var(--warn);border-color:rgba(245,158,11,.55)}
+.astro{width:80px;height:93px;color:var(--sc);filter:drop-shadow(0 0 12px color-mix(in srgb,var(--sc) 45%,transparent));animation:float 4s ease-in-out infinite}
+.sq .astro{width:84px;height:98px}
+.astro.sm{width:54px;height:63px;animation:none}
+.astro .beat{animation:beat var(--beat,1s) ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes beat{0%,100%{opacity:1}50%{opacity:.35}}
+.w-state{font:700 15px var(--fd);letter-spacing:.08em;color:var(--sc)}
+.w-sub{font-size:11.5px;color:var(--ink2);line-height:1.35}
+.w-row{display:flex;gap:6px;justify-content:center}
+.w-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:99px;background:var(--surface);font:600 13px var(--fd);font-variant-numeric:tabular-nums}
+.w-pill small{font:500 10px var(--fb);color:var(--ink3)}
+.w-counts{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:100%}
+.w-counts span{display:flex;flex-direction:column;align-items:center;padding:5px 2px;border-radius:12px;background:var(--surface);font-size:9.5px;color:var(--ink3);border:1px solid var(--line)}
+.w-counts b{font:700 16px var(--fd)}
+.w-counts .c0 b{color:var(--ok)}.w-counts .c1 b{color:var(--warn)}.w-counts .c2 b{color:var(--crit)}
+.w-counts .on.c1{border-color:rgba(245,158,11,.5)}.w-counts .on.c2{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.12)}
+.w-dots{display:flex;gap:2px;justify-content:center}
+.dot{width:16px;height:16px;display:grid;place-items:center}
+.dot i{display:block;width:6px;height:6px;border-radius:3px;background:#3a475e;transition:width .15s}
+.dot[aria-current="true"] i{width:14px;background:var(--ink)}
+.w-tag{font:600 10.5px var(--fm);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.w-tag.crit{color:#fca5a5}.w-tag.warn{color:var(--warn)}.w-tag.water{color:#93c5fd}
+.w-text{font-size:13px;line-height:1.38;color:var(--ink)}
+.w-big{font:700 19px/1.15 var(--fd);color:#fff;text-wrap:balance}
+.w-btn{width:100%;padding:9px 12px;border-radius:99px;background:var(--accent);color:#03141a;font:600 13px var(--fd)}
+.w-btn.water{background:var(--water);color:#fff}
+.w-btn.ghost{background:var(--surface2);color:var(--ink)}
+.w-btn.sm{width:auto;padding:6px 14px;font-size:12px}
+.w-vits{display:flex;flex-direction:column;gap:5px;width:100%}
+.w-vit{display:grid;grid-template-columns:18px 1fr auto;align-items:center;gap:6px;padding:6px 10px;border-radius:12px;background:var(--surface);text-align:left;border:1px solid var(--line)}
+.w-vit .l{font-size:11.5px;color:var(--ink2)}
+.w-vit b{font:600 15px var(--fd);font-variant-numeric:tabular-nums}
+.w-vit b small{font:500 10px var(--fb);color:var(--ink3);margin-left:2px}
+.w-vit.b1{border-color:rgba(245,158,11,.5)}.w-vit.b2{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.1)}
+.w-mic{width:58px;height:58px;border-radius:50%;background:var(--accent);color:#03141a;display:grid;place-items:center;font-size:24px;box-shadow:0 0 22px rgba(0,229,255,.4)}
+.w-chips{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.w-chips button{font-size:11px;padding:5px 9px;border-radius:99px;background:var(--surface2);color:var(--ink)}
+.w-notice{position:absolute;left:50%;top:13%;transform:translateX(-50%);max-width:78%;padding:5px 11px;border-radius:99px;background:#1b2740;border:1px solid var(--line2);font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:drop .3s ease-out;z-index:2}
+.sq .w-notice{top:5%}
+@keyframes drop{from{opacity:0;transform:translate(-50%,-8px)}to{opacity:1;transform:translate(-50%,0)}}
+.w-breath{width:92px;height:92px;border-radius:50%;display:grid;place-items:center}
+.w-breath span{width:92px;height:92px;border-radius:50%;border:2px solid var(--accent);background:rgba(0,229,255,.12);animation:breath 10s ease-in-out infinite}
+@keyframes breath{0%{transform:scale(.55)}40%{transform:scale(1)}100%{transform:scale(.55)}}
+
+/* chat da Cosmo no relógio */
+.w-thread{width:100%;max-height:112px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;text-align:left;scrollbar-width:none;-webkit-mask-image:linear-gradient(to bottom,transparent,#000 14px);mask-image:linear-gradient(to bottom,transparent,#000 14px);padding-top:10px}
+.w-thread::-webkit-scrollbar{display:none}
+.sq .w-thread{max-height:150px}
+.wb{font-size:11.5px;line-height:1.33;padding:6px 9px;border-radius:12px;max-width:94%}
+.wb.cosmo{background:var(--surface2);align-self:flex-start;border-bottom-left-radius:4px}
+.wb.me{background:rgba(0,229,255,.16);color:#cffafe;align-self:flex-end;border-bottom-right-radius:4px}
+.wb .acts{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}
+.wb .acts button{font:600 10.5px var(--fd);padding:3px 8px;border-radius:99px;background:var(--accent);color:#03141a}
+.wb .acts button.water{background:var(--water);color:#fff}
+.wb.typing{display:flex;gap:3px;padding:8px 10px}
+.wb.typing i{width:5px;height:5px;border-radius:50%;background:var(--ink2);animation:typing 1s infinite}
+.wb.typing i:nth-child(2){animation-delay:.15s}.wb.typing i:nth-child(3){animation-delay:.3s}
+@keyframes typing{0%,100%{opacity:.3}50%{opacity:1}}
+.w-chat-in{display:flex;gap:4px;align-items:center;justify-content:center;flex-wrap:wrap}
+.w-chat-in .mic{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#03141a;display:grid;place-items:center;font-size:13px;flex:none}
+.round .w-chips button{font-size:10.5px;padding:4px 8px}
+/* jogo da estufa no relógio */
+.plant{width:46px;height:46px;color:var(--ok);filter:drop-shadow(0 0 8px rgba(16,185,129,.5))}
+.w-quests{display:flex;flex-direction:column;gap:3px;width:100%}
+.w-q{display:grid;grid-template-columns:14px 1fr auto;gap:6px;align-items:center;padding:5px 8px;border-radius:10px;background:var(--surface);border:1px solid var(--line);text-align:left;font-size:11px;width:100%}
+.w-q small{font:500 9.5px var(--fm);color:var(--ink3)}
+.w-q.done{opacity:.75}.w-q.done small{color:var(--ok)}
+button.w-q:hover{border-color:var(--line2)}
+.w-xp{font:600 11px var(--fd);color:var(--ink2)}
+.w-xp b{color:var(--ok)}
+.w-tag.ok{color:var(--ok)}
+/* elo com a família no relógio */
+.w-chal{width:100%;text-align:left}
+.w-chal-t{display:flex;justify-content:space-between;gap:6px;font-size:11px;color:var(--ink2)}
+.w-chal-t b{font:600 11.5px var(--fd);color:var(--ink);font-variant-numeric:tabular-nums}
+.w-chal .bar-t{height:5px;margin-top:4px}
+.w-chal .bar-t i{background:linear-gradient(90deg,var(--water),var(--accent))}
+.w-fam{display:flex;flex-direction:column;gap:3px;width:100%}
+.w-fm{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:6px;align-items:center;padding:4px 8px;border-radius:10px;background:var(--surface);border:1px solid var(--line);font-size:11px;text-align:left}
+.w-fm .av{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:600 9px var(--fd);background:rgba(139,92,246,.28);color:#ddd6fe}
+.w-fm .tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.w-fm b{font:600 10.5px var(--fd);color:var(--accent)}
+.w-btn.sm2{padding:7px 10px;font-size:12px}
+/* sincronia no relógio */
+.w-qbar{display:flex;gap:2px;width:100%;height:6px;border-radius:4px;overflow:hidden;background:#1b2437}
+.w-qbar i{display:block;height:100%}
+.w-qbar .p1{background:var(--crit)}.w-qbar .p2{background:var(--accent)}.w-qbar .p3{background:var(--water)}.w-qbar .p4{background:var(--ok)}
+.w-pks{display:flex;flex-direction:column;gap:3px;width:100%}
+.w-pk{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center;padding:4px 8px;border-radius:9px;background:var(--surface);border-left:3px solid var(--accent);font-size:10.5px;text-align:left}
+.w-pk .tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.w-pk small{font:500 9.5px var(--fm);color:var(--ink3);white-space:nowrap}
+.w-pk.p1{border-left-color:var(--crit)}.w-pk.p3{border-left-color:var(--water)}.w-pk.p4{border-left-color:var(--ok)}
+.w-pk.q small{color:var(--warn)}
+.w-pk.ok{border-left-color:var(--ok);grid-template-columns:14px minmax(0,1fr) auto}
+.w-delay{font:700 20px/1.1 var(--fd);font-variant-numeric:tabular-nums;color:#fff}
+.w-btn.crit{background:var(--crit);color:#fff}
+.w-btn.warn{background:var(--warn);color:#1a1205}
+/* eventos */
+.ws.evt-solar{background:radial-gradient(circle at 50% 40%,rgba(245,158,11,.24),#000 72%)}
+.ws.evt-loose{background:radial-gradient(circle at 50% 40%,rgba(245,158,11,.14),#000 72%)}
+.ws.evt-mood,.ws.evt-sleep{background:radial-gradient(circle at 50% 40%,rgba(139,92,246,.22),#000 72%)}
+.ws.evt-eva{background:radial-gradient(circle at 50% 40%,rgba(0,229,255,.14),#000 72%)}
+.kv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:8px}
+.kv div{display:flex;flex-direction:column;padding:6px 8px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid var(--line);font-size:10.5px;color:var(--ink3);min-width:0}
+.kv b{font:600 13px var(--fd);color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.strip{display:flex;flex-wrap:wrap;gap:6px}
+.strip span{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 9px;border-radius:99px;background:var(--surface);border:1px solid var(--line);color:var(--ink2)}
+.seg button.ev-btn[aria-pressed="true"]{background:rgba(139,92,246,.18);color:#ddd6fe;box-shadow:inset 0 0 0 1px rgba(139,92,246,.55)}
+@container (max-width:540px){.kv{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* copiloto (tablet e Houston) */
+.cop{display:flex;flex-direction:column;gap:8px}
+.cop-chips{display:flex;flex-wrap:wrap;gap:6px}
+.cop-chips button{font-size:11.5px;padding:6px 10px;border-radius:99px;background:var(--surface2);border:1px solid var(--line2);color:var(--ink)}
+.cop-chips button:hover{border-color:var(--accent)}
+.cop-chips button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.cop-a{font-size:12px;line-height:1.45;color:var(--ink);padding:10px 12px;border-radius:12px;background:linear-gradient(140deg,rgba(0,229,255,.08),var(--surface) 70%);border:1px solid rgba(0,229,255,.3)}
+.cop-a b{display:flex;align-items:center;gap:6px;font:600 10.5px var(--fm);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.explain{margin-top:8px;font-size:11.5px;color:var(--ink2);padding:8px 10px;border-radius:10px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.25)}
+.linkbtn{font-size:11.5px;color:var(--accent);text-decoration:underline;text-underline-offset:2px;margin-top:6px}
+
+/* ---------- Celular ---------- */
+.bezel-phone{width:340px;height:700px;border-radius:52px;padding:10px;background:linear-gradient(160deg,#252e42,#0d121c 70%);box-shadow:inset 0 0 0 1px #2e3850,0 24px 60px rgba(0,0,0,.6);max-width:100%}
+.ps{height:100%;border-radius:42px;background:#05070e;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.island{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:96px;height:27px;border-radius:20px;background:#000;z-index:3}
+.ps-status{display:flex;justify-content:space-between;align-items:center;padding:13px 28px 4px;font:600 13px var(--fd);font-variant-numeric:tabular-nums}
+.ps-status .ic{font-size:14px}
+.ps-head{display:flex;align-items:center;gap:10px;padding:12px 18px 10px}
+.app-logo{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(139,92,246,.35),rgba(0,229,255,.25));color:#fff;font-size:18px}
+.ps-head b{display:block;font:600 16px/1.1 var(--fd)}
+.ps-head small{font-size:11.5px;color:var(--ink3)}
+.ps-body{flex:1;overflow-y:auto;padding:4px 16px 16px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin}
+.ps-tabs{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);padding:8px 8px 20px;background:#070a13}
+.ps-tabs button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--ink3);padding:4px}
+.ps-tabs button .ic{font-size:19px}
+.ps-tabs button[aria-current="true"]{color:var(--accent)}
+.pc{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px}
+.pc h4{font:600 15px/1.25 var(--fd)}
+.pc p{font-size:12.5px;color:var(--ink2);margin-top:4px}
+.eyebrow{font:500 10px var(--fm);letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+.hero{display:flex;gap:12px;align-items:center}
+.hero.ok{border-color:rgba(16,185,129,.35);background:linear-gradient(140deg,rgba(16,185,129,.12),var(--surface) 60%)}
+.hero.ok .astro{color:var(--ok)}
+.hero.med{border-color:rgba(139,92,246,.45);background:linear-gradient(140deg,rgba(139,92,246,.16),var(--surface) 60%);align-items:flex-start}
+.hero.dark{border-color:rgba(245,158,11,.4);background:linear-gradient(140deg,rgba(245,158,11,.1),var(--surface) 60%);align-items:flex-start}
+.hero-ic{font-size:26px;flex:none;margin-top:2px}
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mini{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.mini .ic{font-size:16px}
+.mini b{display:block;font:600 14px var(--fd);margin-top:4px}
+.mini > span{font-size:11px;color:var(--ink3)}
+.feed{display:flex;flex-direction:column;gap:6px}
+.feed-i{display:flex;gap:8px;font-size:12.5px;color:var(--ink2);align-items:flex-start}
+.feed-i .ic{color:var(--accent);margin-top:2px}
+.bar-t{height:7px;border-radius:9px;background:#1b2437;overflow:hidden;margin-top:8px}
+.bar-t i{display:block;height:100%;border-radius:9px;background:var(--ok);transition:width .6s}
+.habit{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-top:1px solid var(--line);font-size:12.5px}
+.habit:first-of-type{border-top:0}
+.habit b{color:var(--accent);font-weight:600;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;border-radius:12px;font:600 13px var(--fd);background:var(--accent);color:#03141a;width:100%;margin-top:10px}
+.btn.water{background:var(--water);color:#fff}
+.btn.ghost{background:var(--surface2);color:var(--ink);border:1px solid var(--line2)}
+.btn.crit{background:var(--crit);color:#fff}
+.btn.ok{background:var(--ok);color:#022c1f}
+.status-line{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2);margin-top:8px}
+.thread{display:flex;flex-direction:column;gap:8px}
+.bub{max-width:86%;padding:9px 12px;border-radius:16px;font-size:12.5px;line-height:1.38}
+.bub.me{align-self:flex-end;background:#1e2a4a;border-bottom-right-radius:5px}
+.bub.her{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:5px}
+.bub small{display:block;margin-top:4px;font:500 10.5px var(--fm);color:var(--ink3)}
+.bub small.q{color:var(--warn)}
+.celebrate{border-color:rgba(16,185,129,.5);background:linear-gradient(140deg,rgba(16,185,129,.18),var(--surface));text-align:center}
+
+/* ---------- Tablet ---------- */
+.dev[data-dev="tablet"]{width:min(640px,100%)}
+.bezel-tab{width:100%;border-radius:30px;padding:13px;background:linear-gradient(160deg,#252e42,#0d121c 70%);box-shadow:inset 0 0 0 1px #2e3850,0 24px 60px rgba(0,0,0,.6)}
+.ts{border-radius:18px;background:#05070e;overflow:hidden;container-type:inline-size}
+.ts-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 12px;padding:11px 14px;border-bottom:1px solid var(--line)}
+.ts-head b{font:600 14px var(--fd)}
+.ts-head small{display:block;font-size:11px;color:var(--ink3)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;font:500 10.5px var(--fm);padding:3px 8px;border-radius:99px;border:1px solid var(--line2);color:var(--ink2);white-space:nowrap}
+.chip.warn{color:var(--warn);border-color:rgba(245,158,11,.5)}
+.chip.crit{color:#fca5a5;border-color:rgba(239,68,68,.55)}
+.chip.ok{color:#6ee7b7;border-color:rgba(16,185,129,.45)}
+.ts-body{display:grid;grid-template-columns:150px minmax(0,1fr);min-height:400px}
+.crew{border-right:1px solid var(--line);padding:10px 8px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.crew-i{display:grid;grid-template-columns:10px 1fr;gap:2px 8px;align-items:center;padding:7px 8px;border-radius:10px;font-size:12px}
+.crew-i{width:100%;text-align:left;color:var(--ink);transition:background .15s}
+button.crew-i:hover{background:var(--surface)}
+.crew-i.sel,button.crew-i.sel:hover{background:var(--surface2);box-shadow:inset 0 0 0 1px var(--line2)}
+.crew-i i{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.crew-i i.l1{background:var(--warn)}.crew-i i.l2{background:var(--crit);box-shadow:0 0 0 3px rgba(239,68,68,.25)}
+.crew-i span{font-weight:600}
+.crew-i small{grid-column:2;font-size:10.5px;color:var(--ink3)}
+.ts-main{padding:12px 14px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.pt-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.pt-head b{font:600 15px var(--fd)}
+.state-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font:600 11px var(--fd);letter-spacing:.04em}
+.state-pill.l0{background:rgba(16,185,129,.14);color:#6ee7b7}
+.state-pill.l1{background:rgba(245,158,11,.14);color:#fcd34d}
+.state-pill.l2{background:rgba(239,68,68,.18);color:#fca5a5}
+.ecg{display:block;width:100%;height:70px;border-radius:10px;background:#020409;border:1px solid var(--line)}
+.ecg-wrap{position:relative}
+.ecg-over{position:absolute;inset:0;display:grid;place-items:center;font:500 12px var(--fm);color:var(--warn);background:rgba(2,4,9,.55);border-radius:10px}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px;min-width:0}
+.tile .l{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--ink3)}
+.tile .v{font:600 18px/1.2 var(--fd);font-variant-numeric:tabular-nums;margin-top:2px;overflow-wrap:anywhere}
+.tile .v span{white-space:nowrap}
+.tile .v small{font:500 10.5px var(--fb);color:var(--ink3);margin-left:3px}
+.tile .src{font:400 9.5px var(--fm);color:var(--ink3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile.b1{border-color:rgba(245,158,11,.5)}.tile.b1 .v{color:#fcd34d}
+.tile.b2{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.08)}.tile.b2 .v{color:#fca5a5}
+.dec{border-radius:14px;padding:12px 14px;border:1px solid var(--line);background:var(--surface)}
+.dec.crit{border-color:rgba(239,68,68,.6);background:linear-gradient(140deg,rgba(239,68,68,.13),var(--surface) 70%)}
+.dec.prog{border-color:rgba(0,229,255,.4)}
+.dec.dark{border-color:rgba(245,158,11,.45)}
+.dec h5{margin:0;font:600 13.5px var(--fd)}
+.dec p{font-size:12px;color:var(--ink2);margin-top:3px}
+.dec ol,.dec ul{margin:8px 0 0;padding-left:18px;font-size:12.5px;display:flex;flex-direction:column;gap:3px}
+.dec ul.check{list-style:none;padding:0}
+.dec ul.check li{display:flex;gap:6px;align-items:flex-start}
+.dec-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.dec-actions .btn{width:auto;flex:1;margin:0;min-width:140px}
+.pulse{animation:pulseBtn 1.6s ease-in-out infinite}
+@keyframes pulseBtn{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}50%{box-shadow:0 0 0 8px rgba(239,68,68,0)}}
+.reply{margin-top:10px;padding:9px 11px;border-radius:10px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.4);font-size:12px}
+.reply b{font:600 11px var(--fm);letter-spacing:.06em;text-transform:uppercase;color:#c4b5fd;display:block;margin-bottom:2px}
+@container (max-width:540px){
+  .ts-body{grid-template-columns:minmax(0,1fr)}
+  .crew{border-right:0;border-bottom:1px solid var(--line);flex-direction:row;overflow-x:auto}
+  .crew-i{min-width:118px}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* ---------- Desktop Houston ---------- */
+.mon{border-radius:16px;border:1px solid var(--line2);background:#03050a;overflow:hidden;container-type:inline-size;box-shadow:0 30px 70px rgba(0,0,0,.55)}
+.mon-chrome{display:flex;align-items:center;gap:6px;padding:8px 12px;background:#0b1120;border-bottom:1px solid var(--line);font:400 11.5px var(--fm);color:var(--ink3);white-space:nowrap;overflow:hidden}
+.mon-chrome i{width:10px;height:10px;border-radius:50%;background:#2a3346;flex:none}
+.mon-chrome span{margin-left:8px;overflow:hidden;text-overflow:ellipsis}
+.ds-head{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}
+.ds-head h3{font:600 18px var(--fd);letter-spacing:-.01em}
+.ds-head .sub{font-size:12px;color:var(--ink3)}
+.ds-link{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--ink2)}
+.ds-link b{font:600 14px var(--fd);color:var(--ink)}
+.ds-clock{font:600 22px var(--fd);font-variant-numeric:tabular-nums;text-align:right}
+.ds-clock small{display:block;font:500 10px var(--fm);color:var(--ink3);letter-spacing:.08em;text-transform:uppercase}
+.ds-banner{display:flex;align-items:center;gap:8px;padding:9px 18px;font-size:12.5px;border-bottom:1px solid var(--line)}
+.ds-banner.past{background:rgba(0,229,255,.06);color:#a5f3fc}
+.ds-banner.live{background:rgba(16,185,129,.06);color:#a7f3d0}
+.ds-banner.nosig{background:rgba(245,158,11,.09);color:#fde68a}
+.ds-banner.alert{background:rgba(239,68,68,.14);color:#fecaca}
+.ds-grid{display:grid;grid-template-columns:230px minmax(0,1fr) 320px}
+.ds-col{padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.ds-col+.ds-col{border-left:1px solid var(--line)}
+.ds-h{font:500 10.5px var(--fm);letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+.ds-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.ds .ecg{height:104px}
+.spark{display:block;width:100%;height:64px}
+.spark .area{fill:rgba(239,68,68,.12)}
+.spark .ln{fill:none;stroke:var(--crit);stroke-width:1.6}
+.spark .gl{stroke:rgba(148,163,184,.12);stroke-width:1}
+.spark text{fill:var(--ink3);font:400 9px var(--fm)}
+.auto{font-size:12px;color:var(--ink2);padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
+.auto b{display:block;font:600 13px var(--fd);color:var(--ink);margin-bottom:2px}
+.audit{display:flex;flex-direction:column;gap:6px;list-style:none;margin:0;padding:0}
+.audit li{padding:8px 10px;border-radius:10px;background:var(--surface);border:1px solid var(--line);font-size:12px}
+.audit li.p1{border-color:rgba(239,68,68,.45)}
+.audit time{display:block;font:400 10.5px var(--fm);color:var(--ink3);margin-bottom:2px}
+.empty{font-size:12px;color:var(--ink3);padding:10px 12px;border:1px dashed var(--line2);border-radius:10px}
+@container (max-width:980px){
+  .ds-grid{grid-template-columns:1fr 1fr}
+  .ds-col.main{grid-column:1/-1;order:-1;border-left:0;border-bottom:1px solid var(--line)}
+}
+@container (max-width:620px){
+  .ds-grid{grid-template-columns:1fr}
+  .ds-col+.ds-col{border-left:0;border-top:1px solid var(--line)}
+  .ds-clock{text-align:left}
+}
+
+/* ---------- Linha do tempo ---------- */
+.tl{max-width:1280px;margin:26px auto 0;border-top:1px solid var(--line);padding-top:18px}
+.tl-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 16px}
+.tl-head h3{font:600 16px var(--fd)}
+.tl-head p{font-size:12.5px;color:var(--ink3)}
+.transit{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-top:12px}
+.tr{padding:9px 11px;border-radius:12px;border:1px solid var(--line);background:var(--panel);font-size:12px;min-width:0}
+.tr .dir{font:500 10.5px var(--fm);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.tr .dir.down{color:#c4b5fd}
+.tr .lab{margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tr .eta{font:400 10.5px var(--fm);color:var(--ink3);margin-top:3px}
+.tr .bar-t{height:4px;margin-top:6px}
+.tr .bar-t i{background:var(--accent);transition:none}
+.tr .bar-t i.down{background:var(--sleep)}
+.tr.q{border-color:rgba(245,158,11,.45)}.tr.q .eta{color:var(--warn)}
+.tl-list{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column}
+.tl-list li{display:grid;grid-template-columns:76px 210px minmax(0,1fr);gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:12.5px;align-items:baseline}
+.tl-list time{font:400 11.5px var(--fm);color:var(--ink3);font-variant-numeric:tabular-nums}
+.tl-list .who{display:flex;flex-direction:column;gap:1px;min-width:0}
+.tl-list .who b{font:600 12.5px var(--fd);display:flex;align-items:center;gap:6px}
+.tl-list .who b::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+.tl-list li.s1 .who b::before{background:var(--warn)}
+.tl-list li.s2 .who b::before{background:var(--crit)}
+.tl-list .who small{font:400 10.5px var(--fm);color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tl-list li span{color:var(--ink2)}
+.foot{max-width:1280px;margin:18px auto 0;font-size:11.5px;color:var(--ink3)}
+@media (max-width:640px){
+  .story{grid-template-columns:1fr}
+  .story-ctl{justify-content:flex-start}
+  .tl-list li{grid-template-columns:1fr;gap:2px}
+  .stage{gap:26px}
+  .stage[data-view="relogio"] .watches{zoom:1}
+  .stage[data-view="celular"] .dev[data-dev="phone"]{zoom:1}
+}
+@media (max-width:380px){
+  .bezel-round{zoom:.9}.bezel-sq{zoom:.9}.bezel-phone{zoom:.92}
+}
+@media (prefers-reduced-motion:reduce){
+  .astro,.astro .beat,.w-breath span,.pulse,.w-notice{animation:none!important}
+}
+</style>
+
+<header class="bar" role="banner">
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="62 20" transform="rotate(-60 16 16)"/><path d="M8 17h4l2-5 4 10 2-5h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div><b>AstroHealth OS</b><small>Demo navegável · dados simulados</small></div>
+  </div>
+  <div class="grp"><span class="grp-l" id="lbl-mis">Perfil de missão</span><div class="seg" role="group" aria-labelledby="lbl-mis" id="seg-mission"></div></div>
+  <div class="grp"><span class="grp-l" id="lbl-sc">Cenário</span><div class="seg" role="group" aria-labelledby="lbl-sc" id="seg-scenario"></div></div>
+  <div class="grp"><span class="grp-l" id="lbl-evt">Injetar evento</span><div class="seg" role="group" aria-labelledby="lbl-evt" id="seg-event"></div></div>
+  <div class="grp"><span class="grp-l" id="lbl-view">Dispositivo</span><div class="seg" role="group" aria-labelledby="lbl-view" id="seg-view"></div></div>
+</header>
+
+<section class="story" aria-live="polite" id="story"></section>
+
+<main class="stage" id="stage" data-view="ecossistema">
+  <div class="watches" id="watches">
+    <div class="dev" data-dev="watch-round">
+      <div class="dev-cap"><span class="where ship">A bordo</span>Relógio circular · 45 mm</div>
+      <div class="bezel-round frame"><button class="crown" data-act="w-next" aria-label="Coroa: próxima tela do relógio"></button><div data-render="watch-round"></div></div>
+    </div>
+    <div class="dev" data-dev="watch-sq">
+      <div class="dev-cap"><span class="where ship">A bordo</span>Relógio squircle · 46 mm</div>
+      <div class="bezel-sq frame"><button class="crown" data-act="w-next" aria-label="Coroa: próxima tela do relógio"></button><span class="side-btn"></span><div data-render="watch-sq"></div></div>
+    </div>
+  </div>
+  <div class="dev" data-dev="tablet">
+    <div class="dev-cap"><span class="where ship">A bordo</span>Painel de bordo · oficial médico</div>
+    <div class="bezel-tab frame"><div data-render="tablet"></div></div>
+  </div>
+  <div class="dev" data-dev="phone">
+    <div class="dev-cap"><span class="where earth">Na Terra</span>Celular da família</div>
+    <div class="bezel-phone frame"><div class="ps"><div class="island"></div><div data-render="phone" style="display:contents"></div></div></div>
+  </div>
+  <div class="dev" data-dev="desktop">
+    <div class="dev-cap"><span class="where earth">Na Terra</span>Console do flight surgeon · Houston</div>
+    <div class="mon frame ds"><div class="mon-chrome"><i></i><i></i><i></i><span>AstroHealth · Console do Flight Surgeon · Mission Control, Houston</span></div><div data-render="desktop"></div></div>
+  </div>
+</main>
+
+<section class="tl" id="tl"></section>
+<p class="foot">Todos os dados são simulados para demonstração. Sensores indicados em cada métrica mostram de onde o dado viria num sistema real.</p>
+
+<script>
+(function(){
+"use strict";
+/* ================= Dados de referência ================= */
+const MIS = {
+  leo:{label:'ISS · órbita baixa', chip:'LEO', where:'Estação Espacial Internacional', dist:'a 408 km de altitude', link:'TDRS', linkFull:'Satélites TDRS', oneWay:0.6, oneWayTxt:'< 1 s',
+       autonomy:'Houston acompanha em tempo real e pode decidir junto com a tripulação.',
+       bo:{why:'Perda de sinal entre satélites TDRS', back:'~10 min'}},
+  gateway:{label:'Gateway · órbita lunar', chip:'Lua', where:'Estação Gateway, em órbita da Lua', dist:'a ~384 mil km da Terra', link:'DSN', linkFull:'Deep Space Network', oneWay:1.3, oneWayTxt:'1,3 s',
+       autonomy:'Houston responde em segundos; a Cosmo cobre as pausas de antena.',
+       bo:{why:'Antenas da DSN alocadas a outra missão', back:'~45 min'}},
+  mars:{label:'Trânsito para Marte', chip:'Rumo a Marte', where:'Nave em trânsito Terra–Marte', dist:'a ~150 milhões de km', link:'DSN', linkFull:'Deep Space Network', oneWay:500, oneWayTxt:'8 min 20 s',
+       autonomy:'Decisões médicas acontecem a bordo: Cosmo recomenda, o oficial médico confirma, Houston revisa depois.',
+       bo:{why:'Conjunção solar: o Sol está entre a Terra e a nave', back:'~14 dias'}},
+  marsSurf:{label:'Superfície de Marte', chip:'Marte', where:'Habitat na superfície de Marte', dist:'a ~225 milhões de km', link:'Relay + DSN', linkFull:'Orbitador de relay + Deep Space Network', oneWay:750, oneWayTxt:'12 min 30 s',
+       autonomy:'Decisões médicas acontecem a bordo: Cosmo recomenda, o oficial médico confirma, Houston revisa depois.',
+       bo:{why:'Orbitador de relay abaixo do horizonte', back:'~40 min'}}
+};
+const MIS_ORDER = ['leo','gateway','mars','marsSurf'];
+const CREW_BASE={
+  marcus:{hr:64,spo2:98,hrv:71,stress:30,temp:36.6,bpSys:122,bpDia:80,rr:13,water:1900,waterGoal:2600,sleep:425,actTxt:'30 min'},
+  elena:{hr:78,spo2:97,hrv:46,stress:48,temp:36.9,bpSys:114,bpDia:72,rr:15,water:1250,waterGoal:2400,sleep:370,actTxt:'Pendente'},
+  kenji:{hr:58,spo2:98,hrv:82,stress:24,temp:36.5,bpSys:126,bpDia:82,rr:12,water:2100,waterGoal:2500,sleep:450,actTxt:'60 min'}
+};
+const SCEN = [['normal','Normal'],['emergency','Emergência'],['blackout','Blackout']];
+const VIEWS = [['ecossistema','Ecossistema'],['relogio','Relógio'],['celular','Celular'],['tablet','Painel de bordo'],['desktop','Desktop']];
+const LV = ['Ótimo','Atenção','Crítico'];
+
+const STORY = [
+  {mission:'leo', scenario:'normal', focus:['watch-round','watch-sq'], title:'Um dia normal na ISS',
+   text:'O relógio resume o corpo da Sarah em um avatar e três estados: ótimo, atenção e crítico. Gire a coroa para ver o insight, o chat com a Cosmo, as missões da estufa, o elo com a família e a sincronia. Na órbita baixa, Houston vê tudo quase em tempo real.'},
+  {mission:'mars', scenario:'normal', focus:['desktop','phone'], title:'O mesmo sistema, rumo a Marte',
+   text:'Agora o sinal leva 8 min 20 s para chegar. O console de Houston avisa que está vendo o passado, e a família recebe as notícias com o mesmo atraso. Beba 250 ml no relógio e acompanhe o pacote na tela de sincronia.'},
+  {event:'loose', focus:['watch-round','watch-sq','tablet'], title:'Leitura estranha? A IA pergunta antes',
+   text:'O oxímetro marca 84% com sinal fraco. Em vez de disparar alarme, a Cosmo pergunta à Sarah se o relógio está folgado. Se ninguém responder em 20 s, ela passa o caso para o oficial médico. Aqui quem decide é o próprio astronauta.'},
+  {scenario:'emergency', focus:['watch-round','watch-sq','tablet'], title:'Arritmia durante o treino',
+   text:'A Cosmo detecta frequência alta e irregular e queda de SpO₂ no pulso. Ela orienta a Sarah na hora e manda um protocolo para o painel de bordo do oficial médico pela rede local da nave.'},
+  {focus:['tablet','desktop'], title:'A IA recomenda, um humano confirma',
+   text:'Confirme o protocolo no painel de bordo do Dr. Marcus. Depois, libere o antiarrítmico em um passo separado: medicação nunca é automática. Houston recebe tudo minutos depois e revisa a decisão.'},
+  {scenario:'normal', event:'solar', focus:['watch-round','watch-sq','tablet'], title:'Tempestade solar: a comandante decide',
+   text:'O dosímetro detecta o pico antes do aviso da Terra. A Cosmo acende a rota até o abrigo, uma ação reversível, e pergunta à Sarah, que é a comandante. O painel de bordo mostra a dose de cada um; Houston e a família só ficam sabendo minutos depois.'},
+  {event:'eva', focus:['watch-round','watch-sq','tablet'], title:'Quem vai na EVA?',
+   text:'O check de prontidão mostra a Elena com 64%: sono curto e reação mais lenta. A Cosmo não tira ninguém da escala; ela leva os dados para a comandante decidir no relógio.'},
+  {event:'headache', focus:['tablet','watch-round','watch-sq'], title:'Dor de cabeça: o ar ou os olhos?',
+   text:'A Cosmo cruza a queixa da Sarah com o CO₂ da cabine e com os sintomas dos outros tripulantes. No painel de bordo, o Dr. Marcus pede o ajuste do ar à Elena e aprova o ultrassom ocular guiado; as imagens seguem para laudo em Houston.'},
+  {event:'mood', focus:['watch-round','watch-sq','tablet'], title:'Saúde mental com consentimento',
+   text:'A Cosmo percebe sono mais curto e voz mais baixa. Ela fala só com a Sarah, que decide se conta ao Dr. Marcus. Sem consentimento, nada sai do relógio.'},
+  {event:'sleep', focus:['watch-round','watch-sq'], title:'Hora de dormir: a IA age e deixa vetar',
+   text:'Ajustar a luz da cabine é reversível, então a Cosmo agenda o modo noite sozinha e dá 15 s para a Sarah vetar. Depois de aplicado, ainda dá para desfazer.'},
+  {scenario:'blackout', focus:['tablet','phone'], title:'Sem sinal com a Terra',
+   text:'Na conjunção solar o contato some por dias. A bordo tudo continua funcionando com a IA local, e os dados entram numa fila por prioridade. A família recebe uma explicação, não um susto.'},
+  {scenario:'normal', focus:['phone','desktop','watch-round','watch-sq'], title:'O sinal volta',
+   text:'A fila descarrega para Houston com o ECG primeiro, e o copiloto da Cosmo resume o período. No celular, a Ana propõe um brinde hídrico e o Lucas registra uma corrida; as duas coisas chegam ao Elo Terra do relógio.'}
+];
+
+const METRICS = [
+  {k:'hr', name:'Frequência cardíaca', short:'FC', unit:'bpm', ic:'heart', icc:'c-crit', src:'Relógio · PPG + ECG', band:v=> v.hr>150||v.hr<40?2: v.hr>110||v.hr<50?1:0},
+  {k:'spo2', name:'Saturação de O₂', short:'SpO₂', unit:'%', ic:'o2', icc:'c-acc', src:'Relógio · oxímetro', band:v=> v.spo2<90?2: v.spo2<95?1:0},
+  {k:'bp', name:'Pressão arterial', short:'PA', unit:'mmHg', ic:'gauge', icc:'c-acc', src:'Manguito do kit médico', band:v=> v.bpSys>=160?2: v.bpSys>=135?1:0},
+  {k:'rr', name:'Respiração', short:'Resp.', unit:'irpm', ic:'wind', icc:'c-acc', src:'Patch torácico', band:v=> v.rr>28?2: v.rr>20?1:0},
+  {k:'hrv', name:'Variabilidade cardíaca', short:'HRV', unit:'ms', ic:'wave', icc:'c-acc', src:'Relógio · PPG', band:v=> v.hrv<20?2: v.hrv<40?1:0},
+  {k:'stress', name:'Estresse', short:'Estresse', unit:'/100', ic:'brain', icc:'c-warn', src:'Cosmo · HRV + sono', band:v=> v.stress>=75?2: v.stress>=40?1:0},
+  {k:'water', name:'Hidratação', short:'Água', unit:'ml', ic:'drop', icc:'c-water', src:'Registro + estimativa', band:v=>{const p=v.water/v.waterGoal; return p<.4?2: p<.7?1:0}},
+  {k:'sleep', name:'Sono', short:'Sono', unit:'', ic:'moon', icc:'c-sleep', src:'Relógio · actigrafia', band:v=> v.sleep<300?2: v.sleep<390?1:0},
+  {k:'temp', name:'Temperatura', short:'Temp.', unit:'°C', ic:'thermo', icc:'c-acc', src:'Relógio · pele', band:v=> v.temp>38.5?2: v.temp>37.5?1:0},
+  {k:'act', name:'Atividade', short:'Atividade', unit:'', ic:'bolt', icc:'c-ok', src:'Relógio · acelerômetro', band:()=>0}
+];
+const MK = Object.fromEntries(METRICS.map(m=>[m.k,m]));
+
+const FMT = {
+  hr:v=>Math.round(v.hr), spo2:v=>Math.round(v.spo2), hrv:v=>Math.round(v.hrv), stress:v=>Math.round(v.stress),
+  temp:v=>v.temp.toFixed(1).replace('.',','), bp:v=>Math.round(v.bpSys)+'/'+Math.round(v.bpDia), rr:v=>Math.round(v.rr),
+  water:v=>Math.round(v.water).toLocaleString('pt-BR'), waterPct:v=>Math.round(v.water/v.waterGoal*100),
+  sleep:v=>Math.floor(v.sleep/60)+'h'+String(v.sleep%60).padStart(2,'0'), act:v=> v.actTxt||'45 min', homeo:v=>assess(v).homeo
+};
+
+/* ================= Ícones ================= */
+const P = {
+  heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  drop:'<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
+  o2:'<circle cx="9" cy="12" r="5"/><path d="M16 15.5c0-1 2.5-1.6 2.5-3a1.3 1.3 0 0 0-2.5-.3M16 19h3"/>',
+  wind:'<path d="M3 9h11a3 3 0 1 0-3-3M3 15h14a3 3 0 1 1-3 3"/>',
+  moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+  wave:'<path d="M3 12h4l2-5 4 10 2-5h6"/>',
+  mic:'<path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  sig:'<path d="M5 18v-2M10 18v-5M15 18v-8M20 18V7"/>',
+  nosig:'<path d="M5 18v-2M10 18v-5M15 18v-3M3 4l17 17"/>',
+  alert:'<path d="M12 3l9.5 16.5h-19z"/><path d="M12 10v4M12 17h.01"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7"/>',
+  leaf:'<path d="M5 19c0-8 6-14 14-14 0 8-6 14-14 14zM5 19l7-7"/>',
+  send:'<path d="M4 12l16-8-6 16-3-7z"/>',
+  thermo:'<path d="M10 14V5a2 2 0 0 1 4 0v9a4 4 0 1 1-4 0z"/>',
+  gauge:'<path d="M4 17a8 8 0 1 1 16 0M12 17l4-5"/>',
+  brain:'<path d="M12 5a3.5 3.5 0 0 0-6.4 2A3 3 0 0 0 5 12.5 3 3 0 0 0 8 18h4zM12 5a3.5 3.5 0 0 1 6.4 2 3 3 0 0 1 .6 5.5A3 3 0 0 1 16 18h-4zM12 5v13"/>',
+  bolt:'<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>',
+  shield:'<path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  msg:'<path d="M4 5h16v11H9l-5 4z"/>',
+  home:'<path d="M4 11l8-7 8 7v9H4z"/>',
+  orbit:'<circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-25 12 12)"/>',
+  mesh:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.3 10.8l7.4-3.6M8.3 13.2l7.4 3.6"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  play:'<path d="M7 5l12 7-12 7z"/>',
+  back:'<path d="M15 6l-6 6 6 6"/>',
+  next:'<path d="M9 6l6 6-6 6"/>',
+  reset:'<path d="M4 12a8 8 0 1 0 2.5-5.8M4 4v4h4"/>',
+  radiation:'<circle cx="12" cy="12" r="1.8"/><path d="M12 9.5V3a9 9 0 0 1 7.8 4.5l-5.6 3.2M9.8 10.7L4.2 7.5A9 9 0 0 1 12 3M14.2 13.3l5.6 3.2a9 9 0 0 1-15.6 0l5.6-3.2"/>',
+  battery:'<rect x="3" y="7" width="16" height="10" rx="2"/><path d="M21 11v2M6 10v4M9 10v4M12 10v4"/>'
+};
+const ic=(n,c='')=>`<svg class="ic ${c}" viewBox="0 0 24 24" aria-hidden="true">${P[n]||''}</svg>`;
+
+function astro(lv, cls=''){
+  const eyes = lv===2
+    ? '<path d="M50 39l6 3M70 39l-6 3" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><path d="M53 49q7-3 14 0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>'
+    : '<rect x="50" y="36" width="5.5" height="9" rx="2.75" fill="#fff"/><rect x="64.5" y="36" width="5.5" height="9" rx="2.75" fill="#fff"/>';
+  return `<svg class="astro ${cls}" viewBox="0 0 120 140" aria-hidden="true">
+  <ellipse cx="60" cy="135" rx="28" ry="4" fill="currentColor" opacity=".2"/>
+  <rect x="26" y="58" width="68" height="54" rx="16" fill="#0b1222" stroke="currentColor" stroke-opacity=".35" stroke-width="1.5"/>
+  <rect x="15" y="66" width="15" height="36" rx="7.5" fill="#101a30" stroke="currentColor" stroke-width="2"/>
+  <rect x="90" y="66" width="15" height="36" rx="7.5" fill="#101a30" stroke="currentColor" stroke-width="2"/>
+  <rect x="40" y="104" width="16" height="27" rx="7" fill="#101a30" stroke="currentColor" stroke-width="2"/>
+  <rect x="64" y="104" width="16" height="27" rx="7" fill="#101a30" stroke="currentColor" stroke-width="2"/>
+  <rect x="31" y="60" width="58" height="54" rx="20" fill="#101a30" stroke="currentColor" stroke-width="2.5"/>
+  <rect x="45" y="76" width="30" height="20" rx="6" fill="#060b16" stroke="currentColor" stroke-width="1.5"/>
+  <path class="beat" d="M48 86h7l3-6 4 12 3-6h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="60" cy="38" r="29" fill="#0c1426" stroke="currentColor" stroke-width="2.5"/>
+  <ellipse cx="60" cy="41" rx="21" ry="15" fill="currentColor" opacity=".3"/>
+  <ellipse cx="60" cy="41" rx="21" ry="15" fill="none" stroke="currentColor" stroke-width="1.5"/>
+  ${eyes}
+  <ellipse cx="51" cy="32" rx="7" ry="2.6" fill="#fff" opacity=".22"/>
+</svg>`;
+}
+
+/* ================= Estado ================= */
+const now=()=>performance.now();
+let T0=now();
+function fresh(){
+  return {
+    mission:'leo', scenario:'normal', step:0, focus:STORY[0].focus, ver:0, seq:0, relief:0,
+    v:{hr:72,spo2:98,hrv:64,stress:42,temp:36.8,bpSys:118,bpDia:76,rr:14,water:1450,waterGoal:2400,sleep:460},
+    watch:{screen:'home', answer:null, breathStart:0, notice:null, noticeAt:0, okNote:false},
+    phone:{tab:'home'}, emerg:null, toast:{phase:null}, gh:{level:4,pct:86},
+    chat:[{who:'cosmo',text:'Bom dia, Sarah. Você dormiu 7h40, com 1h55 de sono profundo. Treino de resistência às 14:00.'}],
+    typing:false, xp:450, quests:{treino:true,agua:false,powerdown:false},
+    tExplain:false, tAsk:null, hAsk:null,
+    family:{km:43.6,kmEarth:43.6,goal:60,lucasKm:5,cheers:0,done:false},
+    evt:{}, dose:{sarah:.42,marcus:.40,elena:.45,kenji:.41}, co2:2.4, boneOk:null, rid:Math.random(),
+    crew:{marcus:{...CREW_BASE.marcus},elena:{...CREW_BASE.elena},kenji:{...CREW_BASE.kenji}}, tSel:'sarah', hSel:'sarah', remind:{},
+    bus:[], log:[], hist:[], preBlackout:null, bufferMB:0
+  };
+}
+let S=fresh();
+let VIEW='ecossistema';
+const M=()=>MIS[S.mission];
+const compressed=()=>M().oneWay>5;
+const delayMs=()=> compressed()? M().oneWay*1000/60 : M().oneWay*1000;
+const bump=()=>{S.ver++};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function secOfDay(){return 9*3600+41*60+Math.floor((now()-T0)/1000)}
+function clock(){const s=secOfDay();return [Math.floor(s/3600)%24,Math.floor(s/60)%60,s%60].map(n=>String(n).padStart(2,'0')).join(':')}
+function hm(){return clock().slice(0,5)}
+
+function assess(v){
+  const bands={}; let ok=0,warn=0,crit=0;
+  for(const m of METRICS){const b=m.band(v);bands[m.k]=b;if(b===2)crit++;else if(b===1)warn++;else ok++;}
+  const vitalWarn=['hr','spo2','bp','rr'].some(k=>bands[k]===1);
+  const level=crit?2:(vitalWarn||warn>=3)?1:0;
+  const homeo=Math.max(12,Math.round(100-warn*3-crit*15));
+  return {bands,ok,warn,crit,level,homeo};
+}
+
+function targets(){
+  if(S.scenario==='emergency'){
+    const p=S.emerg&&S.emerg.phase;
+    if(p==='confirmed') return {hr:112,spo2:94,hrv:28,stress:66,temp:37.1,bpSys:142,bpDia:90,rr:21};
+    if(p==='stable') return {hr:94,spo2:96,hrv:34,stress:55,temp:37.0,bpSys:128,bpDia:82,rr:17};
+    return {hr:168,spo2:88,hrv:16,stress:86,temp:37.3,bpSys:166,bpDia:104,rr:26};
+  }
+  if(S.scenario==='blackout') return {hr:76,spo2:98,hrv:58,stress:52,temp:36.8,bpSys:120,bpDia:78,rr:15};
+  return {hr:72,spo2:98,hrv:64,stress:42,temp:36.8,bpSys:118,bpDia:76,rr:14};
+}
+const afibActive=(sc,ph)=> sc==='emergency' && ['detected','proposed','confirmed'].includes(ph);
+
+/* ---------- Histórico e visão da Terra ---------- */
+function pushSnap(){
+  S.hist.push({t:now(), v:{...S.v}, crew:{marcus:{...S.crew.marcus},elena:{...S.crew.elena},kenji:{...S.crew.kenji}}, sc:S.scenario, ph:S.emerg?S.emerg.phase:null, clock:clock()});
+  if(S.hist.length>500) S.hist.shift();
+}
+function snapAt(t){const H=S.hist;for(let i=H.length-1;i>=0;i--) if(H[i].t<=t) return H[i];return H[0];}
+function earthView(){
+  if(S.scenario==='blackout') return {status:'nosig', snap:S.preBlackout||S.hist[0]};
+  const h=snapAt(now()-delayMs());
+  if(h && h.sc==='blackout') return {status:'nosig', snap:S.preBlackout||h, returning:true};
+  return {status:'live', snap:h};
+}
+
+/* ---------- Barramento de mensagens nave ⇄ Terra ---------- */
+function route(dir){return (dir==='up'?'nave → Terra':'Terra → nave')+' · '+M().link+' · '+M().oneWayTxt}
+function send(dir,label,o={}){
+  const m={id:++S.seq,dir,label,fam:o.fam||null,from:o.from||(dir==='up'?'nave':'houston'),aud:o.aud||[],prio:o.prio||3,size:o.size||'0,1 MB',
+    sentAt:now(),sentClock:clock(),arriveAt:0,status:'transit',onArrive:o.onArrive||null,deliveredClock:null};
+  if(S.scenario==='blackout'){m.status='queued'; if(dir==='up'){S.bufferMB+=parseFloat(m.size.replace(',','.'))||0.1;}}
+  else m.arriveAt=now()+delayMs();
+  S.bus.push(m); bump(); return m;
+}
+function flushQueue(){
+  const q=S.bus.filter(m=>m.status==='queued').sort((a,b)=>a.prio-b.prio);
+  q.forEach((m,i)=>{m.status='transit';m.arriveAt=now()+delayMs()+i*500;});
+  if(q.length) log('Rede','fila → '+M().link,`Fila descarregando por prioridade: ${q.length} pacote(s), ECG primeiro.`,0);
+  S.bufferMB=0;
+}
+function busTick(){
+  const t=now();
+  for(const m of S.bus){
+    if(m.status==='transit' && t>=m.arriveAt){
+      m.status='delivered'; m.deliveredClock=clock(); m.deliveredAt=t;
+      if(m.onArrive) m.onArrive(m);
+      bump();
+    }
+  }
+  const del=S.bus.filter(m=>m.status==='delivered');
+  if(del.length>40) S.bus.splice(S.bus.indexOf(del[0]),1);
+}
+
+function log(who,via,text,sev=0){S.log.unshift({t:clock(),who,via,text,sev}); if(S.log.length>40) S.log.pop(); bump();}
+function notify(text){S.watch.notice=text;S.watch.noticeAt=now();bump();}
+
+/* ================= Ações ================= */
+function setMission(k){
+  if(S.mission===k) return;
+  S.mission=k; const m=M();
+  log('Sistema','configuração',`Perfil de missão: ${m.label}. Sinal leva ${m.oneWayTxt} para chegar à Terra${compressed()?' (na demo, 1 min = 1 s)':''}.`);
+}
+function setScenario(k){
+  if(S.scenario===k) return;
+  const prev=S.scenario;
+  if(k==='blackout'){
+    S.preBlackout=earthView().snap;
+    S.scenario='blackout'; S.emerg=null;
+    log('Rede','nave ⇄ Terra',`Sem sinal: ${M().bo.why}. A Cosmo segue com modelos locais e os dados vão para a fila.`,1);
+    cosmoSay('Perdemos o sinal com a Terra. Continuo funcionando aqui no relógio e seus dados ficam salvos.');
+  } else {
+    S.scenario=k;
+    if(prev==='blackout'){ log('Rede','nave ⇄ Terra','Sinal restabelecido.',0); flushQueue(); }
+  }
+  if(k==='emergency') startEmergency(); else if(k!=='blackout') S.emerg=null;
+  if(k!=='emergency' && S.watch.screen==='alert') S.watch.screen='home';
+  S.watch.okNote=false; S.watch.answer=null;
+  bump();
+}
+function startEmergency(){
+  const id=++S.seq;
+  S.emerg={id,phase:'detected',clock:clock(),received:false,replySent:false,reply:null,by:null};
+  S.watch.screen='alert'; S.watch.answer=null; S.tSel='sarah';
+  log('Relógio','sensores → Cosmo (local)','Ritmo cardíaco alto e irregular durante o treino na esteira; SpO₂ em queda.',2);
+  S.typing=false; cosmoSay('Detectei ritmo acelerado e irregular. Pare o exercício e sente-se. Estou avisando o Dr. Marcus.');
+  setTimeout(()=>{
+    if(!S.emerg||S.emerg.id!==id) return;
+    S.emerg.phase='proposed';
+    log('Cosmo','relógio → painel de bordo · rede local · 40 ms','Protocolo proposto ao oficial médico. Aguardando confirmação humana.',2);
+    send('up','Alerta médico da Sarah: ECG bruto + sinais vitais',{prio:1,size:'3,2 MB',aud:['houston'],onArrive:()=>{
+      if(S.emerg&&S.emerg.id===id) S.emerg.received=true; S.hSel='sarah';
+      log('Houston','DSN → console',`Alerta médico recebido ${M().oneWayTxt} depois do evento a bordo.`,2);
+    }});
+    log('Relógio','nave → Terra · '+M().link,'Alerta médico enviado para Houston.',1);
+  },1800);
+}
+function confirmProtocol(manual){
+  const e=S.emerg; if(!e||e.phase!=='proposed') return;
+  e.phase='confirmed'; e.by=manual?'manual':'protocolo'; e.confClock=clock();
+  log('Bordo','oficial médico',manual?'Dr. Marcus assumiu o atendimento manualmente.':'Dr. Marcus confirmou o protocolo: repouso, O₂ por máscara a 2 L/min, ECG de 12 derivações.',1);
+  notify('Dr. Marcus a caminho');
+  cosmoSay('O Dr. Marcus confirmou o atendimento e está a caminho. Coloque a máscara de O₂ quando ele chegar.');
+  const id=e.id;
+  send('up',manual?'Decisão a bordo: atendimento manual do Dr. Marcus':'Decisão a bordo: protocolo da Cosmo confirmado pelo Dr. Marcus',{prio:1,size:'0,2 MB',aud:['houston'],onArrive:()=>{
+    log('Houston','DSN → console','Decisão do oficial médico recebida para revisão.',1);
+  }});
+  setTimeout(()=>{
+    if(!S.emerg||S.emerg.id!==id) return;
+    S.emerg.phase='stable';
+    log('Cosmo','relógio','Sinais melhorando: ritmo mais regular, SpO₂ voltando a 96%.',1);
+    notify('Sinais melhorando');
+  },12000);
+  bump();
+}
+function houstonReply(){
+  const e=S.emerg; if(!e||!e.received||e.replySent) return;
+  e.replySent=true; const id=e.id;
+  const txt='De acordo com o protocolo. Manter O₂ por 20 min, repetir ECG de 12 derivações em 1 h e suspender treino por 24 h.';
+  log('Houston','console → '+M().link,'Flight surgeon enviou parecer sobre o atendimento.',0);
+  send('down','Parecer de Houston: '+txt,{prio:1,from:'houston',aud:['crew'],onArrive:()=>{
+    if(S.emerg&&S.emerg.id===id) S.emerg.reply=txt;
+    log('Bordo','Terra → nave','Parecer de Houston chegou ao oficial médico.',0);
+    notify('Houston revisou seu atendimento');
+    cosmoSay('Houston revisou seu atendimento e concorda com o protocolo. Treino suspenso por 24 h.');
+  }});
+}
+function houstonRoutine(){
+  log('Houston','console → '+M().link,'Recomendação de treino enviada.',0);
+  send('down','Houston: treino de resistência liberado para amanhã, 45 min.',{from:'houston',aud:['crew'],onArrive:()=>{
+    log('Relógio','Terra → nave','Recomendação de Houston chegou.',0);
+    notify('Houston liberou o treino de amanhã');
+    cosmoSay('Mensagem de Houston: treino de resistência liberado para amanhã, 45 min.');
+  }});
+}
+function drink(){
+  S.v.water=Math.min(S.v.waterGoal+600,S.v.water+250);
+  log('Relógio','Sarah','+250 ml de água registrados.',0);
+  if(S.v.water>=S.v.waterGoal) setTimeout(()=>{completeQuest('agua');lastKey='';tick();},400);
+  if(S.toast.phase==='arrived'){
+    S.toast.phase='drank';
+    addGreenhouse(3); cosmoSay('Brinde feito com a Ana. A confirmação já está a caminho da Terra.');
+    log('Cosmo','estufa cooperativa','Brinde hídrico concluído: estufa da tripulação +3%.',0);
+    send('up','Brinde hídrico: Sarah respondeu a Ana (+250 ml)',{prio:4,aud:['family','houston'],fam:'Sarah brindou de volta com 250 ml de água',onArrive:()=>{
+      S.toast.phase='celebrated'; log('Família','nave → Terra','A Ana recebeu o brinde de volta.',0);
+    }});
+    notify('Brinde feito com a Ana');
+  } else {
+    send('up','Hidratação: +250 ml',{prio:4,aud:['family','houston'],fam:'Sarah bebeu 250 ml de água'});
+    notify('+250 ml registrados');
+  }
+  bump();
+}
+/* ---------- Chat da Cosmo (copiloto no relógio) ---------- */
+const QTXT={como:'Como estou?',cansada:'Por que estou cansada?',houston:'Avisar Houston',sinal:'Quando volta o sinal?',familia:'Recado pra família',oque:'O que está acontecendo?',marcus:'Chamar o Dr. Marcus',ok:'Estou bem'};
+function cosmoSay(text,acts){S.chat.push({who:'cosmo',text,acts:acts||null});if(S.chat.length>30)S.chat.shift();bump();}
+function chatChips(){
+  if(S.scenario==='emergency') return ['oque','marcus','ok'];
+  if(S.scenario==='blackout') return ['sinal','como','familia'];
+  return ['cansada','como','houston'];
+}
+function answer(q){
+  const a=assess(S.v), m=M(), v=S.v;
+  switch(q){
+    case 'como':{
+      if(S.scenario==='emergency') return {t:'Seus sinais ainda pedem cuidado. Fique sentada e respire devagar. O Dr. Marcus está acompanhando.'};
+      const att=METRICS.filter(x=>a.bands[x.k]===1).map(x=>x.short.toLowerCase());
+      return {t:`Você está ${LV[a.level].toLowerCase()}. FC ${FMT.hr(v)} bpm, SpO₂ ${FMT.spo2(v)}%, homeostase ${a.homeo}%.`+(att.length?` Pede atenção: ${att.join(', ')}.`:' Nada fora do normal.')};
+    }
+    case 'cansada':{
+      const falta=Math.max(0,Math.round(v.waterGoal-v.water));
+      const acts=[]; if(falta>0) acts.push({label:'+250 ml',act:'w-drink',cls:'water'}); acts.push({label:'Respirar 1 min',act:'w-breath'});
+      return {t:`Cruzei seus dados: hidratação em ${FMT.waterPct(v)}%${falta?` (faltam ${falta.toLocaleString('pt-BR')} ml)`:''}, HRV ${FMT.hrv(v)} ms, REM de 1h15 e ciclo no dia 14, com temperatura basal mais alta. O mais provável é desidratação leve somada ao treino. Sugiro água agora e 1 min de respiração lenta.`,acts};
+    }
+    case 'houston':
+      send('up','Mensagem de voz da Sarah para Houston (0:08)',{prio:3,size:'0,4 MB',aud:['houston']});
+      log('Relógio','Sarah → Cosmo','Mensagem de voz para Houston gravada.',0);
+      return {t: S.scenario==='blackout'?'Estamos sem sinal. Guardei sua mensagem; ela sai assim que o contato voltar.'
+        :`Enviei. Chega em Houston em ${m.oneWayTxt}`+(compressed()?', e a resposta leva o mesmo tempo para voltar.':'.')};
+    case 'sinal': return {t:`${m.bo.why}. O contato volta em ${m.bo.back}. Tudo o que eu preciso para cuidar de você roda aqui no relógio e no computador da nave.`};
+    case 'familia':
+      send('up','Recado da Sarah: "Tudo bem por aqui. Saudades de vocês!"',{prio:3,aud:['family'],fam:'Recado da Sarah: "Tudo bem por aqui. Saudades de vocês!"'});
+      log('Relógio','Sarah → fila','Recado para a família gravado.',0);
+      return {t: S.scenario==='blackout'?'Guardei seu recado. Ele sai para a família assim que o sinal voltar.':`Enviado. A família recebe em ${m.oneWayTxt}.`};
+    case 'oque': return {t:'Seu coração está acelerado e irregular, e o oxigênio caiu um pouco. Pode ser uma arritmia chamada fibrilação atrial. Fique sentada; o Dr. Marcus já recebeu seus dados e decide o próximo passo.'};
+    case 'marcus':
+      log('Relógio','relógio → painel de bordo · rede local','Sarah chamou o oficial médico pelo relógio.',1);
+      return {t:'Chamei o Dr. Marcus pela rede da nave. Ele já está com seus dados no painel de bordo.'};
+    case 'ok':
+      S.watch.okNote=true;
+      log('Relógio','Sarah','Sarah respondeu "Estou bem". A Cosmo manteve o acompanhamento.',1);
+      return {t:S.emerg&&S.emerg.phase==='stable'?'Que bom. Continue em repouso por 20 min; eu sigo de olho.':'Entendi, mas seus sinais ainda estão fora do normal. Vou manter o alerta até o Dr. Marcus avaliar.'};
+  }
+  return {t:'Não entendi. Pode repetir?'};
+}
+function ask(q){
+  S.chat.push({who:'me',text:QTXT[q]||q}); S.typing=true; S.watch.screen='chat'; bump();
+  setTimeout(()=>{const r=answer(q);S.typing=false;cosmoSay(r.t,r.acts);lastKey='';tick();},800);
+}
+/* ---------- Jogo: bioma cooperativo ---------- */
+const QUESTS={treino:'Esteira T2: Cratera Gale',agua:'Hidratação 2,4 L',powerdown:'Escudo mental'};
+function addGreenhouse(p){S.gh.pct+=p;if(S.gh.pct>=100){S.gh.pct-=100;S.gh.level++;log('Cosmo','bioma cooperativo',`A estufa subiu para o nível ${S.gh.level}.`,0);}}
+function completeQuest(k){
+  if(S.quests[k]) return;
+  S.quests[k]=true; S.xp+=150; addGreenhouse(2);
+  log('Cosmo','bioma cooperativo',`Missão concluída: ${QUESTS[k]}. +150 XP para a tripulação.`,0);
+  send('up',`Missão concluída: ${QUESTS[k]}`,{prio:4,aud:['family'],fam:`Sarah completou a missão "${QUESTS[k]}"`});
+  cosmoSay(`Missão "${QUESTS[k]}" concluída. +150 XP e a estufa cresceu.`);
+  notify('Missão concluída · +150 XP');
+}
+/* ---------- Elo com a família e sincronia (relógio) ---------- */
+function cheerLucas(){
+  S.family.cheers++;
+  log('Relógio','Sarah → família','Sarah mandou um incentivo para o Lucas.',0);
+  send('up','Incentivo da Sarah para o Lucas: "Arrasou nos 5 km!"',{prio:4,aud:['family'],fam:'Sarah mandou um incentivo: "Arrasou nos 5 km, filho!"'});
+  notify(S.scenario==='blackout'?'Incentivo guardado na fila':'Incentivo enviado ao Lucas');
+}
+function familyRun(){
+  S.family.kmEarth+=5;
+  log('Família','app Terra-Órbita','O Lucas registrou 5 km de corrida.',0);
+  send('down','Lucas registrou 5 km de corrida',{from:'family',aud:['crew'],onArrive:()=>{
+    const f=S.family; f.km+=5; f.lucasKm+=5; addGreenhouse(1);
+    log('Relógio','Terra → nave','Corrida do Lucas chegou: +5 km no desafio Terra–órbita.',0);
+    notify('Lucas correu 5 km · +15% energia');
+    cosmoSay(`O Lucas correu mais 5 km na Terra. A corrida Terra–órbita está em ${f.km.toFixed(1).replace('.',',')} de ${f.goal} km.`);
+    if(!f.done&&f.km>=f.goal){f.done=true;S.xp+=300;addGreenhouse(5);cosmoSay('Desafio Terra–órbita concluído com a família! +300 XP e a estufa floresceu.');log('Cosmo','bioma cooperativo','Desafio Terra–órbita concluído: +300 XP.',0);}
+  }});
+}
+function syncNow(){
+  send('up','Telemetria contínua: lote manual',{prio:2,size:'1,8 MB',aud:['houston']});
+  log('Relógio','relógio → nave → '+M().link,'Sincronia manual iniciada pela Sarah.',0);
+  notify('Sincronizando via '+M().link);
+}
+function sosBurst(){
+  send('up','SOS: rajada de ECG bruto + sinais',{prio:1,size:'3,2 MB',aud:['houston']});
+  log('Relógio','relógio → nave → '+M().link,'SOS prioritário disparado do relógio.',2);
+  notify('SOS na frente da fila');
+}
+function testSignal(){
+  log('Relógio','relógio → antena da nave',`Teste de sinal sem resposta. ${M().bo.why}.`,1);
+  notify('Sem sinal · volta em '+M().bo.back);
+}
+function startBreath(){S.watch.screen='breath';S.watch.breathStart=now();bump();}
+function endBreath(done){
+  if(done){S.relief=Math.min(20,S.relief+12);log('Relógio','Cosmo','Respiração guiada concluída: estresse em queda.',0);notify('Respiração concluída');completeQuest('powerdown');}
+  S.watch.screen='home';bump();
+}
+function familyToast(){
+  if(S.toast.phase && S.toast.phase!=='celebrated') return;
+  S.toast.phase='sent';
+  log('Família','app Terra-Órbita','A Ana propôs um brinde hídrico e bebeu 250 ml.',0);
+  send('down','Convite da Ana: brinde hídrico de 250 ml',{from:'family',aud:['crew'],onArrive:()=>{
+    if(S.toast.phase==='sent') S.toast.phase='arrived';
+    log('Relógio','Terra → nave','Convite de brinde da Ana chegou ao relógio.',0);
+    notify('Ana propôs um brinde hídrico');
+    cosmoSay('A Ana te convidou para um brinde hídrico lá da Terra.',[{label:'Brindar · +250 ml',act:'w-drink',cls:'water'}]);
+    if(S.scenario!=='emergency') S.watch.screen='insight';
+  }});
+}
+function familyMsg(){
+  log('Família','app Terra-Órbita','O Lucas gravou um áudio para a Sarah.',0);
+  send('down','Áudio do Lucas: "Boa noite, mãe! Corri 5 km hoje."',{from:'family',aud:['crew'],size:'0,6 MB',onArrive:()=>{
+    log('Relógio','Terra → nave','Áudio do Lucas entregue.',0);
+    notify('Nova mensagem do Lucas');
+    cosmoSay('Chegou um áudio do Lucas: "Boa noite, mãe! Corri 5 km hoje."');
+  }});
+}
+function applyStep(i){
+  S.step=Math.max(0,Math.min(STORY.length-1,i));
+  const st=STORY[S.step];
+  if(st.mission) setMission(st.mission);
+  if(st.scenario) setScenario(st.scenario);
+  if(st.event) injectEvent(st.event);
+  S.focus=st.focus||null; bump();
+}
+function resetDemo(){
+  S=fresh(); T0=now(); pushSnap();
+  log('Sistema','configuração','Demo iniciada no perfil ISS · órbita baixa.');
+  bump(); renderControls(); fullRender();
+}
+
+/* ================= Eventos injetáveis: IA local + humano no controle ================= */
+const EVENTS=[['solar','Tempestade solar'],['loose','Sensor solto'],['mood','Queda de humor'],['eva','Prontidão EVA'],['headache','Dor de cabeça'],['sleep','Hora de dormir']];
+const MISSION_DOSE={leo:38,gateway:96,mars:212,marsSurf:340};
+const DOSE_TICK={leo:.0002,gateway:.0005,mars:.0008,marsSurf:.0003};
+const READY={sarah:88,marcus:90,elena:64,kenji:91};
+function later(ms,fn){const r=S.rid;setTimeout(()=>{if(S.rid!==r)return;fn();lastKey='';tick();},ms);}
+function evtOn(k){const e=S.evt[k];return !!e&&e.phase!=='done';}
+const fmtDose=x=>x.toFixed(2).replace('.',',');
+
+function injectEvent(k){
+  const t=clock(), m=M();
+  switch(k){
+  case 'solar':
+    S.evt.solar={phase:'alert',clock:t,saved:0};
+    log('Dosímetro','sensor → Cosmo (local)','Fluxo de prótons subindo: início de tempestade solar.'+(m.oneWay>5?` O aviso de clima espacial da Terra só chegaria daqui a ${m.oneWayTxt}.`:''),2);
+    log('Cosmo','nave · ação automática reversível','Alarme e rota até o abrigo acesos. Aguardando a decisão da comandante.',1);
+    cosmoSay('Tempestade solar começando. Acendi a rota até o abrigo. Como comandante, você decide se a tripulação vai para lá agora.');
+    S.watch.screen='evt'; break;
+  case 'loose':
+    S.evt.loose={phase:'asking',clock:t};
+    log('Relógio','sensores → Cosmo (local)','SpO₂ de 84% com sinal de baixa qualidade. A Cosmo pergunta à Sarah antes de alarmar.',1);
+    S.watch.screen='evt';
+    later(20000,()=>{const e=S.evt.loose;if(e&&e.phase==='asking'){e.phase='escalated';e.timedOut=true;log('Cosmo','relógio → painel de bordo · rede local','Sem resposta da Sarah em 20 s: leitura encaminhada ao oficial médico.',1);notify('Avisei o Dr. Marcus');}});
+    break;
+  case 'mood':
+    S.evt.mood={phase:'offered',clock:t};
+    log('Cosmo','relógio · privado','Padrão de humor em queda detectado. Apoio oferecido só à Sarah; nada foi compartilhado.',0);
+    S.watch.screen='evt'; break;
+  case 'eva':
+    S.evt.eva={phase:'asking',clock:t};
+    log('Cosmo','check de prontidão','EVA das 15:00: Elena com 64% de prontidão (sono curto, reação 18% mais lenta). Decisão levada à comandante.',1);
+    S.watch.screen='evt'; break;
+  case 'headache':
+    S.evt.headache={phase:'open',clock:t,air:null,us:null};
+    S.co2=4.1;
+    S.chat.push({who:'me',text:'Estou com dor de cabeça'});
+    cosmoSay('O CO₂ da cabine está em 4,1 mmHg, acima do alvo de 3. A Elena e o Kenji também relataram dor de cabeça hoje. Avisei o Dr. Marcus para avaliar.');
+    log('Cosmo','relógio → painel de bordo · rede local','Dor de cabeça da Sarah cruzada com o CO₂ da cabine (4,1 mmHg) e mais 2 tripulantes com sintomas.',1);
+    S.watch.screen='chat'; break;
+  case 'sleep':
+    S.evt.sleep={phase:'scheduled',clock:t,at:now()+15000};
+    log('Cosmo','nave · ação automática com veto','Modo noite agendado: luz mais quente e avisos silenciados. A Sarah tem 15 s para vetar.',0);
+    S.watch.screen='evt';
+    later(15000,()=>{const e=S.evt.sleep;if(e&&e.phase==='scheduled'){e.phase='applied';log('Cosmo','nave · ação automática','Modo noite aplicado: luz em 2700 K e avisos silenciados até 06:30.',0);notify('Modo noite ativado');
+      later(14000,()=>{const s=S.evt.sleep;if(s&&s.phase==='applied')s.phase='done';});}});
+    break;
+  }
+  bump();
+}
+
+function evtAction(a){
+  const E=S.evt;
+  switch(a){
+  case 'solar-go':{const e=E.solar;if(!e||!['alert','deferred'].includes(e.phase))return;
+    e.phase='sheltered';e.shelterAt=clock();
+    log('Relógio','comandante → tripulação','Sarah, como comandante, mandou toda a tripulação para o abrigo.',1);
+    cosmoSay('Todos a caminho do abrigo. Vou acompanhar a dose de cada um.');
+    send('up','Tempestade solar: tripulação no abrigo (decisão da comandante)',{prio:1,size:'0,3 MB',aud:['houston','family'],fam:'A tripulação foi para o abrigo da nave por precaução contra uma tempestade solar. É procedimento de rotina.',onArrive:()=>{if(S.evt.solar)S.evt.solar.earthKnown=true;log('Houston','DSN → console','Houston soube da tempestade solar com a tripulação já no abrigo.',1);}});
+    later(18000,()=>{const s=S.evt.solar;if(s&&s.phase==='sheltered'){s.phase='subsiding';log('Dosímetro','sensor → Cosmo','Fluxo de prótons caindo. A Cosmo sugere liberar a tripulação.',0);notify('Fluxo caindo · liberar?');}});
+    break;}
+  case 'solar-wait':{const e=E.solar;if(!e||e.phase!=='alert')return;
+    e.phase='deferred';
+    log('Relógio','comandante','Sarah pediu para aguardar 5 min antes do abrigo.',1);
+    later(7000,()=>{const s=S.evt.solar;if(s&&s.phase==='deferred'){s.phase='alert';log('Cosmo','relógio','O fluxo continua subindo. A Cosmo pergunta de novo à comandante.',2);notify('Fluxo ainda subindo');}});
+    break;}
+  case 'solar-clear':{const e=E.solar;if(!e||e.phase!=='subsiding')return;
+    e.phase='done';
+    log('Relógio','comandante → tripulação','Sarah liberou a tripulação do abrigo.',0);
+    cosmoSay(`Tripulação liberada. O abrigo evitou cerca de ${fmtDose(e.saved)} mSv extras para cada um.`);
+    send('up','Tempestade solar encerrada: tripulação fora do abrigo',{prio:2,aud:['houston','family'],fam:'A tempestade solar passou e a tripulação já saiu do abrigo. Todos bem.',onArrive:()=>{if(S.evt.solar)S.evt.solar.earthKnown=false;}});
+    break;}
+  case 'loose-fix':{const e=E.loose;if(!e||e.phase!=='asking')return;e.phase='done';
+    log('Relógio','Sarah','Sarah ajustou o relógio no pulso. SpO₂ voltou a 98%: alarme falso evitado.',0);
+    cosmoSay('Obrigada! A leitura voltou a 98%. Marquei aquele trecho como falha do sensor, sem alarmar ninguém.');notify('Alarme falso evitado');break;}
+  case 'loose-firm':{const e=E.loose;if(!e||e.phase!=='asking')return;e.phase='escalated';
+    log('Relógio','relógio → painel de bordo · rede local','Sarah disse que o relógio está firme. Leitura encaminhada ao oficial médico.',1);
+    cosmoSay('Entendi. Pedi ao Dr. Marcus para medir com o oxímetro de dedo do kit, só para confirmar.');break;}
+  case 'loose-kit':{const e=E.loose;if(!e||e.phase!=='escalated')return;e.phase='done';
+    log('Bordo','oficial médico','Dr. Marcus mediu 97% com o oxímetro do kit. A leitura do relógio era falha do sensor.',0);
+    cosmoSay('O Dr. Marcus mediu 97% no oxímetro do kit. Era só o sensor; tudo certo.');break;}
+  case 'mood-talk':{if(!E.mood)return;
+    cosmoSay('Estou aqui. Missões longas pesam, e sentir saudade e cansaço é normal. Quer respirar um pouco agora ou pedir uma chamada com a família na próxima janela?',[{label:'Respirar 1 min',act:'w-breath'},{label:'Pedir chamada',act:'mood-call'}]);
+    S.watch.screen='chat';break;}
+  case 'mood-call':
+    send('up','Pedido da Sarah: chamada de vídeo com a família',{prio:3,aud:['family'],fam:'A Sarah pediu uma chamada de vídeo com vocês na próxima janela de comunicação.'});
+    log('Relógio','Sarah → família','Sarah pediu uma chamada com a família.',0);notify('Pedido de chamada enviado');break;
+  case 'mood-share':{const e=E.mood;if(!e||e.phase!=='offered')return;e.phase='shared';
+    log('Relógio','Sarah → painel de bordo · rede local','Sarah autorizou compartilhar o alerta de bem-estar com o Dr. Marcus.',0);
+    cosmoSay('Compartilhei só com o Dr. Marcus: um resumo do padrão, sem gravações da sua voz.');break;}
+  case 'mood-private':{const e=E.mood;if(!e||e.phase!=='offered')return;e.phase='done';
+    log('Relógio','Sarah','Sarah preferiu manter o alerta de bem-estar só para ela. Nada foi compartilhado.',0);
+    cosmoSay('Combinado, fica entre nós. Se quiser, peço uma chamada com a família na próxima janela.',[{label:'Pedir chamada',act:'mood-call'}]);S.watch.screen='chat';break;}
+  case 'mood-meet':{const e=E.mood;if(!e||e.phase!=='shared')return;e.phase='done';
+    log('Bordo','oficial médico → relógio da Sarah','Dr. Marcus marcou uma conversa individual com a Sarah às 19:00.',0);
+    notify('Conversa com o Dr. Marcus às 19:00');cosmoSay('O Dr. Marcus marcou uma conversa com você às 19:00, só vocês dois.');break;}
+  case 'eva-swap':{const e=E.eva;if(!e||e.phase!=='asking')return;e.phase='done';e.result='swap';
+    log('Relógio','comandante → escala','Sarah trocou a Elena pelo Kenji na EVA das 15:00.',0);
+    send('up','Escala da EVA alterada: Kenji no lugar da Elena (decisão da comandante)',{prio:3,aud:['houston']});
+    cosmoSay('Escala atualizada: o Kenji vai na EVA. Avisei a Elena com cuidado e sugeri um cochilo de 30 min.');break;}
+  case 'eva-keep':{const e=E.eva;if(!e||e.phase!=='asking')return;e.phase='done';e.result='keep';
+    log('Relógio','comandante','Sarah manteve a Elena na EVA. A Cosmo vai monitorar a EVA de perto.',1);
+    send('up','EVA mantida com a Elena; monitoramento de fadiga reforçado',{prio:3,aud:['houston']});
+    cosmoSay('Mantido. Vou acompanhar a Elena de perto durante a EVA e sugerir pausas se a fadiga aparecer.');break;}
+  case 'ha-air':{const e=E.headache;if(!e||e.air)return;e.air='requested';
+    log('Bordo','oficial médico → Elena','Dr. Marcus pediu à Elena para ajustar a remoção de CO₂.',0);
+    later(6000,()=>{const h=S.evt.headache;if(!h)return;h.air='done';S.co2=2.6;log('Elena','engenharia · sistema de ar','Elena ajustou os filtros de CO₂: cabine em 2,6 mmHg.',0);cosmoSay('A Elena ajustou o ar: CO₂ em 2,6 mmHg. A dor de cabeça deve melhorar nas próximas horas.');});
+    break;}
+  case 'ha-us':{const e=E.headache;if(!e||e.us)return;e.us='running';
+    log('Bordo','oficial médico','Dr. Marcus aprovou o ultrassom ocular guiado pela Cosmo.',0);
+    later(9000,()=>{const h=S.evt.headache;if(!h)return;h.us='done';
+      log('Cosmo','ultrassom guiado','Ultrassom ocular concluído: nervo óptico dentro do padrão da Sarah. Imagens enviadas a Houston para laudo.',0);
+      send('up','Ultrassom ocular da Sarah: imagens para laudo',{prio:2,size:'6,5 MB',aud:['houston'],onArrive:()=>log('Houston','DSN → console','Imagens do ultrassom ocular recebidas para laudo.',0)});});
+    break;}
+  case 'sleep-veto':{const e=E.sleep;if(!e||e.phase!=='scheduled')return;e.phase='done';
+    log('Relógio','Sarah','Sarah vetou o modo noite. A Cosmo não aplicou a mudança.',0);
+    cosmoSay('Tudo bem, mantive a luz como está. Te lembro de novo mais tarde.');break;}
+  case 'sleep-undo':{const e=E.sleep;if(!e||e.phase!=='applied')return;e.phase='done';
+    log('Relógio','Sarah','Sarah desfez o modo noite.',0);break;}
+  case 'bone-ok':
+    if(S.boneOk)return;S.boneOk=clock();
+    log('Bordo','oficial médico → relógio do Kenji','Dr. Marcus aprovou +5% de carga no treino resistivo do Kenji.',0);break;
+  case 'med-ok':{const e=S.emerg;if(!e||e.med||!['confirmed','stable'].includes(e.phase))return;e.med=clock();
+    log('Bordo','oficial médico','Dr. Marcus liberou o antiarrítmico do kit e definiu a dose.',1);
+    send('up','Medicação liberada a bordo: antiarrítmico (dose definida pelo Dr. Marcus)',{prio:1,size:'0,1 MB',aud:['houston']});break;}
+  default: return;
+  }
+  bump();
+}
+
+function evtTick(){
+  const E=S.evt, base=DOSE_TICK[S.mission]||.0003, sol=E.solar&&E.solar.phase;
+  const extra = sol==='alert'||sol==='deferred'?.012 : sol==='sheltered'?.0015 : sol==='subsiding'?.0008 : 0;
+  for(const id of CREW_IDS) S.dose[id]+=base+extra*(id==='elena'?1.08:1);
+  if(sol==='sheltered') E.solar.saved+=.012-.0015;
+}
+
+/* ---- Render dos eventos ---- */
+function watchEvt(){
+  const E=S.evt;
+  if(E.solar&&['alert','deferred','sheltered','subsiding'].includes(E.solar.phase)) return 'solar';
+  if(E.loose&&E.loose.phase==='asking') return 'loose';
+  if(E.eva&&E.eva.phase==='asking') return 'eva';
+  if(E.mood&&E.mood.phase==='offered') return 'mood';
+  if(E.sleep&&['scheduled','applied'].includes(E.sleep.phase)) return 'sleep';
+  if(E.loose&&E.loose.phase==='escalated') return 'loose';
+  return null;
+}
+function evtWatch(round){
+  const k=watchEvt(), E=S.evt;
+  if(k==='solar'){const e=E.solar;
+    if(e.phase==='alert'||e.phase==='deferred') return `<div class="w-tag warn">${ic('radiation')} Tempestade solar</div><div class="w-big">Fluxo de prótons subindo</div>${round?'':'<p class="w-text">A rota até o abrigo está acesa. Levar a tripulação agora?</p>'}${e.phase==='deferred'?'<div class="w-sub">Aguardando. Pergunto de novo em instantes.</div>':'<button class="w-btn warn sm2" data-act="solar-go">Abrigo para todos</button><button class="w-btn ghost sm" data-act="solar-wait">Aguardar 5 min</button>'}`;
+    if(e.phase==='sheltered') return `<div class="w-tag warn">${ic('radiation')} No abrigo</div><div class="w-delay"><span data-dose="sarah">${fmtDose(S.dose.sarah)}</span> mSv</div><div class="w-sub">sua dose hoje · fluxo ainda alto</div><p class="w-text">Tripulação protegida. Eu aviso quando for seguro sair.</p>`;
+    return `<div class="w-tag ok">Fluxo caindo</div><div class="w-big">Liberar a tripulação?</div><div class="w-sub">Sua dose hoje: <span data-dose="sarah">${fmtDose(S.dose.sarah)}</span> mSv</div><button class="w-btn sm2" data-act="solar-clear">Liberar do abrigo</button>`;
+  }
+  if(k==='loose'){const e=E.loose;
+    if(e.phase==='asking') return `<div class="w-tag warn">Leitura estranha</div><div class="w-big">SpO₂ 84%?</div><p class="w-text">${round?'Seu relógio está folgado?':'O sinal está fraco. Antes de avisar o médico: seu relógio está folgado?'}</p><button class="w-btn sm2" data-act="loose-fix">Ajustei o relógio</button><button class="w-btn ghost sm" data-act="loose-firm">Está firme</button>`;
+    return `<div class="w-tag warn">Verificando</div><p class="w-text">Pedi ao Dr. Marcus para medir com o oxímetro de dedo do kit.</p>`;
+  }
+  if(k==='eva') return `<div class="w-tag">Escala · EVA 15:00</div><p class="w-text">Prontidão da Elena: <b class="c-warn">64%</b>${round?'':' (sono curto, reação mais lenta)'}. Kenji: <b class="c-ok">91%</b>.</p><button class="w-btn sm2" data-act="eva-swap">Trocar pelo Kenji</button><button class="w-btn ghost sm" data-act="eva-keep">Manter a Elena</button>`;
+  if(k==='mood') return `<div class="w-tag" style="color:#c4b5fd">${ic('shield')} Só você vê isto</div><p class="w-text">Seu sono encurtou e sua voz ficou mais baixa nesta semana. Quer conversar?</p><button class="w-btn sm2" data-act="mood-talk">Conversar</button><div class="w-chips"><button data-act="mood-share">Contar ao Dr. Marcus</button><button data-act="mood-private">Só comigo</button></div>`;
+  if(k==='sleep'){const e=E.sleep;
+    if(e.phase==='scheduled') return `<div class="w-tag" style="color:#c4b5fd">${ic('moon')} Modo noite</div><p class="w-text">Às 21:00 deixo a luz mais quente e silencio avisos. ${round?'':'Sua média de sono na semana foi 6h50.'}</p><div class="w-sub">Aplico em <b data-until="sleep">15</b> s</div><button class="w-btn ghost sm2" data-act="sleep-veto">Vetar</button>`;
+    return `<div class="w-tag ok">${ic('moon')} Modo noite ativo</div><p class="w-text">Luz em 2700 K e avisos silenciados até 06:30. Emergências continuam passando.</p><button class="w-btn ghost sm2" data-act="sleep-undo">Desfazer</button>`;
+  }
+  return '';
+}
+function evtTablet(){
+  const E=S.evt; let h='';
+  if(E.solar&&E.solar.phase!=='done'){const e=E.solar;
+    const st={alert:'aguardando a comandante',deferred:'comandante pediu para aguardar',sheltered:'tripulação no abrigo desde '+String(e.shelterAt||'').slice(0,5),subsiding:'fluxo caindo, comandante decide a saída'}[e.phase];
+    h+=`<div class="dec dark"><h5>${ic('radiation','c-warn')} Tempestade solar · ${st}</h5><div class="kv">${CREW_IDS.map(id=>`<div><span>${CREW[id].name}</span><b><span data-dose="${id}">${fmtDose(S.dose[id])}</span> mSv</b></div>`).join('')}</div><p>Dose de hoje por tripulante. A decisão de abrigo é da comandante; você acompanha a exposição.</p></div>`;}
+  if(E.loose&&E.loose.phase==='escalated') h+=`<div class="dec"><h5>${ic('o2','c-warn')} Leitura suspeita · Sarah</h5><p>SpO₂ de 84% no relógio com sinal de baixa qualidade (M2: sinal suspeito, 0,31). ${E.loose.timedOut?'A Sarah não respondeu em 20 s.':'A Sarah diz que o relógio está firme.'} Sugestão da Cosmo: medir com o oxímetro de dedo do kit.</p><div class="dec-actions"><button class="btn" data-act="loose-kit">Registrar medição do kit: 97%</button></div></div>`;
+  if(E.mood&&E.mood.phase==='shared') h+=`<div class="dec" style="border-color:rgba(139,92,246,.5)"><h5>${ic('shield')} Bem-estar · compartilhado pela Sarah</h5><p>Sono 1h10 mais curto em 5 dias, voz mais baixa nas conversas e HRV 15% abaixo do padrão dela. A Sarah autorizou só você a ver este resumo, sem gravações.</p><div class="dec-actions"><button class="btn ghost" data-act="mood-meet">Marcar conversa hoje às 19:00</button></div></div>`;
+  if(E.eva){const e=E.eva;
+    h+=`<div class="dec"><h5>${ic('user','c-acc')} Prontidão para a EVA das 15:00</h5><div class="kv">${CREW_IDS.map(id=>`<div><span>${CREW[id].name}</span><b class="${READY[id]<70?'c-warn':''}">${READY[id]}%</b></div>`).join('')}</div><p>${e.phase==='asking'?'Sono, HRV e tempo de reação. A decisão da escala é da comandante.':e.result==='swap'?'A comandante trocou a Elena pelo Kenji.':'A comandante manteve a Elena; monitoramento de fadiga reforçado.'}</p></div>`;}
+  if(E.headache){const e=E.headache, co2=S.co2.toFixed(1).replace('.',',');
+    const li=(done,run,txtDone,txtRun,txtWait)=>`<li>${ic(done?'check':run?'clock':'alert',done?'c-ok':run?'c-acc':'c-warn')}${done?txtDone:run?txtRun:txtWait}</li>`;
+    h+=`<div class="dec"><h5>${ic('brain','c-warn')} Dor de cabeça · Sarah</h5><p>A Cosmo cruzou a queixa com o ar da cabine: CO₂ em 4,1 mmHg na hora da queixa (alvo abaixo de 3) e mais 2 tripulantes com dor de cabeça. Hipótese principal: CO₂ elevado. A descartar: alteração ocular do voo espacial (SANS).</p>
+    <ul class="check">${li(e.air==='done',e.air==='requested','Ar ajustado pela Elena: '+co2+' mmHg','Elena ajustando os filtros de CO₂…','Ajuste do ar: pendente')}${li(e.us==='done',e.us==='running','Ultrassom ocular: nervo óptico no padrão da Sarah; imagens enviadas a Houston','Ultrassom guiado em andamento: a Cosmo orienta a posição da sonda…','Ultrassom ocular: aguardando sua aprovação')}</ul>
+    ${!e.air||!e.us?`<div class="dec-actions">${!e.air?'<button class="btn ghost" data-act="ha-air">Pedir ajuste do ar à Elena</button>':''}${!e.us?'<button class="btn" data-act="ha-us">Aprovar ultrassom guiado</button>':''}</div>`:''}</div>`;}
+  return h;
+}
+function strip(id){
+  const v=vOf(id), p=v.water/v.waterGoal, r=p<.6?['alto','c-crit']:p<.8?['moderado','c-warn']:['baixo','c-ok'];
+  return `<div class="strip"><span>${ic('drop','c-water')}Rins: risco <b class="${r[1]}">${r[0]}</b> · água ${Math.round(p*100)}% + perda óssea</span><span>${ic('radiation','c-warn')}Radiação: <b data-dose="${id}">${fmtDose(S.dose[id])}</b> mSv hoje · missão ${MISSION_DOSE[S.mission]} de 600 mSv</span></div>`;
+}
+
+/* ================= Render: relógio ================= */
+const WS_NAMES={evt:'Evento',home:'Início',insight:'Insight da Cosmo',vitals:'Sinais',chat:'Chat com a Cosmo',game:'Missões da estufa',elo:'Elo com a família',sync:'Sincronia com a Terra',alert:'Alerta'};
+function watchScreens(){const e=watchEvt()?['evt']:[];return S.scenario==='emergency'?['alert',...e,'chat','sync','vitals']:[...e,'home','insight','chat','game','elo','sync','vitals']}
+const sizeMB=m=>parseFloat(String(m.size).replace(',','.'))||0.1;
+function plant(level){
+  const L=['<path d="M30 40c-6 0-11-3-12-8 6-1 11 2 12 8z"/>','<path d="M30 34c6 0 11-3 12-8-6-1-11 2-12 8z"/>','<path d="M30 28c-5 0-9-3-10-7 5-1 9 2 10 7z"/>','<path d="M30 23c5 0 9-3 10-7-5-1-9 2-10 7z"/>','<path d="M30 18c-4 0-7-2-8-5 4-1 7 1 8 5z"/>'];
+  return `<svg class="plant" viewBox="0 0 60 60" aria-hidden="true"><ellipse cx="30" cy="56" rx="14" ry="2" fill="currentColor" opacity=".25"/><path d="M19 44h22l-3 10H22z" fill="#101a30" stroke="currentColor" stroke-width="1.5"/><path d="M30 44V16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><g fill="currentColor" fill-opacity=".85">${L.slice(0,Math.min(5,level)).join('')}</g><circle cx="30" cy="13" r="3.2" fill="#00e5ff"/></svg>`;
+}
+function curWatch(){const l=watchScreens();let c=S.watch.screen;if(c==='breath')return c;if(!l.includes(c))c=l[0];return c;}
+function linkChip(){return S.scenario==='blackout'?`<span class="w-chip local">${ic('nosig')}IA local</span>`:`<span class="w-chip">${ic('sig')}${esc(M().chip)}</span>`}
+function insight(){
+  const v=S.v;
+  if(S.toast.phase==='arrived') return {tag:'Elo Terra',tc:'water',text:'A Ana propôs um brinde hídrico lá da Terra. Beba 250 ml junto com ela.',btn:'Brindar · +250 ml',act:'w-drink',bc:'water'};
+  if(S.scenario==='blackout') return {tag:'IA local',tc:'warn',text:'Sem sinal com a Terra. Seus dados ficam salvos no relógio e eu sigo acompanhando você.',btn:'Ver meus sinais',act:'w-screen',arg:'vitals',bc:'ghost'};
+  if(v.water/v.waterGoal<.7) return {tag:'Hidratação',tc:'water',text:`Faltam ${Math.round(v.waterGoal-v.water).toLocaleString('pt-BR')} ml para a meta de hoje. Beba 250 ml agora.`,btn:'+250 ml',act:'w-drink',bc:'water'};
+  if(v.stress>=40) return {tag:'Estresse',tc:'warn',text:'Seu HRV caiu um pouco. Um minuto de respiração lenta ajuda a recuperar.',btn:'Respirar 1 min',act:'w-breath',bc:''};
+  return {tag:'Tudo certo',tc:'',text:'Sinais estáveis. Próximo treino de resistência às 14:00.',btn:'Ver meus sinais',act:'w-screen',arg:'vitals',bc:'ghost'};
+}
+function watchHTML(shape){
+  const a=assess(S.v), cur=curWatch(), round=shape==='round';
+  let body='';
+  const top=`<div class="w-top"><span data-clock="hm">${hm()}</span>${linkChip()}</div>`;
+  if(cur==='home'){
+    body=top+astro(a.level)+`<div class="w-state">${LV[a.level].toUpperCase()}</div>`+
+      (round
+        ? `<div class="w-row"><span class="w-pill">${ic('heart','c-crit')}<b data-v="hr">${FMT.hr(S.v)}</b><small>bpm</small></span><span class="w-pill">${ic('o2','c-acc')}<b data-v="spo2">${FMT.spo2(S.v)}</b><small>%</small></span></div>`
+        : `<div class="w-counts"><span class="c0 ${a.ok?'on':''}"><b>${a.ok}</b>ótimos</span><span class="c1 ${a.warn?'on':''}"><b>${a.warn}</b>atenção</span><span class="c2 ${a.crit?'on':''}"><b>${a.crit}</b>críticos</span></div>`);
+  } else if(cur==='insight'){
+    const i=insight();
+    body=`<div class="w-tag ${i.tc}">${esc(i.tag)}</div><p class="w-text">${esc(i.text)}</p><button class="w-btn ${i.bc}" data-act="${i.act}" data-arg="${i.arg||''}">${esc(i.btn)}</button>`;
+  } else if(cur==='vitals'){
+    const rows=round?['hr','spo2','water']:['hr','spo2','water','stress'];
+    body=`<div class="w-tag">Seus sinais</div><div class="w-vits">${rows.map(k=>{const m=MK[k];return `<div class="w-vit b${a.bands[k]}">${ic(m.ic,m.icc)}<span class="l">${m.short}</span><b><span data-v="${k}">${FMT[k](S.v)}</span><small>${m.unit}</small></b></div>`}).join('')}</div>`;
+  } else if(cur==='chat'){
+    const msgs=S.chat.slice(round?-5:-7).map(c=>`<div class="wb ${c.who}">${esc(c.text)}${c.acts?`<div class="acts">${c.acts.map(x=>`<button class="${x.cls||''}" data-act="${x.act}">${esc(x.label)}</button>`).join('')}</div>`:''}</div>`).join('');
+    const chips=chatChips().slice(0,round?2:3);
+    body=`<div class="w-tag ${S.scenario==='blackout'?'warn':''}">Cosmo · ${S.scenario==='blackout'?'IA local':'no relógio'}</div>
+      <div class="w-thread" data-thread>${msgs}${S.typing?'<div class="wb cosmo typing" aria-label="Cosmo digitando"><i></i><i></i><i></i></div>':''}</div>
+      <div class="w-chat-in"><button class="mic" data-act="w-ask" data-arg="como" aria-label="Falar com a Cosmo">${ic('mic')}</button><div class="w-chips">${chips.map(q=>`<button data-act="w-ask" data-arg="${q}">${QTXT[q]}</button>`).join('')}</div></div>`;
+  } else if(cur==='elo'){
+    const f=S.family, pct=Math.min(100,f.km/f.goal*100);
+    const km=n=>n.toFixed(1).replace('.',',');
+    const anaTx=S.toast.phase==='arrived'?'propôs um brinde':'bebeu 500 ml';
+    const btn=S.toast.phase==='arrived'
+      ? `<button class="w-btn water sm2" data-act="w-drink">Brindar com a Ana · +250 ml</button>`
+      : `<button class="w-btn ghost sm2" data-act="w-cheer">Mandar incentivo ao Lucas</button>`;
+    body=`<div class="w-tag water">Elo Terra · família</div>
+      <div class="w-chal"><div class="w-chal-t"><span>Corrida Terra–órbita</span><b>${km(f.km)}/${f.goal} km</b></div><div class="bar-t"><i style="width:${pct.toFixed(1)}%"></i></div></div>
+      <div class="w-fam">
+        <div class="w-fm"><span class="av">AN</span><span class="tx">Ana ${anaTx}</span><b>+25%</b></div>
+        <div class="w-fm"><span class="av">LU</span><span class="tx">Lucas correu ${f.lucasKm} km</span><b>+15%</b></div>
+      </div>${btn}`;
+  } else if(cur==='sync'){
+    const m=M(), bo=S.scenario==='blackout', em=S.scenario==='emergency';
+    const pend=S.bus.filter(x=>x.dir==='up'&&x.status!=='delivered').sort((a,b)=>a.prio-b.prio);
+    const mb=pend.reduce((s,x)=>s+sizeMB(x),0);
+    const lastDel=[...S.bus].reverse().find(x=>x.dir==='up'&&x.status==='delivered');
+    const segs=pend.length?pend.map(x=>`<i class="p${x.prio}" style="flex:${sizeMB(x)}"></i>`).join(''):'<i class="p4" style="flex:1;opacity:.4"></i>';
+    const list=pend.length
+      ? pend.slice(0,round?2:3).map(x=>`<div class="w-pk p${x.prio} ${x.status==='queued'?'q':''}"><span class="tx">${esc(x.label)}</span><small>${x.status==='queued'?'na fila':`<span data-eta="${x.id}">…</span>`}</small></div>`).join('')
+      : `<div class="w-pk ok">${ic('check','c-ok')}<span class="tx">Tudo sincronizado</span><small>${lastDel?lastDel.deliveredClock.slice(0,5):'—'}</small></div>`;
+    const btn= em?`<button class="w-btn crit sm2" data-act="w-sos">Enviar SOS prioritário</button>`
+      : bo?`<button class="w-btn warn sm2" data-act="w-ping">Testar sinal</button>`
+      : `<button class="w-btn sm2" data-act="w-sync">Sincronizar agora</button>`;
+    body=`<div class="w-tag ${bo?'warn':''}">Sincronia · ${bo?'sem sinal':esc(m.link)}</div>
+      <div class="w-delay">${bo?m.bo.back:m.oneWayTxt}</div>
+      <div class="w-sub">${bo?'até a próxima janela':'de atraso até a Terra'} · ${pend.length} na fila${mb?` · ${mb.toFixed(1).replace('.',',')} MB`:''}</div>
+      <div class="w-qbar" aria-hidden="true">${segs}</div>
+      <div class="w-pks">${list}</div>${btn}`;
+  } else if(cur==='game'){
+    const v=S.v, q=S.quests;
+    const rows=[
+      {k:'treino',ic:'bolt',name:'Esteira T2',st:q.treino?'feito':'14:00',act:''},
+      {k:'agua',ic:'drop',name:'Água 2,4 L',st:q.agua?'feito':`${(v.water/1000).toFixed(1).replace('.',',')}/2,4 L`,act:'w-drink'},
+      {k:'powerdown',ic:'moon',name:'Escudo mental',st:q.powerdown?'feito':'1 min',act:'w-breath'}
+    ];
+    body=`<div class="w-tag ok">Bioma cooperativo</div>${plant(S.gh.level)}
+      <div class="w-xp">Nível ${S.gh.level} · estufa ${S.gh.pct}% · <b>${S.xp} XP</b></div>
+      <div class="w-quests">${rows.map(r=>{
+        const inner=`${ic(q[r.k]?'check':r.ic,q[r.k]?'c-ok':'c-acc')}<span>${r.name}</span><small>${r.st}</small>`;
+        return q[r.k]||!r.act?`<div class="w-q ${q[r.k]?'done':''}">${inner}</div>`:`<button class="w-q" data-act="${r.act}" aria-label="${r.name}: fazer agora">${inner}</button>`;
+      }).join('')}</div>`;
+  } else if(cur==='breath'){
+    body=`<div class="w-tag">Respiração guiada</div><div class="w-breath"><span></span></div><div class="w-sub">Inspire 4 s · solte 6 s<br><b data-v="breath">30</b> s restantes</div><button class="w-btn ghost sm" data-act="w-stop">Parar</button>`;
+  } else if(cur==='evt'){
+    body=evtWatch(round);
+  } else if(cur==='alert'){
+    const ph=S.emerg?S.emerg.phase:'detected';
+    const sub={detected:'A Cosmo está analisando seu ritmo cardíaco…',proposed:'Oficial médico avisado. Respire devagar.',confirmed:'Dr. Marcus a caminho · O₂ 2 L/min',stable:'Sinais melhorando. Continue em repouso.'}[ph];
+    const note = S.watch.okNote ? `<div class="w-sub" style="color:#fecaca">${ph==='stable'?'Combinado. Fique em repouso por 20 min.':'Seus sinais ainda estão fora do normal. O oficial médico já foi avisado.'}</div>` : `<button class="w-btn ghost sm" data-act="w-ok">Estou bem</button>`;
+    body=`<div class="w-tag ${ph==='stable'?'warn':'crit'}">${ph==='stable'?'Em recuperação':'Alerta médico'}</div><div class="w-big">${ph==='stable'?'Continue sentada':'Pare e sente-se'}</div><div class="w-row"><span class="w-pill">${ic('heart','c-crit')}<b data-v="hr">${FMT.hr(S.v)}</b></span><span class="w-pill">${ic('o2','c-acc')}<b data-v="spo2">${FMT.spo2(S.v)}</b><small>%</small></span></div><div class="w-sub">${sub}</div>${note}`;
+  }
+  const ring=(cur==='home'||cur==='alert')
+    ? (round
+      ? `<svg class="w-ring" viewBox="0 0 288 288" aria-hidden="true"><circle class="trk" cx="144" cy="144" r="139" pathLength="100"/><circle class="prg" cx="144" cy="144" r="139" pathLength="100" stroke-dasharray="${a.homeo} 100" transform="rotate(-90 144 144)"/></svg>`
+      : `<svg class="w-ring" viewBox="0 0 236 292" aria-hidden="true"><rect class="trk" x="3" y="3" width="230" height="286" rx="55" pathLength="100"/><rect class="prg" x="3" y="3" width="230" height="286" rx="55" pathLength="100" stroke-dasharray="${a.homeo} 100"/></svg>`)
+    : '';
+  const dots = cur==='breath'?'':`<div class="w-dots">${watchScreens().map(s=>`<button class="dot" data-act="w-screen" data-arg="${s}" aria-label="${WS_NAMES[s]}" aria-current="${s===cur}"><i></i></button>`).join('')}</div>`;
+  const notice = S.watch.notice?`<div class="w-notice" role="status">${esc(S.watch.notice)}</div>`:'';
+  return `<div class="ws ${round?'round':'sq'} lv${a.level} ${cur==='alert'?'is-alert':''} ${cur==='evt'?'evt-'+watchEvt():''}" style="--beat:${(60/Math.max(40,S.v.hr)).toFixed(2)}s">${ring}<div class="ws-in">${body}${dots}</div>${notice}</div>`;
+}
+
+/* ================= Render: celular da família ================= */
+function phoneHTML(){
+  const ev=earthView(), sn=ev.snap, m=M(), tab=S.phone.tab;
+  const med = ev.status==='live' && sn.sc==='emergency';
+  let body='';
+  if(tab==='home'){
+    if(ev.status==='nosig'){
+      body+=`<div class="pc hero dark"><span class="hero-ic c-warn">${ic('nosig')}</span><div><div class="eyebrow">Sarah · Comandante</div><h4>Sem sinal da nave por enquanto</h4><p>${esc(m.bo.why)}. Isso é esperado e a tripulação segue a rotina normalmente. O contato volta em ${m.bo.back}.</p><p>Suas mensagens ficam guardadas e seguem quando o sinal voltar.</p></div></div>`;
+    } else if(S.evt.solar&&S.evt.solar.earthKnown){
+      body+=`<div class="pc hero dark"><span class="hero-ic c-warn">${ic('radiation')}</span><div><div class="eyebrow">Tripulação · aviso de rotina</div><h4>A tripulação está no abrigo por precaução</h4><p>Uma tempestade solar está passando. A nave tem um abrigo com proteção extra, e ir para lá é procedimento de rotina. Todos estão bem.</p></div></div>`;
+    } else if(med){
+      body+=`<div class="pc hero med"><span class="hero-ic" style="color:#c4b5fd">${ic('shield')}</span><div><div class="eyebrow">Sarah · Comandante</div><h4>A Sarah está sendo acompanhada pela equipe médica</h4><p>Detalhes de saúde ficam entre a tripulação e os médicos da NASA. A NASA vai entrar em contato com novidades.</p></div></div>`;
+    } else {
+      body+=`<div class="pc hero ok">${astro(0,'sm')}<div><div class="eyebrow">Sarah · Comandante</div><h4>A Sarah está bem</h4><p>${m.oneWay<1?'As notícias da nave chegam quase em tempo real.':`As notícias da nave chegam com ${m.oneWayTxt} de atraso, o tempo que o sinal leva para viajar ${m.dist.replace(/^a /,'')}.`}</p></div></div>`;
+      const st=sn.v.stress<50?'Dia tranquilo':'Dia puxado';
+      body+=`<div class="mini-grid">
+        <div class="mini">${ic('moon','c-sleep')}<b>Dormiu ${FMT.sleep(sn.v)}</b><span>Sono bom</span></div>
+        <div class="mini">${ic('bolt','c-ok')}<b>Treino feito</b><span>45 min na esteira</span></div>
+        <div class="mini">${ic('drop','c-water')}<b><span data-v="waterPct" data-s="e">${FMT.waterPct(sn.v)}</span>% da meta</b><span>Hidratação</span></div>
+        <div class="mini">${ic('brain','c-warn')}<b>${st}</b><span>Humor e energia</span></div></div>`;
+    }
+    const feed=S.bus.filter(x=>x.dir==='up'&&x.status==='delivered'&&x.aud.includes('family')).slice(-3).reverse();
+    body+=`<div class="pc"><div class="eyebrow">Últimas da nave</div><div class="feed" style="margin-top:8px">${feed.length?feed.map(x=>`<div class="feed-i">${ic('check')}<span>${esc(x.fam||x.label)} <span style="color:var(--ink3)">· ${x.deliveredClock.slice(0,5)}</span></span></div>`).join(''):'<div class="feed-i" style="color:var(--ink3)">Nada novo por enquanto.</div>'}</div></div>`;
+    body+=`<div class="status-line">${ic('orbit','c-acc')}${esc(m.where)} · ${esc(m.dist)}</div>`;
+  } else if(tab==='elo'){
+    body+=`<div class="pc"><div class="eyebrow">Estufa da tripulação · nível ${S.gh.level}</div><h4 style="margin-top:4px">${ic('leaf','c-ok')} Ecossistema ${S.gh.pct}% saudável</h4><div class="bar-t"><i style="width:${S.gh.pct}%"></i></div><p>Hábitos saudáveis da tripulação e das famílias fazem a estufa crescer.</p></div>`;
+    const fk=S.family, kmTxt=fk.kmEarth.toFixed(1).replace('.',',');
+    body+=`<div class="pc"><div class="eyebrow">Desafio da semana · família + tripulação</div><h4 style="margin-top:4px">Corrida Terra–órbita</h4><div class="bar-t"><i style="width:${Math.min(100,fk.kmEarth/fk.goal*100).toFixed(1)}%;background:linear-gradient(90deg,var(--water),var(--accent))"></i></div><p>${kmTxt} de ${fk.goal} km somando a esteira da Sarah e as corridas da família.</p></div>`;
+    body+=`<div class="pc"><div class="eyebrow">Hábitos da família hoje</div><div style="margin-top:6px"><div class="habit"><span>Lucas correu 5 km na praia</span><b>+15% energia</b></div><div class="habit"><span>Ana bebeu 500 ml de água</span><b>+25% hidro-pod</b></div></div><button class="btn ghost" data-act="p-run">${ic('bolt')} Registrar corrida do Lucas · 5 km</button></div>`;
+    const tm=[...S.bus].reverse().find(x=>x.label.startsWith('Convite da Ana'));
+    const ph=S.toast.phase;
+    if(!ph){
+      body+=`<div class="pc"><h4>${ic('drop','c-water')} Brinde hídrico Terra–órbita</h4><p>Beba 250 ml e convide a Sarah a beber junto. O convite chega à nave em ${m.oneWayTxt}.</p><button class="btn water" data-act="p-toast">Brindar com a Sarah</button></div>`;
+    } else if(ph==='sent'){
+      body+=`<div class="pc"><h4>Convite a caminho da nave</h4>${tm&&tm.status==='queued'?'<p class="c-warn">Sem sinal agora. O convite sai quando o contato voltar.</p>':`<p>Chega em <b data-eta="${tm?tm.id:0}">…</b></p><div class="bar-t"><i data-etabar="${tm?tm.id:0}" style="width:0;background:var(--water)"></i></div>`}</div>`;
+    } else if(ph==='arrived'){
+      body+=`<div class="pc"><h4>A Sarah recebeu seu convite</h4><p>Quando ela beber, a confirmação viaja de volta para cá.</p></div>`;
+    } else if(ph==='drank'){
+      const bm=[...S.bus].reverse().find(x=>x.label.startsWith('Brinde hídrico'));
+      body+=`<div class="pc"><h4>A Sarah brindou!</h4><p>A confirmação está a caminho da Terra: <b data-eta="${bm?bm.id:0}">…</b></p></div>`;
+    } else {
+      body+=`<div class="pc celebrate"><div style="font-size:30px" class="c-ok">${ic('leaf')}</div><h4>Brinde concluído</h4><p>Você e a Sarah beberam juntas, a ${esc(m.dist.replace(/^a /,''))} de distância. A estufa ganhou +3%.</p><button class="btn ghost" data-act="p-toast">Brindar de novo</button></div>`;
+    }
+  } else {
+    const items=S.bus.filter(x=>(x.dir==='down'&&x.from==='family')||(x.dir==='up'&&x.aud.includes('family')&&x.status==='delivered'));
+    body+=`<div class="pc"><div class="eyebrow">Conversa com a Sarah</div><p>Cada mensagem leva ${m.oneWayTxt} para chegar.</p></div><div class="thread">`+
+      (items.length?items.map(x=>{
+        if(x.dir==='down'){
+          const st = x.status==='queued'?'<small class="q">Na fila: sem sinal</small>': x.status==='transit'?`<small>A caminho · <span data-eta="${x.id}">…</span></small>`:`<small>Entregue · ${x.deliveredClock.slice(0,5)}</small>`;
+          return `<div class="bub me">${esc(x.label)}${st}</div>`;
+        }
+        return `<div class="bub her">${esc(x.fam||x.label)}<small>Recebido · ${x.deliveredClock.slice(0,5)}</small></div>`;
+      }).join(''):'<div class="bub her">Oi, família! Treino feito por hoje.<small>Ontem · 21:10</small></div>')+
+      `</div><button class="btn" data-act="p-msg">${ic('mic')} Enviar áudio do Lucas</button>`;
+  }
+  const tabs=[['home','Início','home'],['elo','Elo','leaf'],['msg','Mensagens','msg']];
+  return `<div class="ps-status"><span data-clock="hm">${hm()}</span><span>${ic('sig')} ${ic('battery')}</span></div>
+  <div class="ps-head"><div class="app-logo">${ic('orbit')}</div><div><b>Terra-Órbita</b><small>Família da Sarah · Houston</small></div></div>
+  <div class="ps-body">${body}</div>
+  <nav class="ps-tabs">${tabs.map(t=>`<button data-act="p-tab" data-arg="${t[0]}" aria-current="${t[0]===tab}">${ic(t[2])}${t[1]}</button>`).join('')}</nav>`;
+}
+
+/* ================= Tripulação ================= */
+const CREW={
+  sarah:{name:'Sarah',role:'Comandante'},
+  marcus:{name:'Dr. Marcus',role:'Oficial médico'},
+  elena:{name:'Elena',role:'Engenheira de voo'},
+  kenji:{name:'Kenji',role:'Especialista de missão'}
+};
+const CREW_IDS=Object.keys(CREW);
+const CREW_NOTES={
+  marcus:{title:'Autoavaliação do oficial médico',items:['Sinais estáveis: você está apto para atender.','Sono de 7h05 e treino de 30 min concluído.','Próxima autoavaliação no domingo.'],remind:null},
+  elena:{title:'Acompanhamento · Elena',items:['Hidratação em cerca de metade da meta; o lembrete das 08:30 ficou sem resposta.','Duas noites seguidas com cerca de 6h10 de sono.','Estresse moderado com a agenda de manutenção da cúpula cheia.'],remind:'Enviar lembrete de água ao relógio da Elena'},
+  kenji:{title:'Acompanhamento · Kenji',items:['DXA (densidade óssea) marcada para sexta.','Densidade óssea −1,2% em 3 meses, dentro do esperado para a missão.','Todos os sinais na faixa ótima.'],remind:'Lembrar o Kenji do treino resistivo'}
+};
+const COP_SUM={
+  marcus:'Você está estável e apto para atender. Nenhuma pendência de saúde própria.',
+  elena:'A Elena é quem mais pede atenção hoje: hidratação baixa, duas noites curtas e estresse moderado. A Cosmo sugere lembrete de água a cada 2 h e uma conversa rápida sobre a carga de trabalho na cúpula.',
+  kenji:'O Kenji está ótimo. A perda óssea segue a curva esperada para a missão; manter o treino resistivo até o exame de sexta.'
+};
+function vOf(id,snap){
+  if(snap) return id==='sarah'?snap.v:((snap.crew&&snap.crew[id])||S.crew[id]);
+  return id==='sarah'?S.v:S.crew[id];
+}
+function crewSub(id,v,a){
+  const k=METRICS.find(m=>a.bands[m.k]===2)||METRICS.find(m=>a.bands[m.k]===1&&m.k!=='stress');
+  if(!k) return CREW[id].role;
+  const val=k.k==='water'?FMT.waterPct(v)+'%':k.k==='sleep'?FMT.sleep(v):FMT[k.k](v)+(k.unit&&k.unit!=='/100'?' '+k.unit:'');
+  return `${CREW[id].role} · ${k.short} ${val}`;
+}
+function crewHTML(sel,snap,act){
+  return CREW_IDS.map(id=>{const v=vOf(id,snap),a=assess(v);
+    return `<button class="crew-i ${id===sel?'sel':''}" data-act="${act}" data-arg="${id}" aria-pressed="${id===sel}"><i class="l${a.level}"></i><span>${CREW[id].name}</span><small>${esc(crewSub(id,v,a))}</small></button>`;}).join('');
+}
+function remind(id){
+  if(S.remind[id]) return;
+  S.remind[id]=clock();
+  log('Bordo',`painel de bordo → relógio de ${CREW[id].name} · rede local`,id==='elena'?'Dr. Marcus enviou um lembrete de água para a Elena.':'Dr. Marcus lembrou o Kenji do treino resistivo.',0);
+  if(id==='elena') setTimeout(()=>{S.crew.elena.water+=250;log('Relógio da Elena','Elena','Elena registrou +250 ml de água.',0);lastKey='';tick();},4000);
+}
+
+/* ================= Render: painel de bordo do oficial médico ================= */
+function tile(k,v,bands,src,who){
+  const m=MK[k];
+  return `<div class="tile b${bands[k]}"><div class="l">${ic(m.ic,m.icc)}${m.name}</div><div class="v"><span data-v="${k}" data-who="${who||'sarah'}"${src==='e'?' data-s="e"':''}>${FMT[k](v)}</span><small>${m.unit}</small></div><div class="src">${m.src}</div></div>`;
+}
+function tabletHTML(){
+  const sel=S.tSel||'sarah', isS=sel==='sarah', v=vOf(sel), a=assess(v), m=M(), e=S.emerg, bo=S.scenario==='blackout';
+  const linkC = bo?`<span class="chip warn">${ic('nosig')}Houston fora de alcance</span>`:`<span class="chip">${ic('sig')}Houston · ${m.oneWayTxt}</span>`;
+  let dec='';
+  if(!isS){
+    const n=CREW_NOTES[sel], rem=S.remind[sel];
+    if(sel==='kenji') dec+=`<div class="dec"><h5>${ic('bolt','c-acc')} Treino resistivo · Kenji</h5><p>Carga atual em 85% do previsto. A Cosmo sugere +5% nesta semana para frear a perda óssea e muscular.</p><button class="btn ${S.boneOk?'ghost':''}" data-act="bone-ok"${S.boneOk?' disabled':''}>${S.boneOk?'Carga aprovada às '+S.boneOk.slice(0,5):'Aprovar carga da semana'}</button></div>`;
+    if(e&&(e.phase==='detected'||e.phase==='proposed')) dec+=`<div class="dec crit"><h5>${ic('alert','c-crit')} A Sarah precisa de você</h5><p>${e.phase==='proposed'?'Há um protocolo da Cosmo aguardando sua confirmação.':'A Cosmo está analisando um evento cardíaco.'}</p><div class="dec-actions"><button class="btn crit pulse" data-act="t-sel" data-arg="sarah">Abrir o painel da Sarah</button></div></div>`;
+    dec+=`<div class="dec"><h5>${n.title}</h5><ul>${n.items.map(i=>`<li>${i}</li>`).join('')}</ul>${n.remind?`<button class="btn ghost" data-act="t-remind" data-arg="${sel}"${rem?' disabled':''}>${rem?'Lembrete enviado às '+rem.slice(0,5):n.remind}</button>`:''}</div>`;
+  } else if(e&&e.phase==='detected'){
+    dec=`<div class="dec crit"><h5>${ic('alert','c-crit')} Cosmo analisando evento da Sarah</h5><p>Ritmo alto e irregular detectado no relógio durante o treino.</p></div>`;
+  } else if(e&&e.phase==='proposed'){
+    dec=`<div class="dec crit"><h5>${ic('alert','c-crit')} Cosmo propõe um protocolo · confiança 87%</h5><p>Suspeita: fibrilação atrial com resposta ventricular rápida e hipoxemia leve.</p>
+    <ol><li>Interromper o exercício; Sarah sentada em repouso.</li><li>O₂ por máscara a 2 L/min.</li><li>ECG de 12 derivações com o kit médico.</li><li>Desfibrilador de prontidão; reavaliar em 10 min.</li><li>Antiarrítmico do kit: só com sua liberação, em passo separado (2 tratamentos em estoque, dentro da validade).</li></ol>
+    <p style="margin-top:8px">Nada é aplicado sem a sua confirmação.</p>
+    <button class="linkbtn" data-act="t-explain">${S.tExplain?'Ocultar explicação':'Por que a Cosmo sugeriu isso?'}</button>
+    ${S.tExplain?`<div class="explain"><b class="c-acc">Evidências usadas pela Cosmo</b><br>Intervalos RR irregulares em 30 s de ECG do relógio (variação acima de 20%), sem onda P visível; FC acima de 150 bpm; SpO₂ abaixo de 90% por mais de 40 s; início durante esforço na esteira. Protocolo de referência: manejo inicial de FA aguda, adaptado ao kit médico da nave. Confiança 87%; a principal alternativa é taquicardia sinusal por esforço.<br><br><b class="c-acc">Modelos</b><br>M1 · fibrilação atrial 0,87 (v0.3, treinado no PhysioNet CinC 2017) · M2 · sinal bom 0,94 (v0.2) · M3 · FC acima da linha de base da Sarah (z robusto v0.1). Isolation Forest m3-if-0.1 também vê a combinação fora do padrão; este alerta é do M1.</div>`:''}
+    <div class="dec-actions"><button class="btn crit pulse" data-act="t-confirm">Confirmar protocolo</button><button class="btn ghost" data-act="t-manual">Assumir manualmente</button></div></div>`;
+  } else if(e&&(e.phase==='confirmed'||e.phase==='stable')){
+    const alertMsg=S.bus.find(x=>x.label.startsWith('Alerta médico'));
+    const hou = e.reply?`<div class="reply"><b>Parecer de Houston</b>${esc(e.reply)}</div>`
+      : e.replySent?`<p style="margin-top:8px">Parecer de Houston a caminho.</p>`
+      : e.received?`<p style="margin-top:8px">Houston recebeu o alerta e está revisando.</p>`
+      : `<p style="margin-top:8px">Alerta chega a Houston em <b data-eta="${alertMsg?alertMsg.id:0}">…</b>. A decisão é sua até lá.</p>`;
+    dec=`<div class="dec prog"><h5>${ic('check','c-acc')} ${e.by==='manual'?'Atendimento manual':'Protocolo em andamento'} · confirmado às ${e.confClock.slice(0,5)}</h5>
+    <ul class="check"><li>${ic('check','c-ok')}Repouso</li><li>${ic(e.phase==='stable'?'check':'clock',e.phase==='stable'?'c-ok':'c-warn')}O₂ 2 L/min ${e.phase==='stable'?'· SpO₂ recuperada':'· em curso'}</li><li>${ic(e.phase==='stable'?'check':'clock',e.phase==='stable'?'c-ok':'c-warn')}ECG de 12 derivações ${e.phase==='stable'?'· ritmo mais regular':'· gravando'}</li><li>${ic(e.med?'check':'alert',e.med?'c-ok':'c-warn')}${e.med?'Antiarrítmico liberado por você às '+e.med.slice(0,5):'Antiarrítmico: aguardando sua liberação'}</li></ul>${e.med?'':'<div class="dec-actions"><button class="btn ghost" data-act="med-ok">Liberar antiarrítmico (você define a dose)</button></div>'}${hou}</div>`;
+  } else if(bo){
+    const q=S.bus.filter(x=>x.status==='queued'&&x.dir==='up');
+    dec=`<div class="dec dark"><h5>${ic('nosig','c-warn')} Houston fora de alcance</h5><p>${esc(m.bo.why)}. Volta em ${m.bo.back}. Enquanto isso, você é a autoridade médica a bordo e a Cosmo opera com modelos locais.</p>
+    <p style="margin-top:6px">Fila para a Terra: <b>${q.length} pacote(s)</b> · prioridade: ECG, decisões médicas, rotina.</p></div>`;
+  } else {
+    dec=`<div class="dec"><h5>Nenhuma decisão pendente</h5><ul><li>ECG de rotina · Sarah · 14:00</li><li>Densidade óssea (DXA) · Kenji · sexta</li><li>Hidratação da Elena abaixo da meta · toque no nome dela para ver</li></ul></div>`;
+  }
+  const TQ={crew:'Quem precisa de atenção hoje?',resumo:`Resumo: ${CREW[sel].name}`,kit:'Situação do kit médico'};
+  const tAns={
+    crew:'Elena: hidratação baixa e duas noites curtas; vale conversar hoje. Sarah: estresse moderado e hidratação abaixo da meta. Kenji e você: estáveis.',
+    resumo: isS
+      ? `Sarah está ${LV[a.level].toLowerCase()}: FC ${FMT.hr(v)} bpm, SpO₂ ${FMT.spo2(v)}%, PA ${FMT.bp(v)}, homeostase ${a.homeo}%. ${e?'Evento cardíaco às '+e.clock.slice(0,5)+'; acompanhar ECG de 12 derivações.':'Sem eventos cardíacos nos últimos 7 dias.'} Ciclo no dia 14 (janela fértil).`
+      : `${CREW[sel].name}: ${LV[a.level].toLowerCase()}, FC ${FMT.hr(v)} bpm, SpO₂ ${FMT.spo2(v)}%, homeostase ${a.homeo}%. ${COP_SUM[sel]}`,
+    kit:'O₂ portátil em 92%, 18 eletrodos de ECG, 6 bolsas de soro, desfibrilador testado ontem. Antiarrítmicos: estoque para 2 tratamentos completos.'
+  };
+  const cop=`<div class="cop"><div class="cop-chips">${Object.keys(TQ).map(k=>`<button data-act="t-ask" data-arg="${k}" aria-pressed="${S.tAsk===k}">${TQ[k]}</button>`).join('')}</div>${S.tAsk&&tAns[S.tAsk]?`<div class="cop-a"><b>${ic('orbit')}Cosmo · copiloto médico</b>${esc(tAns[S.tAsk])}</div>`:''}</div>`;
+  if(!(isS&&e&&e.phase==='proposed')) dec+=cop;
+  dec=evtTablet()+dec;
+  return `<div class="ts-head"><div><b>Enfermaria · Dr. Marcus</b><small>Oficial médico da tripulação</small></div><div class="chips">${linkC}<span class="chip ok">${ic('mesh')}Rede local · 4 tripulantes</span><span class="chip ${S.co2>3?'warn':''}">${ic('wind')}CO₂ ${S.co2.toFixed(1).replace('.',',')} mmHg</span></div></div>
+  <div class="ts-body"><div class="crew" role="group" aria-label="Tripulação">${crewHTML(sel,null,'t-sel')}</div>
+  <div class="ts-main">
+    <div class="pt-head"><b>${CREW[sel].name} · ${CREW[sel].role}</b><span class="state-pill l${a.level}">${LV[a.level]} · homeostase ${a.homeo}%</span></div>
+    <div class="ecg-wrap"><canvas class="ecg" data-ecg="live" data-who="${sel}" aria-label="ECG ao vivo de ${CREW[sel].name}"></canvas></div>
+    <div class="tiles">${['hr','spo2','bp','rr','hrv','water'].map(k=>tile(k,v,a.bands,'',sel)).join('')}</div>
+    ${strip(sel)}
+    ${dec}
+  </div></div>`;
+}
+
+/* ================= Render: console de Houston ================= */
+function desktopHTML(){
+  const ev=earthView(), sn=ev.snap, m=M(), e=S.emerg, hs=S.hSel||'sarah', hv=vOf(hs,sn), a=assess(hv), aS=assess(sn.v);
+  const eAlert = ev.status==='live' && sn.sc==='emergency';
+  let banner='';
+  if(ev.status==='nosig') banner=`<div class="ds-banner nosig">${ic('nosig')}Sem sinal desde ${S.preBlackout?S.preBlackout.clock.slice(0,5):'—'}. ${esc(m.bo.why)}. Mostrando o último dado recebido; contato volta em ${m.bo.back}.</div>`;
+  else if(eAlert) banner=`<div class="ds-banner alert">${ic('alert')}Alerta médico da Sarah. Este evento aconteceu a bordo há ${m.oneWayTxt}; a tripulação já está agindo.${hs!=='sarah'?` <button class="pill" style="padding:4px 10px;font-size:12px;margin-left:auto" data-act="d-sel" data-arg="sarah">Ver a Sarah</button>`:''}</div>`;
+  else if(S.evt.solar&&S.evt.solar.earthKnown) banner=`<div class="ds-banner nosig">${ic('radiation')}Tempestade solar: a tripulação já está no abrigo por decisão da comandante.${m.oneWay>=1?` Houston soube ${m.oneWayTxt} depois da decisão.`:''}</div>`;
+  else if(m.oneWay>=1) banner=`<div class="ds-banner past">${ic('clock')}Você está vendo o passado: estes dados saíram da nave há ${m.oneWayTxt}.</div>`;
+  else banner=`<div class="ds-banner live">${ic('sig')}Dados em tempo real via ${m.linkFull}.</div>`;
+
+  const received=S.bus.filter(x=>x.dir==='up'&&x.status==='delivered'&&x.aud.includes('houston')).slice(-6).reverse();
+  const sentDown=S.bus.filter(x=>x.dir==='down'&&x.from==='houston'&&x.status!=='delivered');
+  const canReply = e && e.received && !e.replySent && S.scenario==='emergency';
+  const act = canReply
+    ? `<button class="btn crit" data-act="d-reply">${ic('send')} Enviar parecer à nave</button><p style="font-size:11.5px;color:var(--ink3)">Chega a bordo em ${m.oneWayTxt}.</p>`
+    : `<button class="btn ghost" data-act="d-routine"${ev.status==='nosig'?' disabled':''}>${ic('send')} Enviar recomendação de treino</button>`;
+  return `<div class="ds-head">
+    <div><div class="eyebrow">Mission Control · Flight Surgeon</div><h3>${esc(m.label)}</h3><div class="sub">${esc(m.where)} · ${esc(m.dist)}</div></div>
+    <div class="ds-link"><span>${ev.status==='nosig'?'Link':'Link ativo'}</span><b>${ev.status==='nosig'?'Sem sinal':esc(m.linkFull)}</b><span>Atraso nave → Terra: ${m.oneWayTxt}${compressed()?' · na demo, 1 min = 1 s':''}</span></div>
+    <div class="ds-clock"><small>Hora da nave</small><span data-clock="hms">${clock()}</span></div>
+  </div>${banner}
+  <div class="ds-grid">
+    <div class="ds-col">
+      <div class="ds-h">Tripulação</div>
+      <div class="crew" style="border:0;padding:0" role="group" aria-label="Tripulação">${crewHTML(hs,sn,'d-sel')}</div>
+      <div class="auto"><b>Modo de autonomia</b>${esc(m.autonomy)}</div>
+    </div>
+    <div class="ds-col main">
+      <div class="pt-head"><b style="font:600 16px var(--fd)">${CREW[hs].name} · ${CREW[hs].role}</b><span class="state-pill l${a.level}">${LV[a.level]} · homeostase ${a.homeo}%</span><span class="chip">${ic('clock')}dado de ${sn.clock}</span></div>
+      <div class="ecg-wrap"><canvas class="ecg" data-ecg="earth" data-who="${hs}" aria-label="ECG de ${CREW[hs].name} recebido em Houston"></canvas>${ev.status==='nosig'?'<div class="ecg-over">Sem sinal · último traçado recebido</div>':''}</div>
+      <div><div class="ds-h">Frequência cardíaca · últimos 60 s recebidos</div><svg class="spark" viewBox="0 0 600 64" preserveAspectRatio="none" aria-hidden="true"><line class="gl" x1="0" x2="600" y1="16" y2="16"/><line class="gl" x1="0" x2="600" y1="48" y2="48"/><path class="area" data-spark="area" d=""/><path class="ln" data-spark="line" d=""/></svg></div>
+      <div class="ds-tiles">${METRICS.map(x=>tile(x.k,hv,a.bands,'e',hs)).join('')}</div>
+    </div>
+    <div class="ds-col">
+      <div class="ds-h">Recebido da nave</div>
+      ${received.length?`<ul class="audit">${received.map(x=>`<li class="p${x.prio}"><time>${x.deliveredClock} · enviado ${x.sentClock}</time>${esc(x.label)}</li>`).join('')}</ul>`:'<div class="empty">Nada recebido ainda nesta sessão.</div>'}
+      <div class="ds-h">Copiloto Cosmo</div>
+      ${houstonCopilot(ev,sn,aS,received)}
+      <div class="ds-h">Enviar para a nave</div>
+      ${act}
+      ${sentDown.length?`<ul class="audit">${sentDown.map(x=>`<li><time>${x.status==='queued'?'Na fila: sem sinal':'A caminho · <span data-eta="'+x.id+'">…</span>'}</time>${esc(x.label)}</li>`).join('')}</ul>`:''}
+    </div>
+  </div>`;
+}
+
+function houstonCopilot(ev,sn,a,received){
+  const HQ={resumo:'O que aconteceu desde o último contato?',decisao:'Explique a decisão tomada a bordo',tendencia:'Tendência da FC'};
+  const all=S.bus.filter(x=>x.dir==='up'&&x.status==='delivered'&&x.aud.includes('houston'));
+  const alertM=all.find(x=>x.label.startsWith('Alerta médico')), decM=all.find(x=>x.label.startsWith('Decisão a bordo'));
+  let txt='';
+  if(S.hAsk==='resumo'){
+    txt=`Recebemos ${all.length} pacote(s) da nave nesta sessão. `+
+      (alertM?`Alerta médico às ${alertM.sentClock.slice(0,5)} (hora da nave): suspeita de fibrilação atrial com resposta rápida e SpO₂ 88%. `:'Nenhum alerta médico. ')+
+      (decM?`O oficial médico confirmou o protocolo às ${decM.sentClock.slice(0,5)}. `:'')+
+      `Último dado recebido: ${LV[a.level].toLowerCase()}, homeostase ${a.homeo}%.`+(ev.status==='nosig'?' Estamos sem sinal; o resto chega quando a fila descarregar.':'');
+  } else if(S.hAsk==='decisao'){
+    txt = decM ? 'A Cosmo detectou RR irregular sem onda P, FC acima de 150 bpm e SpO₂ abaixo de 90% durante esforço, e propôs repouso, O₂ a 2 L/min e ECG de 12 derivações. O Dr. Marcus confirmou sem alterações. A conduta segue o protocolo de FA aguda do kit da nave; sugiro concordar e pedir novo ECG em 1 h.'
+      : alertM ? 'O alerta chegou, mas a decisão do oficial médico ainda não. Ela pode estar a caminho.'
+      : 'Nenhuma decisão médica foi tomada a bordo nesta sessão.';
+  } else if(S.hAsk==='tendencia'){
+    const tEnd=ev.status==='nosig'?(S.preBlackout?S.preBlackout.t:now()):now()-delayMs();
+    const hs=S.hSel||'sarah'; const pts=S.hist.filter(h=>h.t<=tEnd&&h.t>=tEnd-60000).map(h=>vOf(hs,h).hr);
+    if(pts.length){const mn=Math.round(Math.min(...pts)),mx=Math.round(Math.max(...pts)),av=Math.round(pts.reduce((s,x)=>s+x,0)/pts.length);
+      txt=`${CREW[hs].name}, últimos 60 s recebidos: mínima ${mn} bpm, máxima ${mx} bpm, média ${av} bpm. `+(mx>150?'Pico compatível com o evento cardíaco relatado.':mx>110?'Elevação moderada, compatível com esforço.':'Dentro da faixa de repouso.');}
+    else txt='Ainda não há dados suficientes.';
+  }
+  return `<div class="cop"><div class="cop-chips">${Object.keys(HQ).map(k=>`<button data-act="d-ask" data-arg="${k}" aria-pressed="${S.hAsk===k}">${HQ[k]}</button>`).join('')}</div>${txt?`<div class="cop-a"><b>${ic('orbit')}Cosmo · copiloto de Houston</b>${esc(txt)}</div>`:''}</div>`;
+}
+
+/* ================= Render: controles, roteiro e linha do tempo ================= */
+function renderControls(){
+  document.getElementById('seg-mission').innerHTML=MIS_ORDER.map(k=>`<button data-act="mission" data-arg="${k}" aria-pressed="${S.mission===k}">${MIS[k].label}</button>`).join('');
+  document.getElementById('seg-scenario').innerHTML=SCEN.map(([k,l])=>`<button class="sc-${k}" data-act="scenario" data-arg="${k}" aria-pressed="${S.scenario===k}">${l}</button>`).join('');
+  document.getElementById('seg-event').innerHTML=EVENTS.map(([k,l])=>`<button class="ev-btn" data-act="evt" data-arg="${k}" aria-pressed="${evtOn(k)}">${l}</button>`).join('');
+  document.getElementById('seg-view').innerHTML=VIEWS.map(([k,l])=>`<button data-act="view" data-arg="${k}" aria-pressed="${VIEW===k}">${l}</button>`).join('');
+  const st=STORY[S.step], m=M();
+  document.getElementById('story').innerHTML=`<div><div class="story-step">Roteiro · passo ${S.step+1} de ${STORY.length}</div><h2>${esc(st.title)}</h2><p>${esc(st.text)}</p></div>
+  <div class="story-ctl"><button class="pill quiet" data-act="reset">${ic('reset')} Reiniciar</button><button class="pill" data-act="story" data-arg="-1" ${S.step===0?'disabled':''}>${ic('back')} Anterior</button><button class="pill primary" data-act="story" data-arg="1" ${S.step===STORY.length-1?'disabled':''}>Próximo ${ic('next')}</button></div>
+  <div class="linkline"><span>Missão: <b>${esc(m.where)}</b></span><span>Atraso nave → Terra: <b>${m.oneWayTxt}</b> via ${esc(m.linkFull)}</span>${compressed()?'<span>Na demo, 1 min de atraso = 1 s</span>':''}<span>Hora da nave: <b data-clock="hms">${clock()}</b></span></div>`;
+  const stage=document.getElementById('stage'); stage.dataset.view=VIEW;
+  const show={ecossistema:null,relogio:['watch-round','watch-sq'],celular:['phone'],tablet:['tablet'],desktop:['desktop']}[VIEW];
+  stage.querySelectorAll('.dev').forEach(d=>{d.hidden=!!show&&!show.includes(d.dataset.dev); d.classList.toggle('focus',VIEW==='ecossistema'&&!!S.focus&&S.focus.includes(d.dataset.dev));});
+  document.getElementById('watches').hidden = !!show && !show.some(x=>x.startsWith('watch'));
+}
+function renderTimeline(){
+  const tr=S.bus.filter(x=>x.status!=='delivered');
+  document.getElementById('tl').innerHTML=`<div class="tl-head"><h3>Linha do tempo do sistema</h3><p>Visão do apresentador: o que cada dispositivo fez e por onde a informação viajou.</p></div>
+  ${tr.length?`<div class="transit">${tr.map(x=>`<div class="tr ${x.status==='queued'?'q':''}"><div class="dir ${x.dir}">${x.dir==='up'?'Nave → Terra':'Terra → nave'} · prioridade ${x.prio}</div><div class="lab" title="${esc(x.label)}">${esc(x.label)}</div><div class="eta">${x.status==='queued'?'Na fila: aguardando sinal':`chega em <span data-eta="${x.id}">…</span>`}</div>${x.status==='queued'?'':`<div class="bar-t"><i class="${x.dir}" data-etabar="${x.id}" style="width:0"></i></div>`}</div>`).join('')}</div>`:''}
+  <ol class="tl-list">${S.log.slice(0,14).map(l=>`<li class="s${l.sev}"><time>${l.t}</time><div class="who"><b>${esc(l.who)}</b><small>${esc(l.via)}</small></div><span>${esc(l.text)}</span></li>`).join('')}</ol>`;
+}
+
+const RENDER={'watch-round':()=>watchHTML('round'),'watch-sq':()=>watchHTML('sq'),phone:phoneHTML,tablet:tabletHTML,desktop:desktopHTML};
+function fullRender(){
+  const ae=document.activeElement, fa=ae&&ae.dataset?ae.dataset.act:null, fg=ae&&ae.dataset?ae.dataset.arg:null;
+  const host=ae&&ae.closest?ae.closest('[data-render]'):null, hostKey=host?host.dataset.render:null;
+  document.querySelectorAll('[data-render]').forEach(el=>{el.innerHTML=RENDER[el.dataset.render]();});
+  document.querySelectorAll('[data-thread]').forEach(t=>{t.scrollTop=t.scrollHeight;});
+  renderControls(); renderTimeline(); updateLive();
+  if(fa){
+    const scope = hostKey?document.querySelector(`[data-render="${hostKey}"]`):document;
+    const sel=`[data-act="${fa}"]`+(fg!=null&&fg!==''?`[data-arg="${fg}"]`:'');
+    const el=scope&&scope.querySelector(sel); if(el&&!el.disabled) el.focus({preventScroll:true});
+  }
+}
+
+/* ---------- Atualização ao vivo (sem re-render) ---------- */
+function etaText(ms){const s=Math.max(0,ms/1000);if(compressed()){const real=s*60;const mm=Math.floor(real/60),ss=Math.round(real%60);return (mm?mm+' min ':'')+ss+' s';}return s.toFixed(1).replace('.',',')+' s';}
+function updateLive(){
+  const ev=earthView(), es=ev.snap.v, t=now();
+  document.querySelectorAll('[data-v]').forEach(el=>{
+    const k=el.dataset.v;
+    if(k==='breath'){el.textContent=Math.max(0,Math.ceil(30-(t-S.watch.breathStart)/1000));return;}
+    const v=vOf(el.dataset.who||'sarah',el.dataset.s==='e'?ev.snap:null); if(FMT[k]) el.textContent=FMT[k](v);
+  });
+  document.querySelectorAll('[data-dose]').forEach(el=>{el.textContent=fmtDose(S.dose[el.dataset.dose]||0);});
+  document.querySelectorAll('[data-until]').forEach(el=>{const e=S.evt[el.dataset.until];if(e&&e.at)el.textContent=Math.max(0,Math.ceil((e.at-t)/1000));});
+  document.querySelectorAll('[data-clock]').forEach(el=>{el.textContent=el.dataset.clock==='hm'?hm():clock();});
+  document.querySelectorAll('[data-eta]').forEach(el=>{const m=S.bus.find(x=>x.id==el.dataset.eta);if(!m)return;el.textContent=m.status==='transit'?etaText(m.arriveAt-t):m.status==='queued'?'aguardando sinal':'entregue';});
+  document.querySelectorAll('[data-etabar]').forEach(el=>{const m=S.bus.find(x=>x.id==el.dataset.etabar);if(!m||!m.arriveAt)return;const p=Math.min(1,(t-m.sentAt)/(m.arriveAt-m.sentAt));el.style.width=(p*100).toFixed(1)+'%';});
+  // sparkline de FC recebida na Terra
+  const line=document.querySelector('[data-spark="line"]');
+  if(line){
+    const tEnd=ev.status==='nosig'?(S.preBlackout?S.preBlackout.t:t):t-delayMs();
+    const pts=S.hist.filter(h=>h.t<=tEnd&&h.t>=tEnd-60000);
+    if(pts.length>1){
+      const x=h=>((h.t-(tEnd-60000))/60000*600).toFixed(1), y=h=>(64-(Math.min(180,Math.max(40,vOf(S.hSel||'sarah',h).hr))-40)/140*60-2).toFixed(1);
+      const d=pts.map((h,i)=>(i?'L':'M')+x(h)+' '+y(h)).join(' ');
+      line.setAttribute('d',d);
+      document.querySelector('[data-spark="area"]').setAttribute('d',d+` L${x(pts[pts.length-1])} 64 L${x(pts[0])} 64 Z`);
+    }
+  }
+}
+
+/* ================= ECG ================= */
+const FS=150, NBUF=600;
+function gen(){return {buf:new Float32Array(NBUF),idx:0,bt:0,rr:.83,acc:0,t:0}}
+const GL={sarah:gen(),marcus:gen(),elena:gen(),kenji:gen()}, GE={sarah:gen(),marcus:gen(),elena:gen(),kenji:gen()};
+function ecgVal(bt,rr,afib,t){
+  const k=Math.min(1,rr/.8);
+  const g=(c,a,w)=>a*Math.exp(-((bt-c*k)**2)/(2*(w*k)**2));
+  let v=g(.2,-.1,.01)+g(.23,1,.011)+g(.26,-.22,.012)+g(.46,.28,.045);
+  v+= afib ? .05*Math.sin(t*2*Math.PI*6.5)+(Math.random()-.5)*.05 : g(.1,.12,.025);
+  return v;
+}
+function advance(gn,dt,hr,afib){
+  gn.acc+=dt*FS;
+  while(gn.acc>=1){
+    gn.acc--; gn.t+=1/FS; gn.bt+=1/FS;
+    if(gn.bt>=gn.rr){gn.bt-=gn.rr;const base=60/Math.max(30,hr);gn.rr=afib?base*(.6+Math.random()*.8):base*(.97+Math.random()*.06);}
+    gn.buf[gn.idx]=ecgVal(gn.bt,gn.rr,afib,gn.t); gn.idx=(gn.idx+1)%NBUF;
+  }
+}
+function drawECG(cv,gn,color){
+  const dpr=window.devicePixelRatio||1, w=cv.clientWidth, h=cv.clientHeight; if(!w||!h) return;
+  const W=Math.round(w*dpr),H=Math.round(h*dpr); if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
+  const c=cv.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,w,h);
+  c.strokeStyle='rgba(148,163,184,.08)'; c.lineWidth=1; c.beginPath();
+  for(let x=0;x<w;x+=16){c.moveTo(x+.5,0);c.lineTo(x+.5,h);} for(let y=0;y<h;y+=16){c.moveTo(0,y+.5);c.lineTo(w,y+.5);} c.stroke();
+  c.strokeStyle=color; c.lineWidth=1.7; c.lineJoin='round'; c.shadowColor=color; c.shadowBlur=6; c.beginPath();
+  let pen=false;
+  for(let i=0;i<NBUF;i++){
+    const gap=(i-gn.idx+NBUF)%NBUF; if(gap<10){pen=false;continue;}
+    const x=i/(NBUF-1)*w, y=h*.64-gn.buf[i]*h*.52;
+    if(!pen){c.moveTo(x,y);pen=true;} else c.lineTo(x,y);
+  }
+  c.stroke(); c.shadowBlur=0;
+}
+const LVCOL=['#10b981','#f59e0b','#ef4444'];
+let lastF=0;
+function frame(ts){
+  const dt=Math.min(.1,(ts-(lastF||ts))/1000); lastF=ts;
+  for(const id in GL) advance(GL[id],dt,vOf(id).hr,id==='sarah'&&afibActive(S.scenario,S.emerg&&S.emerg.phase));
+  const ev=earthView();
+  if(ev.status==='live') for(const id in GE) advance(GE[id],dt,vOf(id,ev.snap).hr,id==='sarah'&&afibActive(ev.snap.sc,ev.snap.ph));
+  const lvL=assess(S.v).level, lvE=assess(ev.snap.v).level;
+  document.querySelectorAll('canvas[data-ecg]').forEach(cv=>{
+    const e=cv.dataset.ecg==='earth', who=cv.dataset.who||'sarah', lv=assess(vOf(who,e?ev.snap:null)).level;
+    drawECG(cv,(e?GE:GL)[who],e&&ev.status!=='live'?'#64748b':LVCOL[lv]);
+  });
+  requestAnimationFrame(frame);
+}
+
+/* ================= Laço principal ================= */
+const NOISE={hr:.9,spo2:.15,hrv:.6,stress:.3,temp:.01,bpSys:.6,bpDia:.4,rr:.15};
+let lastKey='';
+function tick(){
+  const tg=targets();
+  const rate=(S.scenario==='emergency'&&S.emerg&&['detected','proposed'].includes(S.emerg.phase))?.4:.18;
+  for(const k in NOISE){
+    const target=tg[k]-(k==='stress'?S.relief:0);
+    S.v[k]+=(target-S.v[k])*rate+(Math.random()-.5)*2*NOISE[k];
+  }
+  S.v.spo2=Math.min(100,S.v.spo2); S.relief=Math.max(0,S.relief-.03);
+  for(const id in S.crew){const c=S.crew[id], b=CREW_BASE[id];
+    for(const k in NOISE){const tg2=b[k]+(k==='stress'&&S.scenario==='blackout'?8:0)+(k==='stress'&&S.scenario==='emergency'?12:0)+(k==='hr'&&S.scenario==='emergency'&&id==='marcus'?18:0);c[k]+=(tg2-c[k])*.18+(Math.random()-.5)*2*NOISE[k];}
+    c.spo2=Math.min(100,c.spo2);}
+  evtTick(); pushSnap(); busTick();
+  if(S.scenario==='blackout'){S.boTicks=(S.boTicks||0)+1; if(S.boTicks%12===1) send('up','Telemetria contínua: ECG, sono e hidratação (lote)',{prio:2,size:'2,4 MB',aud:['houston']});} else S.boTicks=0;
+  if(S.watch.notice&&now()-S.watch.noticeAt>6000){S.watch.notice=null;bump();}
+  if(S.watch.screen==='breath'&&now()-S.watch.breathStart>30000) endBreath(true);
+  const al=assess(S.v), ev=earthView(), ae=assess(ev.snap.v);
+  const cb=CREW_IDS.map(id=>JSON.stringify(assess(vOf(id)).bands)+JSON.stringify(assess(vOf(id,ev.snap)).bands)).join('');
+  const key=[S.ver,al.level,JSON.stringify(al.bands),ae.level,JSON.stringify(ae.bands),ev.status,ev.snap.sc,ev.snap.ph,cb].join('|');
+  if(key!==lastKey){lastKey=key;fullRender();} else updateLive();
+}
+
+/* ================= Eventos ================= */
+document.addEventListener('click',ev=>{
+  const b=ev.target.closest('[data-act]'); if(!b||b.disabled) return;
+  const a=b.dataset.act, g=b.dataset.arg;
+  switch(a){
+    case 'mission': setMission(g); break;
+    case 'scenario': setScenario(g); break;
+    case 'view': VIEW=g; try{history.replaceState(null,'','#'+g);}catch(e){} break;
+    case 'story': applyStep(S.step+Number(g)); break;
+    case 'reset': resetDemo(); return;
+    case 'w-screen': S.watch.screen=g; S.watch.answer=null; bump(); break;
+    case 'w-next': {const l=watchScreens(), c=curWatch(); if(c==='breath'){endBreath(false);break;} S.watch.screen=l[(l.indexOf(c)+1)%l.length]; S.watch.answer=null; bump(); break;}
+    case 'w-drink': drink(); break;
+    case 'w-ask': ask(g); break;
+    case 'w-clear': S.watch.answer=null; bump(); break;
+    case 'w-breath': startBreath(); break;
+    case 'w-stop': endBreath(false); break;
+    case 'w-ok': S.watch.okNote=true; log('Relógio','Sarah','Sarah tocou em "Estou bem". A Cosmo manteve o acompanhamento.',1); break;
+    case 'p-tab': S.phone.tab=g; bump(); break;
+    case 'p-toast': familyToast(); break;
+    case 'p-msg': familyMsg(); break;
+    case 't-confirm': confirmProtocol(false); break;
+    case 't-manual': confirmProtocol(true); break;
+    case 'd-reply': houstonReply(); break;
+    case 'd-routine': houstonRoutine(); break;
+    case 'w-cheer': cheerLucas(); break;
+    case 'w-sync': syncNow(); break;
+    case 'w-sos': sosBurst(); break;
+    case 'w-ping': testSignal(); break;
+    case 'p-run': familyRun(); break;
+    case 't-sel': S.tSel=g; S.tAsk=null; break;
+    case 'd-sel': S.hSel=g; break;
+    case 't-remind': remind(g); break;
+    case 't-explain': S.tExplain=!S.tExplain; break;
+    case 't-ask': S.tAsk=S.tAsk===g?null:g; break;
+    case 'd-ask': S.hAsk=S.hAsk===g?null:g; break;
+    case 'evt': injectEvent(g); break;
+    default: evtAction(a);
+  }
+  bump(); lastKey=''; tick();
+});
+function readHash(){const h=(location.hash||'').slice(1);if(VIEWS.some(v=>v[0]===h)){VIEW=h;return true;}return false;}
+window.addEventListener('hashchange',()=>{if(readHash()){lastKey='';tick();}});
+
+/* ================= Início ================= */
+readHash();
+pushSnap();
+log('Sistema','configuração','Demo iniciada no perfil ISS · órbita baixa.');
+fullRender();
+setInterval(tick,500);
+requestAnimationFrame(frame);
+})();
+</script>

@@ -1,0 +1,297 @@
+<!DOCTYPE html><html lang="pt-BR" class="dark"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gráficos &amp; Métricas Corporais — AstroHealth OS</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'accent': '#00E5FF',
+        'optimal': '#10B981',
+        'attention': '#F59E0B',
+        'critical': '#EF4444',
+        'hydration': '#3B82F6',
+        'cycle': '#EC4899',
+        'sleep': '#8B5CF6',
+        'light-primary': '#006878',
+        'light-on-primary': '#FFFFFF',
+        'light-surface': '#080B14',
+        'light-on-surface': '#F3F4F6',
+        'dark-primary': '#00E5FF',
+        'dark-on-primary': '#051820',
+        'dark-surface': '#05070E',
+        'dark-on-surface': '#F8FAFC',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'DEFAULT': '12px',
+        'md': '16px',
+        'lg': '20px',
+        'xl': '28px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '12px',
+        'gutter-lg': '16px',
+        'gutter-xl': '20px',
+        'section': '24px',
+        'page-margin': '16px',
+      },
+      fontFamily: {
+        'display': ['"Space Grotesk"', 'sans-serif'],
+        'headline': ['"Space Grotesk"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg': ['28px', { lineHeight: '32px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['24px', { lineHeight: '28px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'headline-lg': ['20px', { lineHeight: '24px', letterSpacing: '-0.2px', fontWeight: '600' }],
+        'headline-lg-mobile': ['18px', { lineHeight: '22px', letterSpacing: '-0.2px', fontWeight: '600' }],
+        'body-md': ['13px', { lineHeight: '17px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['12px', { lineHeight: '16px', letterSpacing: '0.5px', fontWeight: '600' }],
+        'label-sm': ['10px', { lineHeight: '13px', letterSpacing: '0.2px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '150ms',
+        'pulse-vital': '1000ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'pulse-vital': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'pulse-vital': 'ease-in-out',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <style>
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="bg-black text-slate-100 font-body min-h-[884px] flex items-center justify-center p-2 selection:bg-cyan-500/30" data-stitch-vh="min-h-[884px]===min-h-screen">
+
+  <!-- Smartwatch Case Simulation -->
+  <main class="w-[370px] min-h-[780px] bg-[#07090F] border-[10px] border-[#1C202F] rounded-[54px] shadow-2xl relative overflow-hidden flex flex-col p-4">
+    
+    <!-- Smartwatch Top Status Bar -->
+    <header class="flex items-center justify-between pt-2 px-3 pb-1 border-b border-slate-800/40">
+      <div class="flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-optimal"></span>
+        <span class="font-display text-[13px] font-bold tracking-tight text-cyan-400">TELEMETRIA &amp; GRÁFICOS</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="font-display text-label-lg font-bold text-slate-300 tabular-nums">09:43</span>
+        <span class="material-symbols-outlined text-[15px] text-cyan-300">analytics</span>
+      </div>
+    </header>
+
+    <!-- Navigation Pills / Screens Switcher -->
+    <nav class="flex items-center justify-center gap-1.5 my-2.5 bg-slate-900/80 p-1 rounded-full border border-slate-800" aria-label="Smartwatch Screens">
+      <a href="../astronaut-vital-home/AstronautVitalHome.html" class="px-3 py-1 text-slate-400 hover:text-slate-200 rounded-full font-headline text-[11px] flex items-center gap-1 transition-colors">
+        <span class="material-symbols-outlined text-[13px]">person</span> Corpo
+      </a>
+      <a href="../ai-health-chat/AiHealthChat.html" class="px-3 py-1 text-slate-400 hover:text-slate-200 rounded-full font-headline text-[11px] flex items-center gap-1 transition-colors">
+        <span class="material-symbols-outlined text-[13px]">smart_toy</span> IA Chat
+      </a>
+      <a href="BiometricMetrics.html" class="px-3 py-1 bg-cyan-500/20 text-accent border border-cyan-500/40 rounded-full font-headline text-[11px] font-semibold flex items-center gap-1">
+        <span class="material-symbols-outlined text-[13px]">monitoring</span> Gráficos
+      </a>
+    </nav>
+
+    <!-- METRICS & CHARTS SCROLLABLE STREAM -->
+    <div class="flex-1 overflow-y-auto space-y-2.5 pr-0.5 pb-2">
+
+      <!-- 1. CARDIO & EXERCÍCIO COM SPARKLINE SVG -->
+      <article class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 shadow-md">
+        <div class="flex items-center justify-between mb-1.5">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-rose-400 text-[16px]">ecg</span>
+            <span class="font-headline text-[11px] font-bold text-slate-200">Frequência &amp; Treino</span>
+          </div>
+          <span class="px-1.5 py-0.5 rounded bg-emerald-950 text-optimal text-[9px] font-bold">ZONA 2 AERÓBICA</span>
+        </div>
+        
+        <div class="flex items-baseline justify-between">
+          <div class="flex items-baseline gap-1">
+            <span class="font-display text-[22px] font-bold text-slate-100 tabular-nums">128</span>
+            <span class="text-[11px] text-slate-400">BPM Atual</span>
+          </div>
+          <div class="text-right text-[10px] text-slate-400 font-display">
+            Pico 164 bpm • 420 kcal
+          </div>
+        </div>
+
+        <!-- SVG Line Chart (Cardio Trend over hours) -->
+        <div class="mt-2 h-14 w-full bg-slate-950/70 rounded-xl p-1.5 border border-slate-800/80 relative">
+          <svg viewBox="0 0 280 50" class="w-full h-full overflow-visible">
+            <!-- Grid Lines -->
+            <line x1="0" y1="12" x2="280" y2="12" stroke="#334155" stroke-dasharray="2,3" stroke-width="0.8"></line>
+            <line x1="0" y1="36" x2="280" y2="36" stroke="#334155" stroke-dasharray="2,3" stroke-width="0.8"></line>
+            
+            <!-- Area Gradient Fill -->
+            <defs>
+              <linearGradient id="cardioGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#EF4444" stop-opacity="0.4"></stop>
+                <stop offset="100%" stop-color="#EF4444" stop-opacity="0.0"></stop>
+              </linearGradient>
+            </defs>
+            <path d="M0,38 L30,36 L60,34 L90,26 L120,38 L150,14 L180,8 L210,18 L240,24 L280,20 L280,50 L0,50 Z" fill="url(#cardioGrad)"></path>
+            <!-- Line Path -->
+            <path d="M0,38 L30,36 L60,34 L90,26 L120,38 L150,14 L180,8 L210,18 L240,24 L280,20" fill="none" stroke="#EF4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+            <!-- Peak Point Marker -->
+            <circle cx="180" cy="8" r="3.5" fill="#FFFFFF" stroke="#EF4444" stroke-width="2"></circle>
+          </svg>
+          <div class="flex justify-between text-[8px] text-slate-500 font-display mt-0.5 px-0.5">
+            <span>06h</span><span>07h (Treino)</span><span>08h</span><span>Agora</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 2. SAÚDE MENTAL & ESTRESSE (HRV / CORTISOL) -->
+      <article class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 shadow-md">
+        <div class="flex items-center justify-between mb-1.5">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-amber-400 text-[16px]">self_improvement</span>
+            <span class="font-headline text-[11px] font-bold text-slate-200">Saúde Mental &amp; Estresse</span>
+          </div>
+          <span class="px-1.5 py-0.5 rounded bg-amber-950 text-attention text-[9px] font-bold">MODERADO (42/100)</span>
+        </div>
+
+        <div class="flex items-center justify-between text-[11px] text-slate-300">
+          <span>Variabilidade Cardíaca (HRV): <strong class="text-optimal font-display">64 ms</strong></span>
+          <span class="text-attention text-[10px]">Cortisol Estabilizando</span>
+        </div>
+
+        <!-- Segmented Mental State Gauge -->
+        <div class="mt-2 grid grid-cols-4 gap-1.5">
+          <div class="h-2 rounded-full bg-emerald-500" title="Calmo"></div>
+          <div class="h-2 rounded-full bg-cyan-400" title="Foco"></div>
+          <div class="h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]" title="Alerta Atual"></div>
+          <div class="h-2 rounded-full bg-slate-800" title="Sobrecarga"></div>
+        </div>
+        <div class="flex justify-between text-[8.5px] text-slate-400 mt-1 font-body">
+          <span>Calmo</span><span>Foco</span><span class="text-attention font-bold">Alerta (Você)</span><span>Sobrecarga</span>
+        </div>
+      </article>
+
+      <!-- 3. INGESTÃO DE ÁGUA & HIDRATAÇÃO -->
+      <article class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 shadow-md">
+        <div class="flex items-center justify-between mb-1">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-blue-400 text-[16px]">water_drop</span>
+            <span class="font-headline text-[11px] font-bold text-slate-200">Ingestão Hídrica</span>
+          </div>
+          <span class="font-display text-[11px] font-bold text-blue-400">1.450 / 2.400 ml</span>
+        </div>
+
+        <div class="flex items-center gap-2 mt-1">
+          <!-- Circular Progress SVG -->
+          <div class="w-12 h-12 flex-shrink-0 relative flex items-center justify-center">
+            <svg viewBox="0 0 36 36" class="w-full h-full -rotate-90">
+              <path class="text-slate-800" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+              <path class="text-blue-500" stroke-dasharray="60, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+            </svg>
+            <span class="absolute font-display text-[10px] font-bold text-slate-100">60%</span>
+          </div>
+
+          <div class="flex-1">
+            <p class="font-body text-[10.5px] text-slate-300 leading-tight">
+              Meta restante: <strong>950 ml</strong>. IA calculou reposição pós-exercício.
+            </p>
+            <div class="flex items-center gap-1.5 mt-1.5">
+              <button class="px-2 py-0.5 bg-blue-600/30 border border-blue-500/50 text-blue-300 font-headline text-[9.5px] rounded-lg active:bg-blue-600/50">
+                +250 ml
+              </button>
+              <button class="px-2 py-0.5 bg-blue-600/30 border border-blue-500/50 text-blue-300 font-headline text-[9.5px] rounded-lg active:bg-blue-600/50">
+                +500 ml
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 4. CICLO MENSTRUAL & TEMPERATURA BASAL -->
+      <article class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 shadow-md">
+        <div class="flex items-center justify-between mb-1.5">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-pink-400 text-[16px]">female</span>
+            <span class="font-headline text-[11px] font-bold text-slate-200">Ciclo Menstrual</span>
+          </div>
+          <span class="px-1.5 py-0.5 rounded bg-pink-950 text-pink-300 text-[9px] font-bold">DIA 14 / 28</span>
+        </div>
+
+        <div class="flex items-center justify-between text-[11px] mb-1">
+          <span class="text-pink-300 font-bold font-headline">Janela Fértil / Ovulação</span>
+          <span class="text-slate-400 font-display text-[10px]">Temp: 36.8°C</span>
+        </div>
+
+        <!-- 28-day cycle miniature bar tracker -->
+        <div class="flex gap-1 h-3 mt-1 items-center">
+          <div class="flex-1 h-2 rounded bg-rose-500/60" title="Menstruação (Dias 1-5)"></div>
+          <div class="flex-[1.5] h-2 rounded bg-slate-700" title="Folicular (Dias 6-11)"></div>
+          <div class="flex-1 h-2.5 rounded bg-pink-500 shadow-[0_0_8px_rgba(236,72,153,0.8)] border border-white" title="Ovulação Hoje (Dias 12-16)"></div>
+          <div class="flex-[2] h-2 rounded bg-slate-800" title="Lútea (Dias 17-28)"></div>
+        </div>
+        <div class="flex justify-between text-[8px] text-slate-400 mt-1 font-display">
+          <span>Menstruação</span><span>Folicular</span><span class="text-pink-300 font-bold">Ovulação (Hoje)</span><span>Lútea</span>
+        </div>
+      </article>
+
+      <!-- 5. PERFORMANCE DE SONO (ARQUITETURA NOTURNA) -->
+      <article class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 shadow-md">
+        <div class="flex items-center justify-between mb-1.5">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-violet-400 text-[16px]">bedtime</span>
+            <span class="font-headline text-[11px] font-bold text-slate-200">Qualidade de Sono</span>
+          </div>
+          <span class="px-1.5 py-0.5 rounded bg-violet-950 text-violet-300 text-[9px] font-bold">SCORE 88/100</span>
+        </div>
+
+        <div class="flex items-baseline justify-between mb-1">
+          <div class="font-display text-[18px] font-bold text-slate-100">
+            7h 40min <span class="text-[10px] text-emerald-400 font-normal font-body">Excelente</span>
+          </div>
+          <span class="text-[10px] text-slate-400 font-display">23:15 → 06:55</span>
+        </div>
+
+        <!-- Sleep stages stacked bar -->
+        <div class="w-full h-3 rounded-full flex overflow-hidden gap-0.5 mt-1">
+          <div class="h-full bg-violet-900" style="width: 15%" title="Acordado (15%)"></div>
+          <div class="h-full bg-indigo-600" style="width: 45%" title="Sono Leve (45%)"></div>
+          <div class="h-full bg-purple-500" style="width: 25%" title="Sono Profundo (25%)"></div>
+          <div class="h-full bg-cyan-400" style="width: 15%" title="REM (15%)"></div>
+        </div>
+        <div class="flex justify-between text-[8px] text-slate-400 mt-1 font-body">
+          <span class="flex items-center gap-0.5"><span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>Leve 3h28</span>
+          <span class="flex items-center gap-0.5"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>Prof. 1h55</span>
+          <span class="flex items-center gap-0.5"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>REM 1h15</span>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- FOOTER SUMMARY -->
+    <footer class="pt-2 border-t border-slate-800 text-center">
+      <p class="font-body text-[10px] text-cyan-400 flex items-center justify-center gap-1">
+        <span class="material-symbols-outlined text-[12px]">verified</span>
+        Sensores Ópticos &amp; Biossensores IA ativos 24/7
+      </p>
+    </footer>
+
+  </main>
+
+
+</body></html>

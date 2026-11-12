@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Relógio · alerta de FA (M1)</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="demo.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#04060c}
+a{color:#00e5ff}a:hover{color:#7df3ff}
+</style>
+</helmet>
+<div style="width: 400px; height: 400px; box-sizing: border-box; padding: 40px; background: #04060c; display: flex; align-items: flex-start; justify-content: center; font-family: Inter, system-ui, sans-serif; color: #eef2f8;">
+<div class="dev" data-dev="watch-round">
+<div class="bezel-round frame"><button class="crown" aria-label="Coroa: próxima tela do relógio"></button><div data-render="watch-round"><div class="ws round lv2 is-alert " style="--beat:0.36s"><svg class="w-ring" viewBox="0 0 288 288" aria-hidden="true"><circle class="trk" cx="144" cy="144" r="139" pathLength="100"></circle><circle class="prg" cx="144" cy="144" r="139" pathLength="100" stroke-dasharray="19 100" transform="rotate(-90 144 144)"></circle></svg><div class="ws-in"><div class="w-tag crit">Alerta médico</div><div class="w-big">Pare e sente-se</div><div class="w-row"><span class="w-pill"><svg class="ic c-crit" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg><b data-v="hr">167</b></span><span class="w-pill"><svg class="ic c-acc" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="12" r="5"></circle><path d="M16 15.5c0-1 2.5-1.6 2.5-3a1.3 1.3 0 0 0-2.5-.3M16 19h3"></path></svg><b data-v="spo2">88</b><small>%</small></span></div><div class="w-sub">Oficial médico avisado. Respire devagar.</div><button class="w-btn ghost sm">Estou bem</button><div class="w-dots"><button class="dot" data-arg="alert" aria-label="Alerta" aria-current="true"><i></i></button><button class="dot" data-arg="chat" aria-label="Chat com a Cosmo" aria-current="false"><i></i></button><button class="dot" data-arg="sync" aria-label="Sincronia com a Terra" aria-current="false"><i></i></button><button class="dot" data-arg="vitals" aria-label="Sinais" aria-current="false"><i></i></button></div></div></div></div></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":400,"height":400}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

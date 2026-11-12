@@ -1,0 +1,282 @@
+<!DOCTYPE html><html lang="pt-BR" class="dark"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão de Sincronização NASA — AstroHealth OS</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'accent': '#00E5FF',
+        'optimal': '#10B981',
+        'attention': '#F59E0B',
+        'critical': '#EF4444',
+        'hydration': '#3B82F6',
+        'cycle': '#EC4899',
+        'sleep': '#8B5CF6',
+        'light-primary': '#006878',
+        'light-on-primary': '#FFFFFF',
+        'light-surface': '#080B14',
+        'light-on-surface': '#F3F4F6',
+        'dark-primary': '#00E5FF',
+        'dark-on-primary': '#051820',
+        'dark-surface': '#05070E',
+        'dark-on-surface': '#F8FAFC',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'DEFAULT': '12px',
+        'md': '16px',
+        'lg': '20px',
+        'xl': '28px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '12px',
+        'gutter-lg': '16px',
+        'gutter-xl': '20px',
+        'section': '24px',
+        'page-margin': '16px',
+      },
+      fontFamily: {
+        'display': ['"Space Grotesk"', 'sans-serif'],
+        'headline': ['"Space Grotesk"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg': ['28px', { lineHeight: '32px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['24px', { lineHeight: '28px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'headline-lg': ['20px', { lineHeight: '24px', letterSpacing: '-0.2px', fontWeight: '600' }],
+        'headline-lg-mobile': ['18px', { lineHeight: '22px', letterSpacing: '-0.2px', fontWeight: '600' }],
+        'body-md': ['13px', { lineHeight: '17px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['12px', { lineHeight: '16px', letterSpacing: '0.5px', fontWeight: '600' }],
+        'label-sm': ['10px', { lineHeight: '13px', letterSpacing: '0.2px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '150ms',
+        'pulse-vital': '1000ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'pulse-vital': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'pulse-vital': 'ease-in-out',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <style>
+    ::-webkit-scrollbar { display: none; }
+    @keyframes pulseAntenna {
+      0%, 100% { opacity: 0.3; transform: scale(0.95); }
+      50% { opacity: 0.85; transform: scale(1.06); }
+    }
+    .animate-antenna-pulse {
+      animation: pulseAntenna 2s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-black text-slate-100 font-body min-h-[884px] flex items-center justify-center p-2 selection:bg-cyan-500/30" data-stitch-vh="min-h-[884px]===min-h-screen">
+
+  <!-- Smartwatch Case Simulation -->
+  <main class="w-[370px] min-h-[780px] bg-[#07090F] border-[10px] border-[#1C202F] rounded-[54px] shadow-2xl relative overflow-hidden flex flex-col p-4">
+    
+    <!-- Smartwatch Top Status Bar -->
+    <header class="flex items-center justify-between pt-2 px-3 pb-1 border-b border-slate-800/40">
+      <div class="flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-attention animate-pulse"></span>
+        <span class="font-display text-[12px] font-bold tracking-tight text-amber-400">NASA DSN TELEMETRY</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="font-display text-label-lg font-bold text-slate-300 tabular-nums">09:45</span>
+        <span class="material-symbols-outlined text-[15px] text-amber-400">satellite_alt</span>
+      </div>
+    </header>
+
+    <!-- Navigation Pills / Screens Switcher -->
+    <nav class="flex items-center justify-center gap-1 my-2 bg-slate-900/80 p-1 rounded-full border border-slate-800" aria-label="Smartwatch Screens">
+      <a href="../astronaut-vital-home/AstronautVitalHome.html" class="px-2 py-0.5 text-slate-400 hover:text-slate-200 rounded-full font-headline text-[10px] flex items-center gap-0.5 transition-colors">
+        <span class="material-symbols-outlined text-[11px]">person</span> Corpo
+      </a>
+      <a href="../ai-health-chat/AiHealthChat.html" class="px-2 py-0.5 text-slate-400 hover:text-slate-200 rounded-full font-headline text-[10px] flex items-center gap-0.5 transition-colors">
+        <span class="material-symbols-outlined text-[11px]">smart_toy</span> IA Chat
+      </a>
+      <a href="../biometric-metrics/BiometricMetrics.html" class="px-2 py-0.5 text-slate-400 hover:text-slate-200 rounded-full font-headline text-[10px] flex items-center gap-0.5 transition-colors">
+        <span class="material-symbols-outlined text-[11px]">monitoring</span> Gráficos
+      </a>
+      <a href="NasaSyncManagement.html" class="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-full font-headline text-[10px] font-semibold flex items-center gap-0.5">
+        <span class="material-symbols-outlined text-[11px]">sync</span> NASA
+      </a>
+    </nav>
+
+    <!-- MAIN SCROLLABLE TELEMETRY SYNC INTERFACE -->
+    <div class="flex-1 overflow-y-auto space-y-2.5 pr-0.5 pb-2">
+
+      <!-- 1. ORBITAL LATENCY & LINK QUALITY HERO CARD -->
+      <section class="bg-gradient-to-b from-slate-900 via-slate-900 to-amber-950/30 border border-amber-500/30 rounded-2xl p-3 relative overflow-hidden">
+        
+        <!-- Subtle Radar Wave in Background -->
+        <div class="absolute -right-6 -top-6 w-28 h-28 rounded-full border border-amber-500/20 animate-antenna-pulse pointer-events-none"></div>
+
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-amber-400 text-[18px]">satellite</span>
+            <span class="font-headline text-[11px] font-bold text-amber-300">Houston Flight Surgeons Link</span>
+          </div>
+          <span class="px-1.5 py-0.2 bg-amber-900/60 text-amber-300 border border-amber-500/30 rounded font-display text-[9px] font-bold">
+            DSN-Goldstone
+          </span>
+        </div>
+
+        <!-- Latency Display -->
+        <div class="grid grid-cols-2 gap-2 mt-1">
+          <div class="bg-slate-950/80 p-2 rounded-xl border border-slate-800">
+            <span class="font-body text-[9px] text-slate-400 uppercase tracking-wider block">Delay de Ida e Volta</span>
+            <div class="flex items-baseline gap-1 mt-0.5">
+              <span class="font-display text-[18px] font-bold text-amber-400 tabular-nums">4.2 min</span>
+              <span class="text-[9px] text-slate-500">RTT</span>
+            </div>
+            <span class="text-[8.5px] text-slate-400 block mt-0.5">Distância Orbital: 1.27 M km</span>
+          </div>
+
+          <div class="bg-slate-950/80 p-2 rounded-xl border border-slate-800">
+            <span class="font-body text-[9px] text-slate-400 uppercase tracking-wider block">Próxima Janela Direta</span>
+            <div class="flex items-baseline gap-1 mt-0.5">
+              <span class="font-display text-[18px] font-bold text-cyan-400 tabular-nums">00:18:40</span>
+            </div>
+            <span class="text-[8.5px] text-emerald-400 block mt-0.5">Banda Larga Ativa</span>
+          </div>
+        </div>
+
+        <!-- Local Watch Autonomous Shield Notification -->
+        <div class="mt-2.5 flex items-start gap-1.5 bg-cyan-950/40 border border-cyan-500/30 p-2 rounded-xl text-[10.5px]">
+          <span class="material-symbols-outlined text-cyan-400 text-[16px] flex-shrink-0 mt-0.5">shield</span>
+          <p class="font-body text-slate-300 leading-snug">
+            <strong class="text-cyan-300">Autonomia Total no Relógio:</strong> Em caso de delay crítico, a <strong class="text-slate-100">Cosmo AI</strong> diagnostica e atua localmente sem depender do sinal da Terra.
+          </p>
+        </div>
+      </section>
+
+      <!-- 2. LOCAL BUFFER & QUEUED TELEMETRY PACKETS -->
+      <section class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 shadow-md">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-cyan-400 text-[16px]">inventory_2</span>
+            <span class="font-headline text-[11px] font-bold text-slate-200">Fila de Buffer Local (Smartwatch)</span>
+          </div>
+          <span class="font-display text-[10px] text-cyan-300 font-bold">14.8 MB retidos</span>
+        </div>
+
+        <!-- Buffer Capacity Bar -->
+        <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden flex border border-slate-800">
+          <div class="bg-rose-500 h-full" style="width: 15%" title="Crítico ECG (15%)"></div>
+          <div class="bg-amber-500 h-full" style="width: 35%" title="Treino &amp; Estresse (35%)"></div>
+          <div class="bg-cyan-500 h-full" style="width: 30%" title="Sono &amp; Hidratação (30%)"></div>
+          <div class="bg-slate-700 h-full" style="width: 20%" title="Buffer Livre (20%)"></div>
+        </div>
+
+        <div class="flex justify-between text-[8px] text-slate-400 mt-1 font-body">
+          <span class="flex items-center gap-0.5"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>ECG Contínuo</span>
+          <span class="flex items-center gap-0.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Treino/Estresse</span>
+          <span class="flex items-center gap-0.5"><span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>Gerais</span>
+        </div>
+
+        <!-- Telemetry Items Status List -->
+        <div class="mt-2.5 space-y-1.5">
+          
+          <!-- Packet 1: Critical Telemetry (High Priority) -->
+          <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-xl border border-rose-500/20">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-rose-400 text-[16px]">ecg_heart</span>
+              <div>
+                <div class="font-headline text-[10.5px] font-bold text-slate-200">ECG &amp; Pico Cardíaco (138 BPM)</div>
+                <div class="font-body text-[8.5px] text-slate-400">Gravado às 09:38 • 3.2 MB</div>
+              </div>
+            </div>
+            <span class="px-1.5 py-0.5 bg-rose-950 text-rose-300 font-headline text-[9px] font-bold rounded flex items-center gap-0.5">
+              <span class="w-1 h-1 rounded-full bg-rose-400 animate-ping"></span> Prioridade 1
+            </span>
+          </div>
+
+          <!-- Packet 2: Biometrics & Water -->
+          <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-xl border border-slate-800">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-blue-400 text-[16px]">water_drop</span>
+              <div>
+                <div class="font-headline text-[10.5px] font-bold text-slate-200">Hidratação &amp; Ciclo Folicular</div>
+                <div class="font-body text-[8.5px] text-slate-400">Sincronizado há 12 min • 1.8 MB</div>
+              </div>
+            </div>
+            <span class="px-1.5 py-0.5 bg-emerald-950 text-optimal font-headline text-[9px] font-bold rounded">
+              Enviado (ACK)
+            </span>
+          </div>
+
+          <!-- Packet 3: Sleep Architecture -->
+          <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-xl border border-slate-800">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-purple-400 text-[16px]">bedtime</span>
+              <div>
+                <div class="font-headline text-[10.5px] font-bold text-slate-200">Arquitetura de Sono (7h 40m)</div>
+                <div class="font-body text-[8.5px] text-slate-400">Aguardando janela • 9.8 MB</div>
+              </div>
+            </div>
+            <span class="px-1.5 py-0.5 bg-amber-950 text-amber-300 font-headline text-[9px] font-bold rounded">
+              Na Fila
+            </span>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- 3. ACTIONS & MANUAL SYNC TRIGGER -->
+      <section class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 shadow-md space-y-2">
+        <span class="font-headline text-[11px] font-bold text-slate-300 block">Comandos de Transmissão</span>
+        
+        <div class="flex items-center gap-2">
+          <!-- Primary Emergency Burst Button -->
+          <button class="flex-1 py-2 px-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-headline text-[11px] font-bold rounded-xl flex items-center justify-center gap-1.5 active:scale-95 transition-transform shadow-lg">
+            <span class="material-symbols-outlined text-[16px]">bolt</span> Disparar Rajada SOS (Burst)
+          </button>
+          
+          <!-- Compress Telemetry Toggle -->
+          <button class="p-2 bg-slate-800 border border-slate-700 text-cyan-300 rounded-xl hover:bg-slate-700 active:scale-95 transition-all" title="Compactar Dados">
+            <span class="material-symbols-outlined text-[18px]">compress</span>
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between pt-1 text-[9px] text-slate-400">
+          <span>Compressão Bio-Lossless: <strong class="text-optimal">Ativada (78%)</strong></span>
+          <span>Criptografia: <strong class="text-cyan-400">AES-256 NASA</strong></span>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- BOTTOM FIXED TELEMETRY PULSE -->
+    <footer class="pt-2 border-t border-slate-800 text-center">
+      <div class="flex items-center justify-center gap-2 text-[10px] text-slate-400">
+        <span class="flex items-center gap-1 text-optimal font-bold">
+          <span class="w-1.5 h-1.5 rounded-full bg-optimal"></span> ISS Relay: Forte
+        </span>
+        <span class="text-slate-600">•</span>
+        <span class="font-display tabular-nums">Tx: 128 kbps</span>
+      </div>
+    </footer>
+
+  </main>
+
+
+</body></html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html><html lang="pt-BR" class="dark"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Astronauta &amp; 3 Indicadores Vitais — AstroHealth OS</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'accent': '#00E5FF',
+        'optimal': '#10B981',
+        'attention': '#F59E0B',
+        'critical': '#EF4444',
+        'hydration': '#3B82F6',
+        'cycle': '#EC4899',
+        'sleep': '#8B5CF6',
+        'light-primary': '#006878',
+        'light-on-primary': '#FFFFFF',
+        'light-surface': '#080B14',
+        'light-on-surface': '#F3F4F6',
+        'dark-primary': '#00E5FF',
+        'dark-on-primary': '#051820',
+        'dark-surface': '#05070E',
+        'dark-on-surface': '#F8FAFC',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'DEFAULT': '12px',
+        'md': '16px',
+        'lg': '20px',
+        'xl': '28px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '12px',
+        'gutter-lg': '16px',
+        'gutter-xl': '20px',
+        'section': '24px',
+        'page-margin': '16px',
+      },
+      fontFamily: {
+        'display': ['"Space Grotesk"', 'sans-serif'],
+        'headline': ['"Space Grotesk"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg': ['28px', { lineHeight: '32px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['24px', { lineHeight: '28px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'headline-lg': ['20px', { lineHeight: '24px', letterSpacing: '-0.2px', fontWeight: '600' }],
+        'headline-lg-mobile': ['18px', { lineHeight: '22px', letterSpacing: '-0.2px', fontWeight: '600' }],
+        'body-md': ['13px', { lineHeight: '17px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['12px', { lineHeight: '16px', letterSpacing: '0.5px', fontWeight: '600' }],
+        'label-sm': ['10px', { lineHeight: '13px', letterSpacing: '0.2px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '150ms',
+        'pulse-vital': '1000ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'pulse-vital': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'pulse-vital': 'ease-in-out',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <style>
+    @keyframes floatAstro {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-7px) rotate(1deg); }
+    }
+    @keyframes pulseAura {
+      0%, 100% { opacity: 0.35; transform: scale(0.97); }
+      50% { opacity: 0.75; transform: scale(1.04); }
+    }
+    .animate-float-astro {
+      animation: floatAstro 4s ease-in-out infinite;
+    }
+    .animate-pulse-aura {
+      animation: pulseAura 2.5s ease-in-out infinite;
+    }
+    /* Hide scrollbars for watch viewport */
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="bg-black text-slate-100 font-body min-h-[884px] flex items-center justify-center p-2 selection:bg-cyan-500/30" data-stitch-vh="min-h-[884px]===min-h-screen">
+
+  <!-- Smartwatch Case Simulation (Retangular / Squircle Apple Watch Ultra Style) -->
+  <main class="w-[370px] min-h-[780px] bg-[#07090F] border-[10px] border-[#1C202F] rounded-[54px] shadow-2xl relative overflow-hidden flex flex-col p-4">
+    
+    <!-- Smartwatch Top Status Bar -->
+    <header class="flex items-center justify-between pt-2 px-3 pb-1 border-b border-slate-800/40">
+      <div class="flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-optimal animate-pulse"></span>
+        <span class="font-display text-[13px] font-bold tracking-tight text-cyan-400">COSMO VITA</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="font-display text-label-lg font-bold text-slate-300 tabular-nums">09:41</span>
+        <span class="material-symbols-outlined text-[15px] text-cyan-300">bolt</span>
+      </div>
+    </header>
+
+    <!-- Navigation Pills / Screens Switcher Completo -->
+    <nav class="flex items-center justify-center gap-1 my-2 bg-slate-900/90 p-1 rounded-full border border-slate-800 text-[10px] overflow-x-auto no-scrollbar" aria-label="Smartwatch Screens">
+      <a href="AstronautVitalHome.html" class="px-2 py-0.5 bg-cyan-500/20 text-accent border border-cyan-500/40 rounded-full font-headline font-semibold flex items-center gap-0.5">
+        <span class="material-symbols-outlined text-[11px]">person</span> Corpo
+      </a>
+      <a href="../ai-health-chat/AiHealthChat.html" class="px-2 py-0.5 text-slate-400 hover:text-slate-200 rounded-full font-headline flex items-center gap-0.5 transition-colors">
+        <span class="material-symbols-outlined text-[11px]">smart_toy</span> IA Chat
+      </a>
+      <a href="../biometric-metrics/BiometricMetrics.html" class="px-2 py-0.5 text-slate-400 hover:text-slate-200 rounded-full font-headline flex items-center gap-0.5 transition-colors">
+        <span class="material-symbols-outlined text-[11px]">monitoring</span> Gráficos
+      </a>
+      <a href="../nasa-sync-management/NasaSyncManagement.html" class="px-2 py-0.5 text-slate-400 hover:text-slate-200 rounded-full font-headline flex items-center gap-0.5 transition-colors">
+        <span class="material-symbols-outlined text-[11px]">sync</span> NASA
+      </a>
+      <a href="../space-gamification-pve/SpaceGamificationPve.html" class="px-2 py-0.5 text-slate-400 hover:text-slate-200 rounded-full font-headline flex items-center gap-0.5 transition-colors">
+        <span class="material-symbols-outlined text-[11px]">potted_plant</span> Missão
+      </a>
+      <a href="../circular-astronaut-vital/CircularAstronautVital.html" class="px-1.5 py-0.5 text-slate-400 hover:text-cyan-300 rounded-full font-headline flex items-center" title="Alternar para Modo Circular">
+        <span class="material-symbols-outlined text-[11px]">radio_button_unchecked</span>
+      </a>
+    </nav>
+
+    <!-- SECTION: ASTRONAUTA INTERATIVO BIOMÉTRICO -->
+    <section class="relative flex flex-col items-center justify-center py-2 px-1">
+      
+      <!-- Bio-Aura Glowing Background (Muda conforme status predominante) -->
+      <div class="absolute w-52 h-52 rounded-full bg-gradient-to-tr from-cyan-500/20 via-emerald-500/25 to-blue-600/10 blur-2xl animate-pulse-aura pointer-events-none"></div>
+
+      <!-- Live Astronaut SVG Body Representation -->
+      <div class="relative w-44 h-48 flex items-center justify-center animate-float-astro">
+        <svg viewBox="0 0 200 240" class="w-full h-full drop-shadow-[0_10px_20px_rgba(0,229,255,0.25)]">
+          <defs>
+            <!-- Helmet Visor Gradient -->
+            <linearGradient id="visorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00E5FF" stop-opacity="0.8"></stop>
+              <stop offset="50%" stop-color="#0F172A" stop-opacity="0.95"></stop>
+              <stop offset="100%" stop-color="#10B981" stop-opacity="0.7"></stop>
+            </linearGradient>
+            <!-- Suit Glow -->
+            <radialGradient id="suitCore" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#1E293B"></stop>
+              <stop offset="85%" stop-color="#0F172A"></stop>
+              <stop offset="100%" stop-color="#05070E"></stop>
+            </radialGradient>
+          </defs>
+
+          <!-- Backpack / Life Support Unit (PLSS) -->
+          <rect x="45" y="65" width="110" height="95" rx="20" fill="#1E293B" stroke="#334155" stroke-width="2"></rect>
+          <circle cx="60" cy="85" r="4" fill="#00E5FF"></circle>
+          <circle cx="60" cy="98" r="4" fill="#10B981"></circle>
+          <circle cx="60" cy="111" r="4" fill="#F59E0B"></circle>
+          
+          <!-- Oxygen line tube -->
+          <path d="M55,120 C35,130 35,80 70,75" fill="none" stroke="#00E5FF" stroke-width="3" stroke-linecap="round" stroke-dasharray="3,2"></path>
+
+          <!-- Suit Legs -->
+          <rect x="68" y="160" width="28" height="52" rx="12" fill="#1E293B" stroke="#334155" stroke-width="2"></rect>
+          <rect x="104" y="160" width="28" height="52" rx="12" fill="#1E293B" stroke="#334155" stroke-width="2"></rect>
+          <!-- Boots with Pressure Sensors -->
+          <rect x="64" y="202" width="34" height="18" rx="8" fill="#0F172A" stroke="#10B981" stroke-width="2"></rect>
+          <rect x="102" y="202" width="34" height="18" rx="34" fill="#0F172A" stroke="#10B981" stroke-width="2"></rect>
+
+          <!-- Suit Arms -->
+          <!-- Left Arm holding scanner -->
+          <path d="M60,95 L30,125 L45,142 L70,118 Z" fill="#1E293B" stroke="#334155" stroke-width="2"></path>
+          <!-- Right Arm waving/relaxed -->
+          <path d="M140,95 L170,125 L155,142 L130,118 Z" fill="#1E293B" stroke="#334155" stroke-width="2"></path>
+
+          <!-- Suit Body Torso -->
+          <rect x="58" y="80" width="84" height="90" rx="24" fill="url(#suitCore)" stroke="#38BDF8" stroke-width="2"></rect>
+
+          <!-- Biometric Chestplate Reactor HUD (Indicador de Homeostase) -->
+          <rect x="76" y="96" width="48" height="34" rx="10" fill="#070D17" stroke="#00E5FF" stroke-width="1.5"></rect>
+          <path d="M82,113 L88,113 L91,104 L95,120 L99,111 L103,115 L118,115" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          <circle cx="116" cy="103" r="2.5" fill="#00E5FF"></circle>
+
+          <!-- Helmet Outer Ring -->
+          <circle cx="100" cy="58" r="42" fill="#0F172A" stroke="#475569" stroke-width="3"></circle>
+          <!-- Helmet Visor (Face do Astronauta) -->
+          <ellipse cx="100" cy="58" rx="33" ry="26" fill="url(#visorGrad)" stroke="#00E5FF" stroke-width="2"></ellipse>
+          <!-- Visor Reflection Light Sheen -->
+          <path d="M78,44 Q100,38 122,46" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.6"></path>
+          
+          <!-- Cute Friendly Eye Sensors in Visor -->
+          <ellipse cx="90" cy="57" rx="3.5" ry="5" fill="#FFFFFF"></ellipse>
+          <ellipse cx="110" cy="57" rx="3.5" ry="5" fill="#FFFFFF"></ellipse>
+          <path d="M96,65 Q100,69 104,65" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"></path>
+        </svg>
+
+        <!-- Floating Sensor Badges attached to Astronaut Body -->
+        <div class="absolute -right-2 top-4 bg-emerald-950/90 border border-optimal/60 px-2 py-0.5 rounded-full flex items-center gap-1 shadow-lg backdrop-blur-md">
+          <span class="w-1.5 h-1.5 rounded-full bg-optimal animate-ping"></span>
+          <span class="font-display text-[10px] font-bold text-optimal">SPO2 99%</span>
+        </div>
+        <div class="absolute -left-3 bottom-6 bg-cyan-950/90 border border-cyan-400/60 px-2 py-0.5 rounded-full flex items-center gap-1 shadow-lg backdrop-blur-md">
+          <span class="material-symbols-outlined text-[11px] text-cyan-300">favorite</span>
+          <span class="font-display text-[10px] font-bold text-cyan-300">72 BPM</span>
+        </div>
+      </div>
+
+      <!-- Real-time Body Status Tagline -->
+      <div class="text-center mt-1">
+        <h2 class="font-headline text-[15px] font-bold text-slate-100 flex items-center justify-center gap-1.5">
+          <span>Homeostase Astronauta</span>
+          <span class="px-1.5 py-0.2 bg-emerald-500/20 text-optimal rounded text-[10px] uppercase font-bold tracking-wide">94% Estável</span>
+        </h2>
+        <p class="font-body text-[11px] text-slate-400 mt-0.5">Metabolismo e sinais corpóreos sincronizados</p>
+      </div>
+    </section>
+
+    <!-- OS 3 INDICADORES CENTRAIS (ÓTIMO, ATENÇÃO/BEM, RUIM/CRÍTICO) -->
+    <section class="mt-2.5 pt-2.5 border-t border-slate-800/80">
+      <div class="flex items-center justify-between mb-2">
+        <span class="font-headline text-[11px] uppercase tracking-wider text-slate-400 font-bold">3 Indicadores de Estado</span>
+        <span class="font-body text-[10px] text-cyan-400">Em tempo real</span>
+      </div>
+
+      <!-- The 3 Indicators Grid -->
+      <div class="grid grid-cols-3 gap-2">
+        
+        <!-- 1. ÓTIMO -->
+        <div class="bg-gradient-to-b from-emerald-950/50 to-slate-950 border border-optimal/40 rounded-2xl p-2.5 flex flex-col items-center text-center relative overflow-hidden group">
+          <div class="w-7 h-7 rounded-full bg-optimal/20 border border-optimal/60 flex items-center justify-center text-optimal mb-1">
+            <span class="material-symbols-outlined text-[16px]">check_circle</span>
+          </div>
+          <span class="font-headline text-[11px] font-bold text-optimal">ÓTIMO</span>
+          <span class="font-display text-[15px] font-bold text-slate-100 mt-0.5 tabular-nums">8/10</span>
+          <span class="font-body text-[9px] text-slate-400 leading-tight mt-0.5">Cardio, Sono &amp; Foco</span>
+          <div class="w-full bg-slate-800 h-1 rounded-full mt-2 overflow-hidden">
+            <div class="bg-optimal h-full rounded-full" style="width: 85%"></div>
+          </div>
+        </div>
+
+        <!-- 2. BEM / ATENÇÃO -->
+        <div class="bg-gradient-to-b from-amber-950/50 to-slate-950 border border-attention/50 rounded-2xl p-2.5 flex flex-col items-center text-center relative overflow-hidden">
+          <div class="w-7 h-7 rounded-full bg-attention/20 border border-attention/60 flex items-center justify-center text-attention mb-1">
+            <span class="material-symbols-outlined text-[16px]">warning</span>
+          </div>
+          <span class="font-headline text-[11px] font-bold text-attention">ATENÇÃO</span>
+          <span class="font-display text-[15px] font-bold text-slate-100 mt-0.5 tabular-nums">2 Alertas</span>
+          <span class="font-body text-[9px] text-slate-400 leading-tight mt-0.5">Água &amp; Estresse</span>
+          <div class="w-full bg-slate-800 h-1 rounded-full mt-2 overflow-hidden">
+            <div class="bg-attention h-full rounded-full" style="width: 65%"></div>
+          </div>
+        </div>
+
+        <!-- 3. RUIM / CRÍTICO -->
+        <div class="bg-gradient-to-b from-rose-950/40 to-slate-950 border border-critical/30 rounded-2xl p-2.5 flex flex-col items-center text-center relative overflow-hidden">
+          <div class="w-7 h-7 rounded-full bg-critical/20 border border-critical/50 flex items-center justify-center text-critical mb-1">
+            <span class="material-symbols-outlined text-[16px]">error</span>
+          </div>
+          <span class="font-headline text-[11px] font-bold text-critical">CRÍTICO</span>
+          <span class="font-display text-[15px] font-bold text-slate-100 mt-0.5 tabular-nums">0 Zero</span>
+          <span class="font-body text-[9px] text-slate-400 leading-tight mt-0.5">Nenhum perigo</span>
+          <div class="w-full bg-slate-800 h-1 rounded-full mt-2 overflow-hidden">
+            <div class="bg-critical h-full rounded-full" style="width: 0%"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- QUICK REAL-TIME AI ACTION CARD (COSMO INSIGHT) -->
+    <article class="mt-3 bg-gradient-to-r from-slate-900 via-slate-900 to-cyan-950/40 border border-cyan-500/30 rounded-2xl p-3 flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-cyan-400 text-[18px]">psychology</span>
+          <span class="font-headline text-[11px] font-bold text-cyan-300">INSIGHT DA IA EM TEMPO REAL</span>
+        </div>
+        <span class="text-[9px] font-display text-slate-400">Agora</span>
+      </div>
+      <p class="font-body text-[11.5px] leading-snug text-slate-200">
+        &#34;Você gastou <strong>420 kcal</strong> no treino aeróbico, mas bebeu apenas <strong>450ml de água</strong> hoje. Beba <strong>250ml agora</strong> para restaurar a circulação antes da fase lútea.&#34;
+      </p>
+      <div class="flex items-center gap-2 pt-0.5">
+        <button class="flex-1 py-1.5 px-2 bg-accent text-slate-950 font-headline text-[11px] font-bold rounded-xl flex items-center justify-center gap-1 active:scale-95 transition-transform">
+          <span class="material-symbols-outlined text-[14px]">water_full</span> +250ml Registrado
+        </button>
+        <a href="../ai-health-chat/AiHealthChat.html" class="p-1.5 bg-slate-800 border border-slate-700 text-cyan-300 rounded-xl hover:bg-slate-700 transition-colors" title="Conversar com a IA">
+          <span class="material-symbols-outlined text-[16px]">chat</span>
+        </a>
+      </div>
+    </article>
+
+    <!-- MINI VITALS DOCK (Footer Glanceable) -->
+    <footer class="mt-auto pt-2 pb-1 grid grid-cols-4 gap-1.5 border-t border-slate-800/80 text-center">
+      <div class="bg-slate-900/60 p-1.5 rounded-xl border border-slate-800">
+        <span class="material-symbols-outlined text-cyan-400 text-[15px]">water_drop</span>
+        <div class="font-display text-[11px] font-bold text-slate-200 mt-0.5">1.2L</div>
+        <div class="text-[8px] text-slate-400">Água (60%)</div>
+      </div>
+      <div class="bg-slate-900/60 p-1.5 rounded-xl border border-slate-800">
+        <span class="material-symbols-outlined text-violet-400 text-[15px]">bedtime</span>
+        <div class="font-display text-[11px] font-bold text-slate-200 mt-0.5">7h 40m</div>
+        <div class="text-[8px] text-slate-400">Sono 88%</div>
+      </div>
+      <div class="bg-slate-900/60 p-1.5 rounded-xl border border-slate-800">
+        <span class="material-symbols-outlined text-pink-400 text-[15px]">calendar_month</span>
+        <div class="font-display text-[11px] font-bold text-slate-200 mt-0.5">Dia 14</div>
+        <div class="text-[8px] text-slate-400">Fase Folicular</div>
+      </div>
+      <div class="bg-slate-900/60 p-1.5 rounded-xl border border-slate-800">
+        <span class="material-symbols-outlined text-amber-400 text-[15px]">self_improvement</span>
+        <div class="font-display text-[11px] font-bold text-slate-200 mt-0.5">Mod. 42</div>
+        <div class="text-[8px] text-slate-400">Estresse Baixo</div>
+      </div>
+    </footer>
+
+  </main>
+
+
+</body></html>

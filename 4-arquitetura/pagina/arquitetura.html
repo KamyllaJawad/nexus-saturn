@@ -1,0 +1,1775 @@
+<title>Arquitetura AstroHealth OS</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: cabeçalho fixo + índice lateral (vira faixa no celular) + coluna de leitura de ~860px.
+   Diagramas sempre sobre cartão claro, para ficarem legíveis nos dois temas. */
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --surface2:#eef2f7; --ink:#0d1526; --ink2:#4b5a73; --ink3:#73819a;
+  --line:#dde3ec; --accent:#0e7490; --accent-soft:rgba(14,116,144,.1); --ok:#047857; --warn:#b45309; --low:#6b7280;
+  --fd:"Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fb:"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fm:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#070a12; --surface:#0e1424; --surface2:#151d33; --ink:#e8edf6; --ink2:#a3afc4; --ink3:#7a879e;
+  --line:rgba(148,163,184,.18); --accent:#22d3ee; --accent-soft:rgba(34,211,238,.12); --ok:#34d399; --warn:#fbbf24; --low:#9ca3af; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#070a12; --surface:#0e1424; --surface2:#151d33; --ink:#e8edf6; --ink2:#a3afc4; --ink3:#7a879e;
+  --line:rgba(148,163,184,.18); --accent:#22d3ee; --accent-soft:rgba(34,211,238,.12); --ok:#34d399; --warn:#fbbf24; --low:#9ca3af; color-scheme:dark }
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--fb);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+a{color:var(--accent);text-underline-offset:2px}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+h1,h2,h3,h4{font-family:var(--fd);text-wrap:balance;margin:0}
+code{font-family:var(--fm);font-size:.88em;background:var(--surface2);padding:1px 5px;border-radius:4px}
+.topo{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;margin-left:calc(-1*max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1*max(16px,env(safe-area-inset-right,0px)));padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.marca{display:flex;align-items:center;gap:10px;margin-right:auto;font:600 15px var(--fd)}
+.marca svg{width:26px;height:26px;color:var(--accent)}
+.marca small{display:block;font:500 10.5px var(--fm);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 13px var(--fd);text-decoration:none;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.prim{background:var(--accent);border-color:transparent;color:var(--bg)}
+.grade{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:230px minmax(0,1fr);gap:40px;padding-top:28px}
+nav.indice{position:sticky;top:96px;align-self:start;display:flex;flex-direction:column;gap:2px;max-height:calc(100vh - 120px);overflow:auto}
+nav.indice a{display:flex;gap:10px;padding:6px 10px;border-radius:8px;color:var(--ink2);text-decoration:none;font-size:13.5px}
+nav.indice a span{font:500 11.5px var(--fm);color:var(--ink3);padding-top:2px}
+nav.indice a:hover{background:var(--surface2);color:var(--ink)}
+nav.indice a.ativo{background:var(--accent-soft);color:var(--ink);font-weight:600}
+nav.indice a.ativo span{color:var(--accent)}
+main{min-width:0;max-width:860px}
+.abertura{padding-bottom:28px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.abertura h1{font-size:clamp(28px,4vw,40px);letter-spacing:-.02em;line-height:1.1}
+.abertura p.lead{font-size:17px;color:var(--ink2);max-width:62ch;margin:12px 0 0}
+.numeros{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.numeros span{font:500 12.5px var(--fm);padding:5px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--ink2)}
+.numeros b{color:var(--ink);font-weight:600}
+.regra{margin-top:18px;padding:14px 16px;border-radius:12px;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);font-size:14.5px}
+.regra b{font-family:var(--fd)}
+.secao{padding:36px 0 12px;border-bottom:1px solid var(--line)}
+.secao > p, .secao li{max-width:68ch}
+.sec-n{font:500 12px var(--fm);color:var(--accent);margin:0 0 4px;letter-spacing:.08em}
+.secao h2{font-size:26px;letter-spacing:-.01em;margin-bottom:12px}
+.secao h3{font-size:18px;margin:28px 0 10px}
+.secao h4{font-size:15px;margin:20px 0 8px;color:var(--ink)}
+.secao ul,.secao ol{padding-left:22px}
+.tbl{overflow-x:auto;margin:14px 0;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;line-height:1.45}
+th{text-align:left;font:600 12px var(--fd);letter-spacing:.02em;color:var(--ink2);background:var(--surface2);padding:9px 12px;white-space:nowrap}
+td{padding:9px 12px;border-top:1px solid var(--line);vertical-align:top}
+tr[hidden]{display:none}
+figure.diagrama{margin:16px 0;padding:16px;background:#ffffff;border:1px solid var(--line);border-radius:14px;overflow-x:auto}
+figure.diagrama pre{margin:0;background:none;color:#0d1526;font:12px var(--fm);white-space:pre}
+figure.diagrama svg{max-width:100%;height:auto}
+@media (max-width:600px){figure.diagrama svg{max-width:none!important;min-width:560px}}
+.na-demo{font-size:13px;color:var(--ink2);margin:-4px 0 8px}
+.filtros{display:flex;flex-direction:column;gap:8px;margin:16px 0 6px}
+.filtros div{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.filtros .rot{font:500 11px var(--fm);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-right:4px}
+.chip{font:500 12.5px var(--fb);padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.contagem{font:500 12px var(--fm);color:var(--ink3)}
+.pri{display:inline-block;padding:2px 8px;border-radius:999px;font:600 11.5px var(--fd);white-space:nowrap}
+.pri.p0{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}
+.pri.p1{background:color-mix(in srgb,var(--warn) 15%,transparent);color:var(--warn)}
+.pri.p2{background:color-mix(in srgb,var(--low) 15%,transparent);color:var(--low)}
+.codigo{position:relative;margin:12px 0}
+.codigo pre{margin:0;padding:14px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--line);overflow-x:auto;font:12.5px/1.5 var(--fm)}
+.codigo pre code{background:none;padding:0}
+.copiar{position:absolute;top:8px;right:8px;font:600 12px var(--fd);padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);cursor:pointer}
+.secao pre:not(.mermaid){padding:14px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--line);overflow-x:auto;font:12.5px/1.5 var(--fm)}
+.secao pre:not(.mermaid) code{background:none;padding:0}
+.caixa{display:inline-block;width:13px;height:13px;border:1.5px solid var(--ink3);border-radius:3px;vertical-align:-1px}
+.adr-ctl{margin:6px 0 10px}
+details.adr{border:1px solid var(--line);border-radius:12px;background:var(--surface);margin:8px 0}
+details.adr summary{display:flex;gap:12px;align-items:baseline;padding:12px 14px;cursor:pointer;list-style:none}
+details.adr summary::-webkit-details-marker{display:none}
+details.adr summary::after{content:"+";margin-left:auto;font:600 16px var(--fd);color:var(--ink3)}
+details.adr[open] summary::after{content:"–"}
+.adr-n{font:600 12px var(--fm);color:var(--accent);white-space:nowrap}
+.adr-t{font:600 14.5px var(--fd)}
+.adr-b{padding:0 16px 14px;font-size:14px}
+.adr-b h4{font-size:13.5px;margin:14px 0 4px;color:var(--ink2)}
+.adr-b ul{margin:4px 0}
+blockquote{margin:14px 0;padding:10px 14px;border-left:3px solid var(--warn);background:color-mix(in srgb,var(--warn) 8%,transparent);border-radius:0 10px 10px 0}
+blockquote p{margin:0}
+footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
+@media (max-width:900px){
+  .topo{flex-wrap:nowrap;gap:8px;padding-top:10px;padding-bottom:10px}
+  .marca small{display:none}
+  .btn{padding:6px 10px;font-size:12px;white-space:nowrap}
+  .grade{grid-template-columns:minmax(0,1fr);gap:0;padding-top:12px}
+  nav.indice{position:sticky;top:50px;z-index:4;flex-direction:row;overflow-x:auto;max-height:none;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);scrollbar-width:none}
+  nav.indice::-webkit-scrollbar{display:none}
+  nav.indice a{white-space:nowrap;flex:none}
+  html{scroll-padding-top:128px}
+}
+</style>
+
+<header class="topo">
+  <div class="marca"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="62 20" transform="rotate(-60 16 16)"/><path d="M8 17h4l2-5 4 10 2-5h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div>AstroHealth OS<small>Arquitetura · Fase 2</small></div></div>
+  <a class="btn" href="https://claude.ai/artifact/VAc7XDqgnsWmbqsZRo5kvB" target="_blank" rel="noopener">Documento</a>
+  <a class="btn prim" href="https://claude.ai/artifact/CE5bxpHxaLhi8Af9SY7NmU" target="_blank" rel="noopener">Abrir a demo</a>
+</header>
+
+<div class="grade">
+  <nav class="indice" aria-label="Seções"><a href="#visao" data-nav="visao"><span>01</span>Visão geral</a>
+<a href="#requisitos" data-nav="requisitos"><span>02</span>Requisitos</a>
+<a href="#c4" data-nav="c4"><span>03</span>Arquitetura C4</a>
+<a href="#comunicacao" data-nav="comunicacao"><span>04</span>Implantação e comunicação</a>
+<a href="#decisoes" data-nav="decisoes"><span>05</span>Motor de decisões</a>
+<a href="#fluxos" data-nav="fluxos"><span>06</span>Fluxos</a>
+<a href="#dados" data-nav="dados"><span>07</span>Modelo de dados</a>
+<a href="#stack" data-nav="stack"><span>08</span>Stack híbrida</a>
+<a href="#seguranca" data-nav="seguranca"><span>09</span>Segurança e privacidade</a>
+<a href="#roadmap" data-nav="roadmap"><span>10</span>Roadmap e riscos</a>
+<a href="#adrs" data-nav="adrs"><span>11</span>Decisões (ADRs)</a></nav>
+  <main>
+    <div class="abertura">
+      <h1>A nave decide sozinha; a Terra recebe com atraso e revisa</h1>
+      <p class="lead">Arquitetura do AstroHealth OS para a NASA Space Apps 2026: monitoramento da tripulação com IA local e um humano responsável por cada decisão clínica.</p>
+      <div class="numeros"><span><b>26</b> requisitos · 16 essenciais</span><span><b>11</b> atributos de qualidade</span><span><b>12</b> diagramas</span><span><b>11</b> ADRs</span><span>submissão <b>15/11 · 23:59</b></span></div>
+      <div class="regra"><b>Regra de ouro.</b> O LLM conversa, explica e resume. Só o motor de decisões determinístico muda o estado de um evento, e toda decisão clínica tem um humano responsável.</div>
+    </div>
+    <section id="visao" class="secao"><p class="sec-n">01</p><h2>Visão geral</h2><p>O AstroHealth OS monitora a saúde da tripulação a bordo e apoia decisões com um humano no controle, mesmo sem contato com a Terra. Esta arquitetura sai direto da demo navegável: cada fluxo dela vira requisito, componente e diagrama.</p>
+<p><strong>Problema.</strong> Quanto mais longe da Terra, maior o atraso e mais longos os períodos sem sinal. A caminho de Marte, cada mensagem leva minutos para chegar. Houston deixa de ser quem responde primeiro, e a nave precisa de medicina própria.</p>
+<h3 id="visao-escopo-desta-fase">Escopo desta fase</h3>
+<ul>
+<li><strong>Dentro:</strong> monitoramento contínuo pelo relógio, IA local (Cosmo), motor de decisões com humano no controle, painel do oficial médico, console de Houston, app da família e comunicação tolerante a atraso.</li>
+<li><strong>Fora, por ora:</strong> certificação médica, integração com o hardware real da nave e controle de sistemas de suporte de vida. Nesses sistemas a Cosmo só sugere; quem age é a engenharia.</li>
+</ul>
+<h3 id="visao-principios-de-arquitetura">Princípios de arquitetura</h3>
+<ol>
+<li><strong>Offline primeiro:</strong> tudo o que protege a vida roda a bordo, sem depender da Terra.</li>
+<li><strong>Humano no controle:</strong> a IA nunca toma sozinha uma decisão clínica ou irreversível.</li>
+<li><strong>O humano certo decide:</strong> astronauta, oficial médico ou comandante, conforme o tipo de decisão.</li>
+<li><strong>Atraso é dado:</strong> toda informação carrega quando foi gerada e quando chegou.</li>
+<li><strong>Privacidade por padrão:</strong> saúde mental só sai do relógio com consentimento; a família nunca vê sinais vitais.</li>
+<li><strong>Sensores honestos:</strong> cada métrica declara sua fonte e a qualidade do sinal.</li>
+<li><strong>Auditoria total:</strong> toda sugestão, decisão e escalonamento fica registrado.</li>
+</ol>
+<h3 id="visao-como-a-arquitetura-responde-aos-perigos-ridge">Como a arquitetura responde aos perigos RIDGE</h3>
+<p>A NASA organiza os riscos de voos longos em cinco perigos (<a href="https://www.nasa.gov/hrp/hazards" target="_blank" rel="noopener">NASA HRP</a>).</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Perigo (RIDGE)</th>
+<th>Risco para a tripulação</th>
+<th>Resposta da arquitetura</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Radiação</td>
+<td>Câncer, danos ao sistema nervoso, mal agudo em tempestades solares</td>
+<td>Dosímetro + Cosmo detectam o pico a bordo; a comandante decide o abrigo</td>
+</tr>
+<tr>
+<td>Isolamento e confinamento</td>
+<td>Queda de humor, conflitos, saudade</td>
+<td>Alerta de bem-estar com consentimento; Elo Terra com a família</td>
+</tr>
+<tr>
+<td>Distância da Terra</td>
+<td>Ajuda médica demora ou some</td>
+<td>IA local, decisões a bordo, rede tolerante a atraso</td>
+</tr>
+<tr>
+<td>Gravidade</td>
+<td>Perda óssea e muscular, coração, olhos (SANS), rins</td>
+<td>Treino prescrito, hidratação, ultrassom guiado</td>
+</tr>
+<tr>
+<td>Ambiente hostil e fechado</td>
+<td>CO₂ alto, calor no traje, medicamentos degradados</td>
+<td>Cruzamento de sintomas com o ar da cabine; farmácia de bordo</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="visao-ligacao-com-o-desafio">Ligação com o desafio</h3>
+<p>O projeto responde ao desafio <a href="https://www.spaceappschallenge.org/2026/challenges/health-monitoring-software/" target="_blank" rel="noopener">Create Health Monitoring Software for Astronauts…</a> da NASA Space Apps 2026. O evento acontece em 14 e 15 de novembro de 2026; as submissões fecham dia 15 às 23:59, no horário local (<a href="https://www.spaceappschallenge.org/2026/" target="_blank" rel="noopener">Space Apps 2026</a>).</p>
+<blockquote>
+<p><strong>Pendente:</strong> colar aqui o enunciado oficial e os critérios de avaliação, e cruzar cada critério com os requisitos de <a href="#requisitos">02-requisitos.md</a>.</p>
+</blockquote></section>
+<section id="requisitos" class="secao"><p class="sec-n">02</p><h2>Requisitos</h2><h3 id="requisitos-requisitos-funcionais">Requisitos funcionais</h3>
+<p>São 26 requisitos, 16 deles essenciais para o MVP. Cada um vem de um fluxo que já existe na demo.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requisito</th>
+<th>Ator</th>
+<th>Origem na demo</th>
+<th>Prioridade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RF01</td>
+<td>Ver o estado de saúde em 3 níveis (ótimo, atenção, crítico) com avatar e homeostase</td>
+<td>Astronauta</td>
+<td>Relógio · início</td>
+<td>Essencial (MVP)</td>
+</tr>
+<tr>
+<td>RF02</td>
+<td>Receber insights da Cosmo com ação em um toque (beber, respirar)</td>
+<td>Astronauta</td>
+<td>Relógio · insight</td>
+<td>Essencial (MVP)</td>
+</tr>
+<tr>
+<td>RF03</td>
+<td>Conversar com a Cosmo por voz ou texto, sem conexão com a Terra</td>
+<td>Astronauta</td>
+<td>Relógio · chat</td>
+<td>Essencial (MVP)</td>
+</tr>
+<tr>
+<td>RF04</td>
+<td>Confirmar ou negar uma leitura suspeita antes de virar alarme</td>
+<td>Astronauta</td>
+<td>Evento sensor solto</td>
+<td>Essencial (MVP)</td>
+</tr>
+<tr>
+<td>RF05</td>
+<td>Decidir se um alerta de bem-estar é compartilhado com o médico</td>
+<td>Astronauta</td>
+<td>Evento queda de humor</td>
+<td>Essencial (MVP)</td>
+</tr>
+<tr>
+<td>RF06</td>
+<td>Vetar ou desfazer ações automáticas reversíveis</td>
+<td>Astronauta</td>
+<td>Evento hora de dormir</td>
+<td>Importante</td>
+</tr>
+<tr>
+<td>RF07</td>
+<td>Ver atraso, fila e próxima janela de contato; disparar SOS prioritário</td>
+<td>Astronauta</td>
+<td>Relógio · sincronia</td>
+<td>Essencial (MVP)</td>
+</tr>
+<tr>
+<td>RF08</td>
+<td>Participar das missões da estufa e do Elo Terra com a família</td>
+<td>Astronauta</td>
+<td>Relógio · missões e Elo</td>
+<td>Desejável</td>
+</tr>
+<tr>
+<td>RF09</td>
+<td>Decidir se a tripulação vai para o abrigo de radiação</td>
+<td>Comandante</td>
+<td>Evento tempestade solar</td>
+<td>Essencial (MVP)</td>
+</tr>
+<tr>
+<td>RF10</td>
+<td>Decidir a escala de tarefas críticas a partir da prontidão de cada um</td>
+<td>Comandante</td>
+<td>Evento prontidão EVA</td>
+<td>Importante</td>
+</tr>
+<tr>
+<td>RF11</td>
+<td>Ver o painel de cada tripulante com ECG, sinais e a fonte de cada sensor</td>
+<td>Oficial médico</td>
+<td>Tablet</td>
+<td>Essencial (MVP)</td>
+</tr>
+<tr>
+<td>RF12</td>
+<td>Confirmar, rejeitar ou assumir protocolos da Cosmo, vendo evidências e confiança</td>
+<td>Oficial médico</td>
+<td>Emergência</td>
+<td>Essencial (MVP)</td>
+</tr>
+<tr>
+<td>RF13</td>
+<td>Liberar medicação em passo separado, definindo a dose</td>
+<td>Oficial médico</td>
+<td>Emergência</td>
+<td>Essencial (MVP)</td>
+</tr>
+<tr>
+<td>RF14</td>
+<td>Aprovar exames guiados e pedir ajustes à engenharia</td>
+<td>Oficial médico</td>
+<td>Evento dor de cabeça</td>
+<td>Importante</td>
+</tr>
+<tr>
+<td>RF15</td>
+<td>Enviar lembretes ao relógio de um tripulante</td>
+<td>Oficial médico</td>
+<td>Painel da Elena</td>
+<td>Importante</td>
+</tr>
+<tr>
+<td>RF16</td>
+<td>Ver dose de radiação, risco renal e CO₂ da cabine</td>
+<td>Oficial médico</td>
+<td>Tablet · faixa</td>
+<td>Importante</td>
+</tr>
+<tr>
+<td>RF17</td>
+<td>Perguntar ao copiloto sobre a tripulação, um tripulante ou o kit médico</td>
+<td>Oficial médico</td>
+<td>Tablet · copiloto</td>
+<td>Importante</td>
+</tr>
+<tr>
+<td>RF18</td>
+<td>Ver dados com a hora em que foram gerados e o estado do link</td>
+<td>Flight surgeon</td>
+<td>Console de Houston</td>
+<td>Essencial (MVP)</td>
+</tr>
+<tr>
+<td>RF19</td>
+<td>Revisar decisões tomadas a bordo e enviar parecer</td>
+<td>Flight surgeon</td>
+<td>Emergência</td>
+<td>Essencial (MVP)</td>
+</tr>
+<tr>
+<td>RF20</td>
+<td>Pedir ao copiloto um resumo do que houve desde o último contato</td>
+<td>Flight surgeon</td>
+<td>Houston · copiloto</td>
+<td>Importante</td>
+</tr>
+<tr>
+<td>RF21</td>
+<td>Ver o estado da tripulação em linguagem simples, sem sinais vitais</td>
+<td>Família</td>
+<td>App Terra-Órbita</td>
+<td>Essencial (MVP)</td>
+</tr>
+<tr>
+<td>RF22</td>
+<td>Trocar mensagens, brindes e corridas, vendo o atraso de entrega</td>
+<td>Família</td>
+<td>App · Elo e mensagens</td>
+<td>Desejável</td>
+</tr>
+<tr>
+<td>RF23</td>
+<td>Guardar e reenviar dados por prioridade quando o link cair</td>
+<td>Sistema</td>
+<td>Cenário blackout</td>
+<td>Essencial (MVP)</td>
+</tr>
+<tr>
+<td>RF24</td>
+<td>Escalonar ao próximo humano quando ninguém responde no prazo</td>
+<td>Sistema</td>
+<td>Evento sensor solto</td>
+<td>Essencial (MVP)</td>
+</tr>
+<tr>
+<td>RF25</td>
+<td>Registrar toda sugestão, decisão e escalonamento em trilha de auditoria</td>
+<td>Sistema</td>
+<td>Linha do tempo</td>
+<td>Essencial (MVP)</td>
+</tr>
+<tr>
+<td>RF26</td>
+<td>Ajustar o comportamento ao perfil de missão (atraso, link, autonomia)</td>
+<td>Sistema</td>
+<td>Perfil de missão</td>
+<td>Importante</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="requisitos-atributos-de-qualidade">Atributos de qualidade</h3>
+<p>Três atributos guiam as decisões: segurança do paciente, operação sem a Terra e controle humano. Em conflito, vale a ordem da tabela. Os números são metas de projeto, a validar em teste.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Ordem</th>
+<th>Atributo</th>
+<th>Estímulo</th>
+<th>Resposta esperada (meta)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Segurança do paciente</td>
+<td>Arritmia detectada no relógio</td>
+<td>Alerta no pulso em menos de 1 s; protocolo no tablet em menos de 2 s, sem depender da Terra</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Disponibilidade offline</td>
+<td>Link com a Terra cai por 14 dias</td>
+<td>Todas as funções de bordo seguem; nenhum dado se perde</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Controle humano e auditoria</td>
+<td>Qualquer decisão clínica</td>
+<td>100% com um humano responsável registrado, com sugestão, evidências e versão do modelo</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Tolerância a atraso</td>
+<td>Mensagem para a Terra com 3 a 22 min de atraso</td>
+<td>Entrega garantida; prioridade 1 sai à frente na próxima janela</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Privacidade</td>
+<td>Alerta de bem-estar sem consentimento</td>
+<td>Nenhum dado sai do relógio; a família recebe só texto de status</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Confiabilidade dos alarmes</td>
+<td>Leitura com sinal ruim</td>
+<td>O astronauta confirma antes de escalar; menos de 1 alarme falso por tripulante por semana</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Explicabilidade</td>
+<td>Protocolo proposto pela Cosmo</td>
+<td>Evidências, confiança e alternativa visíveis; o médico decide em menos de 30 s</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Usabilidade sob estresse</td>
+<td>Alerta crítico</td>
+<td>Entendido num olhar (cor, avatar, uma ação); operável por voz e com luva</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Eficiência de energia</td>
+<td>Monitoramento contínuo no relógio</td>
+<td>Bateria de pelo menos 24 h; modelos grandes rodam fora do relógio</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Segurança da informação</td>
+<td>Dispositivo perdido ou nó invadido</td>
+<td>Dados cifrados em repouso e em trânsito; autenticação mútua entre nós</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Modificabilidade</td>
+<td>Novo sensor ou novo tipo de evento</td>
+<td>Entra como regra e máquina de estados, sem mudar os apps; perfil de missão por configuração</td>
+</tr>
+</tbody>
+</table></div>
+<h4>Conflitos já resolvidos pela ordem</h4>
+<ul>
+<li><strong>Segurança acima de privacidade, só em risco de vida:</strong> uma emergência clínica vai ao médico sem pedir consentimento. Saúde mental fora de emergência continua exigindo consentimento.</li>
+<li><strong>Offline acima de eficiência:</strong> o relógio guarda dados localmente mesmo gastando mais bateria, e a fila nunca descarta alertas.</li>
+<li><strong>Controle humano acima de velocidade:</strong> até numa emergência, a Cosmo orienta o astronauta na hora, mas o protocolo só é aplicado depois da confirmação do médico.</li>
+</ul></section>
+<section id="c4" class="secao"><p class="sec-n">03</p><h2>Arquitetura C4</h2><p>Tudo o que protege a vida roda na nave; só o gateway DTN atravessa para a Terra. O motor de decisões é o único componente que muda o estado de um evento.</p>
+<h3 id="c4-nivel-1-contexto">Nível 1 · Contexto</h3>
+<figure class="diagrama"><pre class="mermaid">flowchart TB
+  astro([Astronauta e comandante])
+  medico([Oficial médico])
+  fs([Flight surgeon em Houston])
+  fam([Família])
+  sys[AstroHealth OS&lt;br/&gt;monitoramento com IA local&lt;br/&gt;e humano no controle]
+  nave[[Sensores e sistemas da nave]]
+  dsn[[Rede de espaço profundo · DTN]]
+  astro --&gt;|usa o relógio| sys
+  medico --&gt;|decide protocolos no tablet| sys
+  fs --&gt;|revisa e dá parecer| sys
+  fam --&gt;|recebe status em frases| sys
+  sys --&gt;|lê sinais e ambiente| nave
+  sys &lt;--&gt;|pacotes com atraso| dsn
+</pre></figure>
+<h3 id="c4-nivel-2-containers">Nível 2 · Containers</h3>
+<figure class="diagrama"><pre class="mermaid">flowchart TB
+  subgraph bordo[A bordo da nave]
+    relogio[Relógio da tripulação&lt;br/&gt;Cosmo borda: arritmia e chat&lt;br/&gt;guarda dados sem link]
+    tablet[Tablet do médico&lt;br/&gt;painel de cada tripulante&lt;br/&gt;confirma e libera medicação]
+    sensores[Sensores de bordo&lt;br/&gt;patch, manguito, oxímetro&lt;br/&gt;dosímetro e CO₂]
+    subgraph servidor[Servidor da nave]
+      motor[Motor de decisões&lt;br/&gt;regras + estados]
+      cosmo[Cosmo nave&lt;br/&gt;LLM local + RAG]
+      dados[(Dados e auditoria)]
+      gw[Gateway DTN&lt;br/&gt;fila por prioridade]
+    end
+  end
+  link{{Link DTN · menos de 1 s a 22 min · blackouts de dias}}
+  subgraph terra[Na Terra]
+    srvT[Servidor da Terra&lt;br/&gt;filtro de privacidade]
+    console[Console de Houston&lt;br/&gt;Cosmo Terra: copiloto]
+    app[App da família]
+  end
+  relogio --&gt;|rede local| motor
+  tablet --&gt;|rede local| motor
+  sensores --&gt; motor
+  motor --&gt; cosmo
+  motor --&gt; dados
+  motor --&gt; gw
+  gw --&gt; link --&gt; srvT
+  srvT --&gt; console
+  srvT --&gt;|só frases, sem sinais vitais| app
+</pre></figure>
+<h3 id="c4-nivel-3-componentes-do-servidor-da-nave">Nível 3 · Componentes do servidor da nave</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Componente</th>
+<th>Responsabilidade</th>
+<th>Fala com</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ingestão de sinais</td>
+<td>Recebe leituras, marca fonte, hora e qualidade do sinal</td>
+<td>Relógios, sensores, motor de decisões</td>
+</tr>
+<tr>
+<td>Detectores</td>
+<td>Modelos pequenos: arritmia, hipóxia, artefato de sensor, prontidão, humor e linha de base. O z robusto classifica cada sinal; o Isolation Forest, um modelo por tripulante, marca a combinação fora do padrão (<a href="#adr-0012">ADR-012</a>)</td>
+<td>Ingestão, motor de decisões</td>
+</tr>
+<tr>
+<td>Motor de decisões</td>
+<td>Abre eventos, aplica o nível de autonomia, chama o humano responsável, escala por tempo</td>
+<td>Detectores, apps, auditoria, gateway</td>
+</tr>
+<tr>
+<td>Cosmo nave (LLM + RAG)</td>
+<td>Conversa, explica evidências e resume; não muda estado</td>
+<td>Motor de decisões (só leitura), apps</td>
+</tr>
+<tr>
+<td>Base de protocolos</td>
+<td>Protocolos médicos, manual do kit, estoque e validade de medicamentos</td>
+<td>Cosmo nave, motor de decisões</td>
+</tr>
+<tr>
+<td>Consentimentos</td>
+<td>Quem autorizou o quê, para quem, até quando</td>
+<td>Motor de decisões, gateway</td>
+</tr>
+<tr>
+<td>Auditoria</td>
+<td>Log só de inclusão com hash encadeado</td>
+<td>Todos os componentes (escrita)</td>
+</tr>
+<tr>
+<td>Gateway DTN</td>
+<td>Monta pacotes, aplica prioridade e consentimento, guarda no blackout</td>
+<td>Motor de decisões, link DTN</td>
+</tr>
+</tbody>
+</table></div>
+<figure class="diagrama"><pre class="mermaid">flowchart LR
+  ing[Ingestão de sinais] --&gt; det[Detectores]
+  det --&gt; mot[Motor de decisões]
+  mot &lt;--&gt;|consulta| prot[(Base de protocolos)]
+  mot &lt;--&gt;|consulta| cons[(Consentimentos)]
+  mot --&gt;|estado, só leitura| llm[Cosmo nave&lt;br/&gt;LLM + RAG]
+  llm --&gt; prot
+  mot --&gt; aud[(Auditoria)]
+  mot --&gt; gw[Gateway DTN]
+  cons --&gt; gw
+</pre></figure>
+<p>No relógio roda uma versão reduzida: ingestão, detector de arritmia e de artefato, chat básico e fila local. Assim, um alerta crítico não depende nem do servidor da nave.</p></section>
+<section id="comunicacao" class="secao"><p class="sec-n">04</p><h2>Implantação e comunicação</h2><p>Dentro da nave, tudo conversa pela rede local em milissegundos. Para fora, os dados viajam em pacotes DTN, guardados e reenviados até chegar, sempre na ordem de prioridade.</p>
+<figure class="diagrama"><pre class="mermaid">flowchart LR
+  r[Relógios] --&gt; fila
+  t[Tablet do médico] --&gt; fila
+  m[Motor de decisões] --&gt; fila
+  subgraph fila[Gateway DTN · fila por prioridade]
+    direction TB
+    p1[P1 · alertas, SOS, decisões médicas]
+    p2[P2 · telemetria contínua e exames]
+    p3[P3 · mensagens e escala]
+    p4[P4 · rotina e gamificação]
+  end
+  fila --&gt; j[Janela de contato&lt;br/&gt;P1 primeiro, custódia e reenvio]
+  j --&gt; s[Servidor da Terra&lt;br/&gt;confirma recebimento, devolve pareceres]
+</pre></figure>
+<p><strong>Blackout:</strong> a fila guarda tudo; P1 nunca é descartado; P4 pode virar um resumo. Cada pacote carrega a hora em que foi gerado (<a href="#adr-0006">ADR-006</a>).</p>
+<h3 id="comunicacao-nos-de-implantacao">Nós de implantação</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Nó</th>
+<th>Onde roda</th>
+<th>Comunicação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Relógio</td>
+<td>Pulso de cada tripulante</td>
+<td>Rede local da nave (BLE ou Wi-Fi); guarda dados se o servidor cair</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>Enfermaria, com o oficial médico</td>
+<td>Wi-Fi da nave</td>
+</tr>
+<tr>
+<td>Servidor da nave</td>
+<td>Computador de bordo, com dois nós redundantes</td>
+<td>Rede local para dentro; DTN para fora</td>
+</tr>
+<tr>
+<td>Servidor da Terra</td>
+<td>Data center em Houston</td>
+<td>DTN para a nave; HTTPS para o console e o app</td>
+</tr>
+<tr>
+<td>Console de Houston</td>
+<td>Sala do flight surgeon</td>
+<td>HTTPS, com autenticação forte</td>
+</tr>
+<tr>
+<td>App da família</td>
+<td>Celular da família</td>
+<td>HTTPS, só o feed já filtrado</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="comunicacao-perfis-de-missao">Perfis de missão</h3>
+<p>O mesmo software se ajusta ao atraso. O perfil muda quem decide primeiro, não o código.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Perfil</th>
+<th>Atraso de ida</th>
+<th>Link</th>
+<th>Quem decide primeiro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ISS · órbita baixa</td>
+<td>Menos de 1 s</td>
+<td>Satélites TDRS</td>
+<td>Houston junto com a tripulação</td>
+</tr>
+<tr>
+<td>Gateway · órbita lunar</td>
+<td>Cerca de 1,3 s</td>
+<td>Deep Space Network</td>
+<td>Tripulação, com Houston em segundos</td>
+</tr>
+<tr>
+<td>Trânsito para Marte</td>
+<td>3 a 22 min, conforme a posição dos planetas</td>
+<td>Deep Space Network</td>
+<td>Tripulação; Houston revisa depois</td>
+</tr>
+<tr>
+<td>Superfície de Marte</td>
+<td>3 a 22 min</td>
+<td>Orbitador de relay + DSN</td>
+<td>Tripulação; Houston revisa depois</td>
+</tr>
+</tbody>
+</table></div>
+<p>Referência: <a href="https://www.nasa.gov/space-communications-navigation/interplanetary-overlay-network/" target="_blank" rel="noopener">NASA · Interplanetary Overlay Network (DTN)</a>.</p></section>
+<section id="decisoes" class="secao"><p class="sec-n">05</p><h2>Motor de decisões</h2><p>Todo evento de saúde vira uma máquina de estados com um humano responsável. A IA só age sozinha em ações urgentes e reversíveis, e mesmo assim o humano pode desfazer.</p>
+<h3 id="decisoes-niveis-de-autonomia">Níveis de autonomia</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Nível</th>
+<th>O que a Cosmo faz</th>
+<th>Exemplos na demo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 · Observar</td>
+<td>Registra e aprende o padrão de cada tripulante</td>
+<td>Linha de base de FC, sono e HRV</td>
+</tr>
+<tr>
+<td>1 · Informar</td>
+<td>Avisa, sem recomendar nada</td>
+<td>Dose de radiação do dia, tendência de sono, combinação de sinais fora do padrão</td>
+</tr>
+<tr>
+<td>2 · Sugerir</td>
+<td>Propõe; o humano decide</td>
+<td>Beber água, respirar, prontidão para EVA</td>
+</tr>
+<tr>
+<td>3 · Preparar e pedir confirmação</td>
+<td>Deixa tudo pronto e executa após um toque</td>
+<td>Protocolo de emergência, abrigo, ultrassom guiado</td>
+</tr>
+<tr>
+<td>4 · Agir e avisar, com desfazer</td>
+<td>Executa ações urgentes e reversíveis</td>
+<td>Rota até o abrigo, modo noite, SOS na frente da fila</td>
+</tr>
+<tr>
+<td>Nunca sozinha</td>
+<td>Sempre exige um humano</td>
+<td>Medicação, procedimentos invasivos, compartilhar saúde mental, tirar alguém de tarefa crítica</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="decisoes-linha-de-base-no-motor">Linha de base no motor</h3>
+<p>O estado de três níveis sai do z robusto, sinal por sinal. O Isolation Forest não altera esse estado nem abre evento clínico. Ele vira sugestão de nível 1 só quando marca anomalia, o M2 classifica o sinal como bom e nenhum sinal está crítico sozinho. Se o M1 já abriu fibrilação atrial, ou se um sinal está crítico, permanece o evento aberto. A família não recebe escore nem faixa. O modelo está na <a href="#adr-0012">ADR-012</a>.</p>
+<h3 id="decisoes-quem-decide-cada-tipo-de-evento">Quem decide cada tipo de evento</h3>
+<p>Os prazos são metas de projeto, a validar com o time médico.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Tipo de decisão</th>
+<th>Humano responsável</th>
+<th>Prazo para responder</th>
+<th>Sem resposta, vai para</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Leitura suspeita do sensor</td>
+<td>O próprio astronauta</td>
+<td>20 s</td>
+<td>Oficial médico</td>
+</tr>
+<tr>
+<td>Protocolo clínico</td>
+<td>Oficial médico</td>
+<td>60 s</td>
+<td>Comandante e tripulante com treino médico</td>
+</tr>
+<tr>
+<td>Medicação</td>
+<td>Oficial médico</td>
+<td>Sem escalonamento automático</td>
+<td>Oficial médico substituto</td>
+</tr>
+<tr>
+<td>Abrigo contra radiação</td>
+<td>Comandante</td>
+<td>2 min</td>
+<td>Próximo na cadeia de comando</td>
+</tr>
+<tr>
+<td>Escala de tarefa crítica</td>
+<td>Comandante</td>
+<td>Até o início da tarefa</td>
+<td>Próximo na cadeia de comando</td>
+</tr>
+<tr>
+<td>Compartilhar saúde mental</td>
+<td>O próprio astronauta</td>
+<td>Não escala</td>
+<td>Ninguém; exceção só em risco de vida</td>
+</tr>
+<tr>
+<td>Ação de nível 4</td>
+<td>O próprio astronauta, por veto</td>
+<td>15 s para vetar</td>
+<td>Aplica e oferece desfazer</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="decisoes-estados-de-um-evento">Estados de um evento</h3>
+<figure class="diagrama"><pre class="mermaid">stateDiagram-v2
+  state &quot;Detectado&quot; as Detectado
+  state &quot;Confirmação com o astronauta&quot; as Confirmacao
+  state &quot;Proposto&quot; as Proposto
+  state &quot;Aguardando humano&quot; as Aguardando
+  state &quot;Escalonado&quot; as Escalonado
+  state &quot;Decidido&quot; as Decidido
+  state &quot;Em execução&quot; as Execucao
+  state &quot;Resolvido&quot; as Resolvido
+  state &quot;Encerrado&quot; as Encerrado
+  state &quot;Agendado com veto&quot; as Agendado
+  state &quot;Aplicado&quot; as Aplicado
+
+  [*] --&gt; Detectado
+  Detectado --&gt; Confirmacao: sinal ruim
+  Confirmacao --&gt; Encerrado: ajustou o sensor
+  Confirmacao --&gt; Proposto: confirmou ou 20 s sem resposta
+  Detectado --&gt; Proposto: nível 2 ou 3
+  Detectado --&gt; Agendado: nível 4
+  Proposto --&gt; Aguardando
+  Aguardando --&gt; Escalonado: prazo vencido
+  Escalonado --&gt; Aguardando: próximo humano, novo prazo
+  Aguardando --&gt; Decidido: humano confirma, ajusta ou recusa
+  Decidido --&gt; Execucao: confirmado
+  Decidido --&gt; Encerrado: recusado
+  Execucao --&gt; Resolvido
+  Agendado --&gt; Aplicado: sem veto
+  Agendado --&gt; Encerrado: vetado
+  Aplicado --&gt; Encerrado: mantido ou desfeito
+  Resolvido --&gt; [*]
+  Encerrado --&gt; [*]
+</pre></figure>
+<p>Cada transição grava na auditoria: evento, estado anterior e novo, quem decidiu, quando, versão do modelo e evidências usadas. O escalonamento sempre aponta para outro humano, nunca para a IA (<a href="#adr-0004">ADR-004</a>).</p></section>
+<section id="fluxos" class="secao"><p class="sec-n">06</p><h2>Fluxos</h2><p>Nos cinco fluxos, a decisão acontece a bordo, e a Terra fica sabendo depois. Setas <code>--)</code> cruzam o link com a Terra e levam de menos de 1 s a 22 min, conforme o perfil de missão.</p>
+<h3 id="fluxos-emergencia-cardiaca">Emergência cardíaca</h3><p class="na-demo">Na demo: <b>Cenário → Emergência; depois confirme o protocolo no tablet</b> · <a href="https://claude.ai/artifact/CE5bxpHxaLhi8Af9SY7NmU" target="_blank" rel="noopener" target="_blank" rel="noopener">abrir a demo</a></p>
+<figure class="diagrama"><pre class="mermaid">sequenceDiagram
+  autonumber
+  participant R as Relógio (Sarah)
+  participant M as Motor + Cosmo (nave)
+  participant T as Tablet (Dr. Marcus)
+  participant G as Gateway DTN
+  participant H as Houston
+  R-&gt;&gt;R: detecta FC 168 irregular e SpO₂ 88%
+  R-&gt;&gt;R: alerta no pulso: pare e sente-se
+  R-&gt;&gt;M: evento arritmia + ECG
+  M-&gt;&gt;T: protocolo + evidências (nível 3)
+  M-&gt;&gt;G: alerta P1
+  T-&gt;&gt;M: confirma protocolo (assinado)
+  M-&gt;&gt;R: médico a caminho
+  T-&gt;&gt;M: libera antiarrítmico e define a dose
+  G--)H: alerta chega com atraso
+  H--)G: parecer
+  G-&gt;&gt;T: parecer chega a bordo
+</pre></figure>
+<h3 id="fluxos-tempestade-solar">Tempestade solar</h3><p class="na-demo">Na demo: <b>Injetar evento → Tempestade solar</b> · <a href="https://claude.ai/artifact/CE5bxpHxaLhi8Af9SY7NmU" target="_blank" rel="noopener" target="_blank" rel="noopener">abrir a demo</a></p>
+<figure class="diagrama"><pre class="mermaid">sequenceDiagram
+  autonumber
+  participant D as Dosímetro
+  participant M as Motor + Cosmo
+  participant C as Relógio da comandante
+  participant T as Tablet
+  participant G as Gateway DTN
+  participant E as Houston e família
+  D-&gt;&gt;M: fluxo de prótons subindo
+  M-&gt;&gt;M: nível 4: acende a rota até o abrigo
+  M-&gt;&gt;C: abrigo para todos?
+  opt comandante adia 5 min
+    C-&gt;&gt;M: aguardar
+    M-&gt;&gt;C: fluxo ainda subindo, pergunta de novo
+  end
+  C-&gt;&gt;M: abrigo para todos
+  M-&gt;&gt;T: dose de cada tripulante
+  M-&gt;&gt;G: alerta P1: tripulação no abrigo
+  G--)E: chega minutos depois
+  D-&gt;&gt;M: fluxo caindo
+  M-&gt;&gt;C: liberar a tripulação?
+  C-&gt;&gt;M: libera
+</pre></figure>
+<h3 id="fluxos-sensor-solto">Sensor solto</h3><p class="na-demo">Na demo: <b>Injetar evento → Sensor solto</b> · <a href="https://claude.ai/artifact/CE5bxpHxaLhi8Af9SY7NmU" target="_blank" rel="noopener" target="_blank" rel="noopener">abrir a demo</a></p>
+<figure class="diagrama"><pre class="mermaid">sequenceDiagram
+  autonumber
+  participant S as Oxímetro do relógio
+  participant R as Cosmo borda
+  participant A as Astronauta
+  participant T as Tablet (médico)
+  S-&gt;&gt;R: SpO₂ 84% com sinal fraco
+  R-&gt;&gt;A: o relógio está folgado?
+  alt ajustou
+    A-&gt;&gt;R: ajustei
+    R-&gt;&gt;R: leitura volta a 98% e o trecho vira artefato
+  else está firme ou 20 s sem resposta
+    R-&gt;&gt;T: leitura suspeita
+    T-&gt;&gt;R: oxímetro do kit marca 97%
+  end
+</pre></figure>
+<h3 id="fluxos-saude-mental-com-consentimento">Saúde mental com consentimento</h3><p class="na-demo">Na demo: <b>Injetar evento → Queda de humor</b> · <a href="https://claude.ai/artifact/CE5bxpHxaLhi8Af9SY7NmU" target="_blank" rel="noopener" target="_blank" rel="noopener">abrir a demo</a></p>
+<figure class="diagrama"><pre class="mermaid">sequenceDiagram
+  autonumber
+  participant C as Cosmo (relógio)
+  participant A as Astronauta
+  participant T as Tablet (médico)
+  participant F as Família
+  C-&gt;&gt;C: sono, voz e HRV indicam queda de humor
+  C-&gt;&gt;A: só você vê isto. Quer conversar?
+  opt pede chamada com a família
+    A-&gt;&gt;C: pedir chamada
+    C--)F: pedido de chamada (P3)
+  end
+  alt compartilhar
+    A-&gt;&gt;C: contar ao Dr. Marcus
+    C-&gt;&gt;T: resumo, sem gravações
+    T-&gt;&gt;A: conversa marcada às 19:00
+  else só comigo
+    A-&gt;&gt;C: só comigo
+    Note over C: nada sai do relógio
+  end
+</pre></figure>
+<h3 id="fluxos-blackout-e-volta-do-sinal">Blackout e volta do sinal</h3><p class="na-demo">Na demo: <b>Cenário → Blackout; depois Normal</b> · <a href="https://claude.ai/artifact/CE5bxpHxaLhi8Af9SY7NmU" target="_blank" rel="noopener" target="_blank" rel="noopener">abrir a demo</a></p>
+<figure class="diagrama"><pre class="mermaid">sequenceDiagram
+  autonumber
+  participant N as Nave (motor)
+  participant G as Fila DTN
+  participant T as Terra
+  Note over N,T: link cai (conjunção solar)
+  N-&gt;&gt;G: P2 telemetria (guardada)
+  N-&gt;&gt;G: P1 alerta (guardado)
+  T-&gt;&gt;T: mensagens da Terra esperam do lado da Terra
+  Note over N,T: janela de contato abre
+  G--)T: P1 primeiro
+  G--)T: depois P2, P3 e P4
+  T--)G: confirma cada pacote
+  T-&gt;&gt;T: copiloto de Houston resume o período
+</pre></figure></section>
+<section id="dados" class="secao"><p class="sec-n">07</p><h2>Modelo de dados</h2><p>O centro do modelo é o Evento: leituras abrem eventos, a Cosmo anexa sugestões e só humanos registram decisões. Toda entidade carrega a hora em que foi gerada; a Terra acrescenta a hora em que recebeu.</p>
+<figure class="diagrama"><pre class="mermaid">erDiagram
+  TRIPULANTE ||--o{ LEITURA : gera
+  TRIPULANTE ||--o{ CONSENTIMENTO : concede
+  TRIPULANTE ||--o{ EVENTO : envolve
+  LEITURA }o--o| EVENTO : abre
+  EVENTO ||--o{ SUGESTAO : recebe
+  EVENTO ||--o{ DECISAO : recebe
+  EVENTO ||--o{ PACOTE : vira
+  PERFIL_MISSAO ||--o{ PACOTE : define_atraso
+  EVENTO ||--o{ REGISTRO_AUDITORIA : registra
+
+  TRIPULANTE {
+    string id PK
+    string nome
+    string papel
+    json linha_de_base
+  }
+  LEITURA {
+    string id PK
+    string tripulante_id FK
+    string metrica
+    float valor
+    string unidade
+    string fonte_sensor
+    float qualidade_sinal
+    datetime gerada_em
+  }
+  EVENTO {
+    string id PK
+    string tipo
+    string estado
+    int nivel_autonomia
+    string papel_responsavel
+    datetime prazo_em
+    datetime gerado_em
+  }
+  SUGESTAO {
+    string id PK
+    string evento_id FK
+    string texto
+    json evidencias
+    float confianca
+    string alternativa
+    string versao_modelo
+  }
+  DECISAO {
+    string id PK
+    string evento_id FK
+    string humano_id FK
+    string acao
+    string dose
+    string assinatura
+    datetime decidida_em
+  }
+  CONSENTIMENTO {
+    string id PK
+    string tripulante_id FK
+    string tipo_dado
+    string destinatario
+    datetime valido_ate
+    datetime revogado_em
+  }
+  PACOTE {
+    string id PK
+    int prioridade
+    string destino
+    string estado
+    datetime gerado_em
+    datetime enviado_em
+    datetime confirmado_em
+  }
+  REGISTRO_AUDITORIA {
+    int seq PK
+    string entidade
+    string de_estado
+    string para_estado
+    string ator
+    datetime quando
+    string hash_anterior
+    string hash
+  }
+  PERFIL_MISSAO {
+    string id PK
+    float atraso_ida_s
+    string link
+    json janelas_previstas
+  }
+</pre></figure>
+<h3 id="dados-regras-de-escrita">Regras de escrita</h3>
+<ul>
+<li><strong>Sugestão:</strong> escrita só pela Cosmo; nunca muda o estado do evento.</li>
+<li><strong>Decisão:</strong> escrita só por humanos, sempre assinada.</li>
+<li><strong>Registro de auditoria:</strong> só inclusão; cada registro guarda o hash do anterior.</li>
+</ul>
+<h3 id="dados-contrato-evento-atualizado">Contrato <code>evento.atualizado</code></h3>
+<p>O mesmo formato vai para o tablet pela rede local e para a Terra num pacote DTN. Schema em <a href="#contrato">contratos/evento-atualizado.schema.json</a>; exemplo em <a href="#contrato">contratos/exemplos/evento-arritmia.json</a>.</p>
+<h3 id="dados-analise-dos-modelos">Análise dos modelos</h3>
+<p>O <code>ia.py</code> devolve M1, M2 e M3 no formato de <a href="#analise-fa">contratos/exemplos/analise-fa.json</a>. Os números desse arquivo são ilustrativos, até o treino do sábado. Em <code>m3.metricas</code>, cada sinal traz o z robusto e a faixa (<code>padrao</code>, <code>atencao</code>, <code>critico</code>). Em <code>m3.isolation_forest</code>, <code>score</code> é o <code>-score_samples</code> depois do <code>RobustScaler</code> daquela pessoa: quanto maior, mais a combinação se afasta do padrão dela. <code>evidencias</code> lista os sinais cuja troca pela mediana mais reduz esse escore. Quem decide se isso vira sugestão é o motor, pela <a href="#adr-0012">ADR-012</a>.</p>
+<h3 id="dados-interfaces-do-prototipo">Interfaces do protótipo</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Interface</th>
+<th>Tipo</th>
+<th>Quem publica ou chama</th>
+<th>Quem consome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tripulante/{id}/leituras</code></td>
+<td>Tópico MQTT</td>
+<td>Relógio, sensores</td>
+<td>Ingestão, detectores</td>
+</tr>
+<tr>
+<td><code>eventos/{id}</code></td>
+<td>Tópico MQTT</td>
+<td>Motor de decisões</td>
+<td>Relógio, tablet, gateway</td>
+</tr>
+<tr>
+<td><code>POST /decisoes</code></td>
+<td>REST (FastAPI)</td>
+<td>Relógio, tablet (assinado)</td>
+<td>Motor de decisões</td>
+</tr>
+<tr>
+<td><code>POST /consentimentos</code></td>
+<td>REST</td>
+<td>Relógio</td>
+<td>Motor, gateway</td>
+</tr>
+<tr>
+<td><code>POST /cosmo/chat</code></td>
+<td>REST</td>
+<td>Relógio, tablet, console</td>
+<td>Cosmo (nave ou Terra)</td>
+</tr>
+<tr>
+<td><code>GET /familia/feed</code></td>
+<td>REST, só na Terra</td>
+<td>App da família</td>
+<td>Filtro de privacidade</td>
+</tr>
+</tbody>
+</table></div><h3 id="contrato">Exemplo de mensagem <code>evento.atualizado</code></h3><div class="codigo"><button class="copiar" type="button" data-alvo="json-contrato">Copiar</button><pre id="json-contrato"><code>{
+  &quot;tipo_msg&quot;: &quot;evento.atualizado&quot;,
+  &quot;versao_contrato&quot;: &quot;1.0&quot;,
+  &quot;evento&quot;: {
+    &quot;id&quot;: &quot;evt-0042&quot;,
+    &quot;tipo&quot;: &quot;arritmia&quot;,
+    &quot;tripulante_id&quot;: &quot;sarah&quot;,
+    &quot;estado&quot;: &quot;aguardando_humano&quot;,
+    &quot;nivel_autonomia&quot;: 3,
+    &quot;responsavel_papel&quot;: &quot;oficial_medico&quot;,
+    &quot;prazo_em&quot;: &quot;2026-11-14T09:43:12Z&quot;,
+    &quot;gerado_em&quot;: &quot;2026-11-14T09:42:12Z&quot;
+  },
+  &quot;sugestao&quot;: {
+    &quot;texto&quot;: &quot;Repouso, O2 a 2 L/min e ECG de 12 derivações&quot;,
+    &quot;confianca&quot;: 0.87,
+    &quot;alternativa&quot;: &quot;taquicardia sinusal por esforço&quot;,
+    &quot;evidencias&quot;: [
+      &quot;rr_irregular_30s&quot;,
+      &quot;fc_acima_150&quot;,
+      &quot;spo2_abaixo_90_40s&quot;
+    ],
+    &quot;versao_modelo&quot;: &quot;arritmia-borda-0.3&quot;
+  },
+  &quot;pacote&quot;: {
+    &quot;prioridade&quot;: 1,
+    &quot;destinos&quot;: [
+      &quot;oficial_medico&quot;,
+      &quot;houston&quot;
+    ]
+  }
+}</code></pre></div><h3 id="analise-fa">Exemplo de análise com z robusto e Isolation Forest</h3><div class="codigo"><button class="copiar" type="button" data-alvo="json-analise">Copiar</button><pre id="json-analise"><code>{
+  &quot;tripulante_id&quot;: &quot;sarah&quot;,
+  &quot;m1&quot;: {
+    &quot;classe&quot;: &quot;fa&quot;,
+    &quot;confianca&quot;: 0.87,
+    &quot;atributos&quot;: [&quot;rr_irregular_30s&quot;, &quot;fc_media&quot;, &quot;sdnn&quot;],
+    &quot;versao_modelo&quot;: &quot;arritmia-borda-0.3&quot;
+  },
+  &quot;m2&quot;: {
+    &quot;qualidade&quot;: &quot;bom&quot;,
+    &quot;confianca&quot;: 0.94,
+    &quot;versao_modelo&quot;: &quot;qualidade-0.2&quot;
+  },
+  &quot;m3&quot;: {
+    &quot;estado&quot;: &quot;critico&quot;,
+    &quot;versao_z&quot;: &quot;m3-z-0.1&quot;,
+    &quot;metricas&quot;: {
+      &quot;fc&quot;: {&quot;z&quot;: 6.2, &quot;faixa&quot;: &quot;critico&quot;},
+      &quot;spo2&quot;: {&quot;z&quot;: -4.1, &quot;faixa&quot;: &quot;critico&quot;},
+      &quot;hrv&quot;: {&quot;z&quot;: -3.4, &quot;faixa&quot;: &quot;critico&quot;},
+      &quot;temperatura&quot;: {&quot;z&quot;: 1.1, &quot;faixa&quot;: &quot;atencao&quot;},
+      &quot;sono&quot;: {&quot;z&quot;: 0.2, &quot;faixa&quot;: &quot;padrao&quot;},
+      &quot;hidratacao&quot;: {&quot;z&quot;: -0.8, &quot;faixa&quot;: &quot;padrao&quot;}
+    },
+    &quot;isolation_forest&quot;: {
+      &quot;anomalo&quot;: true,
+      &quot;score&quot;: 0.71,
+      &quot;limiar&quot;: 0.62,
+      &quot;evidencias&quot;: [&quot;fc&quot;, &quot;spo2&quot;],
+      &quot;versao_modelo&quot;: &quot;m3-if-0.1&quot;
+    }
+  }
+}
+</code></pre></div></section>
+<section id="stack" class="secao"><p class="sec-n">08</p><h2>Stack híbrida</h2><p>Os diagramas descrevem o sistema como ele seria numa nave real. O protótipo do hackathon implementa as mesmas fronteiras com a stack que o time já domina. Regra para as duas colunas: o LLM conversa, explica e resume, mas quem decide o estado de um evento é o motor de decisões determinístico.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Camada</th>
+<th>Referência para produção (padrão NASA)</th>
+<th>Protótipo do hackathon</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Relógio (borda)</td>
+<td>Wear OS, watchOS ou firmware dedicado; modelos pequenos quantizados (TFLite/LiteRT, ONNX) para arritmia e qualidade de sinal</td>
+<td>Relógio simulado na demo web; modelos em Python com ONNX Runtime ou scikit-learn</td>
+</tr>
+<tr>
+<td>Rede local da nave</td>
+<td>Wi-Fi e BLE da nave; mensageria com QoS e autenticação mútua</td>
+<td>MQTT (Mosquitto) ou WebSocket local</td>
+</tr>
+<tr>
+<td>Cosmo nave</td>
+<td>LLM local quantizado + RAG sobre protocolos médicos e manual do kit, sem internet</td>
+<td>Python + FastAPI; LangChain ou CrewAI; ChromaDB com os protocolos; LLM local via Ollama</td>
+</tr>
+<tr>
+<td>Motor de decisões</td>
+<td>Regras + máquina de estados determinística, certificável e testável</td>
+<td>Python com máquina de estados (biblioteca transitions ou própria)</td>
+</tr>
+<tr>
+<td>Armazenamento</td>
+<td>Banco embarcado + log de auditoria só de inclusão, com hash encadeado</td>
+<td>SQLite + tabela de eventos só de inclusão</td>
+</tr>
+<tr>
+<td>Link nave ⇄ Terra</td>
+<td>DTN com Bundle Protocol (por exemplo, o ION da NASA), custódia e prioridade</td>
+<td>Simulador de atraso em Python: fila por prioridade e atraso configurável por perfil de missão</td>
+</tr>
+<tr>
+<td>Cosmo Terra (Houston)</td>
+<td>Modelos maiores, inclusive em nuvem, sob regras para dados de saúde</td>
+<td>FastAPI + LangChain; API da OpenAI permitida só aqui, nunca a bordo</td>
+</tr>
+<tr>
+<td>App da família</td>
+<td>App móvel; filtro de privacidade aplicado no servidor da Terra</td>
+<td>Página web responsiva, como na demo</td>
+</tr>
+<tr>
+<td>Testes</td>
+<td>Testes de cenário e de tempo real</td>
+<td>Robot Framework para aceitação dos fluxos + pytest nas regras</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Por que híbrida:</strong> a banca vê uma arquitetura plausível para uma nave real, e o time entrega código funcionando em 48 h. Trocar o simulador pelo ION ou o relógio simulado por um real não muda as fronteiras entre os componentes (<a href="#adr-0011">ADR-011</a>).</p>
+<h3 id="stack-linha-de-base-no-prototipo-m3">Linha de base no protótipo (M3)</h3>
+<p>O M3 roda no <code>ia.py</code>, no servidor da nave, com scikit-learn. O relógio recebe o estado de três níveis; a floresta não roda no pulso.</p>
+<ul>
+<li><strong>Z robusto:</strong> mediana e MAD de cada tripulante, por sinal. Isso pinta o avatar e cada indicador do painel.</li>
+<li><strong>Isolation Forest (<code>m3-if-0.1</code>):</strong> um modelo por tripulante, treinado só nos minutos normais de <code>dados/vitais.csv</code>. O pipeline leva um <code>RobustScaler</code> daquela pessoa e depois a floresta. O limiar cabe em no máximo 1 alarme por pessoa por dia simulado. A explicação troca cada sinal pela mediana e fica com os que mais reduzem o escore.</li>
+</ul>
+<p>As duas peças saem juntas em <code>analisar(leitura)</code>. O escore não substitui a faixa de cada sinal. A regra de quando o motor abre sugestão de nível 1 está na <a href="#adr-0012">ADR-012</a>. O exemplo de resposta, no quadro de fibrilação atrial da Sarah, está em <a href="#analise-fa">contratos/exemplos/analise-fa.json</a>.</p>
+<h3 id="stack-estrutura-sugerida-do-codigo-do-prototipo">Estrutura sugerida do código do protótipo</h3>
+<pre><code class="language-text">astrohealth/
+├── nave/
+│   ├── ingestao/          # leituras + qualidade de sinal
+│   ├── detectores/        # arritmia, artefato, linha de base (z e Isolation Forest), prontidão, humor
+│   ├── motor/             # máquina de estados + regras + prazos
+│   ├── cosmo/             # LangChain/CrewAI + ChromaDB + Ollama
+│   ├── auditoria/         # log com hash encadeado (SQLite)
+│   └── gateway_dtn/       # fila por prioridade + simulador de atraso
+├── terra/
+│   ├── servidor/          # recepção, confirmação, filtro de privacidade
+│   └── cosmo_terra/       # copiloto de Houston
+├── apps/                  # relógio, tablet, console, família (web)
+├── contratos/             # JSON Schemas compartilhados
+└── testes/
+    ├── aceitacao/         # Robot Framework, um .robot por fluxo
+    └── unidade/           # pytest
+</code></pre></section>
+<section id="seguranca" class="secao"><p class="sec-n">09</p><h2>Segurança e privacidade</h2><p>Os maiores riscos são um comando médico falso entrando na rede da nave e dados clínicos chegando a quem não deveria. As ameaças seguem o modelo STRIDE, mais duas específicas de IA.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Ameaça</th>
+<th>Exemplo no AstroHealth</th>
+<th>Mitigação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Falsificação de identidade</td>
+<td>Um nó falso injeta leituras ou confirma um protocolo</td>
+<td>Chave por dispositivo, autenticação mútua e decisões médicas assinadas</td>
+</tr>
+<tr>
+<td>Adulteração</td>
+<td>Alguém altera a trilha de auditoria depois de um erro</td>
+<td>Log só de inclusão com hash encadeado, copiado para a Terra</td>
+</tr>
+<tr>
+<td>Repúdio</td>
+<td>"Não fui eu que liberei a medicação"</td>
+<td>Cada decisão leva a identidade do humano (biometria do tablet + PIN)</td>
+</tr>
+<tr>
+<td>Vazamento de informação</td>
+<td>A família ou terceiros veem dados clínicos</td>
+<td>Filtro de privacidade no servidor da Terra, cifragem e consentimento para saúde mental</td>
+</tr>
+<tr>
+<td>Negação de serviço</td>
+<td>Telemetria de rotina satura o link na janela de contato</td>
+<td>Fila por prioridade, cota por classe e banda reservada para prioridade 1</td>
+</tr>
+<tr>
+<td>Elevação de privilégio</td>
+<td>O app da família tenta acessar a API clínica</td>
+<td>Papéis por ator; a família só lê o feed já filtrado</td>
+</tr>
+<tr>
+<td>Injeção de instruções na IA</td>
+<td>Uma mensagem externa tenta fazer o LLM "aprovar" algo</td>
+<td>O LLM não tem permissão de ação; tudo passa pelo motor de decisões; texto externo é tratado como dado</td>
+</tr>
+<tr>
+<td>Deriva do modelo</td>
+<td>Um modelo novo começa a errar arritmias</td>
+<td>Modo sombra e aprovação do oficial médico antes de entrar em uso</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="seguranca-regras-de-privacidade">Regras de privacidade</h3>
+<ul>
+<li><strong>Consentimento granular e revogável:</strong> por tipo de dado (sinais vitais, saúde mental, localização) e por destinatário (oficial médico, Houston, família).</li>
+<li><strong>Exceção única:</strong> risco de vida vai ao médico sem consentimento, e isso fica registrado na auditoria.</li>
+<li><strong>Minimização:</strong> a família recebe frases prontas, nunca números; Houston recebe o necessário para o parecer.</li>
+<li><strong>Dado de saúde é dado sensível:</strong> tratar com o rigor da LGPD (art. 11) no Brasil, usando a HIPAA como referência de mercado nos EUA.</li>
+</ul>
+<h3 id="seguranca-matriz-de-acesso">Matriz de acesso</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Dado</th>
+<th>Astronauta</th>
+<th>Oficial médico</th>
+<th>Comandante</th>
+<th>Houston</th>
+<th>Família</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sinais vitais próprios</td>
+<td>Sim</td>
+<td>Sim</td>
+<td>Só estado (ótimo/atenção/crítico)</td>
+<td>Sim, com atraso</td>
+<td>Não</td>
+</tr>
+<tr>
+<td>ECG bruto</td>
+<td>Sim</td>
+<td>Sim</td>
+<td>Não</td>
+<td>Sim, com atraso</td>
+<td>Não</td>
+</tr>
+<tr>
+<td>Alerta de saúde mental</td>
+<td>Sim</td>
+<td>Só com consentimento</td>
+<td>Não</td>
+<td>Só com consentimento</td>
+<td>Não</td>
+</tr>
+<tr>
+<td>Dose de radiação</td>
+<td>Sim</td>
+<td>Sim</td>
+<td>Sim</td>
+<td>Sim</td>
+<td>Não</td>
+</tr>
+<tr>
+<td>Status em frases</td>
+<td>Sim</td>
+<td>Sim</td>
+<td>Sim</td>
+<td>Sim</td>
+<td>Sim</td>
+</tr>
+<tr>
+<td>Trilha de auditoria</td>
+<td>Própria</td>
+<td>Sim</td>
+<td>Sim</td>
+<td>Sim</td>
+<td>Não</td>
+</tr>
+</tbody>
+</table></div></section>
+<section id="roadmap" class="secao"><p class="sec-n">10</p><h2>Roadmap e riscos</h2><p>O MVP precisa dos 16 requisitos essenciais funcionando até o fechamento das submissões, em 15/11 às 23:59. A versão acadêmica, para a pós, fica para a semana seguinte.</p>
+<figure class="diagrama"><pre class="mermaid">gantt
+  title AstroHealth OS · roadmap
+  dateFormat YYYY-MM-DD
+  axisFormat %d/%m
+  section Preparação
+  Revisar arquitetura e amarrar o enunciado :a1, 2026-11-11, 3d
+  Esqueleto do protótipo                    :a2, 2026-11-12, 2d
+  section Hackathon
+  Motor + simulador DTN + Cosmo nave        :crit, b1, 2026-11-14, 2d
+  Vídeo e submissão até 23h59               :milestone, crit, b2, 2026-11-15, 0d
+  section Pós-hackathon
+  ADRs completos, avaliação ATAM, testes Robot :c1, 2026-11-16, 3d
+</pre></figure>
+<p>O que a demo atual já mostra não precisa ser reimplementado no hackathon. O código novo são o motor de decisões, o simulador DTN e a Cosmo nave com RAG.</p>
+<h3 id="roadmap-riscos">Riscos</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Risco</th>
+<th>Efeito</th>
+<th>Mitigação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>O enunciado cobra algo fora deste escopo</td>
+<td>Retrabalho no meio do evento</td>
+<td>Colar o enunciado e os critérios antes de 13/11 e cruzar com os requisitos</td>
+</tr>
+<tr>
+<td>LLM local lento no notebook do evento</td>
+<td>A demo trava na frente da banca</td>
+<td>Modelo pequeno e quantizado; respostas prontas como alternativa</td>
+</tr>
+<tr>
+<td>Escopo grande para 48 h</td>
+<td>MVP incompleto</td>
+<td>Só os 16 requisitos essenciais; o resto fica na demo atual</td>
+</tr>
+<tr>
+<td>Conselho médico errado ou exagerado</td>
+<td>Perda de credibilidade</td>
+<td>Protocolos de fontes públicas, aviso de que não é dispositivo médico, humano sempre decide</td>
+</tr>
+<tr>
+<td>Integração MQTT e web atrasa</td>
+<td>Fluxos não fecham ponta a ponta</td>
+<td>WebSocket direto como plano B</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="roadmap-proximos-passos">Próximos passos</h3>
+<ul>
+<li><span class="caixa" aria-hidden="true"></span> Colar o enunciado oficial e os critérios de avaliação em <code>docs/01-visao-geral.md</code></li>
+<li><span class="caixa" aria-hidden="true"></span> Dividir o time por container: motor, Cosmo nave, simulador DTN, front</li>
+<li><span class="caixa" aria-hidden="true"></span> Criar o repositório a partir desta pasta</li>
+<li><span class="caixa" aria-hidden="true"></span> Escrever os testes de aceitação dos fluxos de emergência e de sensor solto</li>
+<li><span class="caixa" aria-hidden="true"></span> Montar a base de protocolos médicos para o RAG</li>
+</ul>
+<h3 id="roadmap-fontes">Fontes</h3>
+<ul>
+<li><a href="https://www.nasa.gov/hrp/hazards" target="_blank" rel="noopener">NASA Human Research Program: os cinco perigos (RIDGE)</a></li>
+<li><a href="https://www.spaceappschallenge.org/2026/" target="_blank" rel="noopener">NASA Space Apps Challenge 2026</a></li>
+<li><a href="https://www.spaceappschallenge.org/2026/challenges/health-monitoring-software/" target="_blank" rel="noopener">Desafio: Create Health Monitoring Software for Astronauts…</a></li>
+<li><a href="https://www.nasa.gov/space-communications-navigation/interplanetary-overlay-network/" target="_blank" rel="noopener">NASA: Interplanetary Overlay Network (DTN)</a></li>
+</ul></section>
+<section id="adrs" class="secao"><p class="sec-n">11</p><h2>Decisões de arquitetura</h2><p>Decisões no formato MADR, todas aceitas. Abra cada uma para ver contexto, alternativas e consequências.</p><div class="adr-ctl"><button type="button" id="abrir-adrs">Abrir todas</button></div><details class="adr" id="adr-0001"><summary><span class="adr-n">ADR-001</span><span class="adr-t">IA na borda primeiro; a Terra só apoia</span></summary><div class="adr-b"><ul>
+<li><strong>Status:</strong> aceita</li>
+<li><strong>Data:</strong> 2026-11-11</li>
+<li><strong>Relacionadas:</strong> <a href="#adr-0005">ADR-005</a>, <a href="#adr-0010">ADR-010</a></li>
+</ul>
+<h4>Contexto</h4>
+<p>A caminho de Marte, cada mensagem leva de 3 a 22 min por trecho, e conjunções solares cortam o contato por dias. Uma arritmia ou uma tempestade solar exigem resposta em segundos.</p>
+<h4>Decisão</h4>
+<p>Toda detecção e toda decisão que protege a vida rodam a bordo: o relógio detecta e alerta sozinho; o servidor da nave abre o evento e chama o humano responsável. A Terra recebe, revisa e devolve pareceres.</p>
+<h4>Alternativas consideradas</h4>
+<ul>
+<li><strong>Processar tudo na Terra:</strong> Simples e com modelos maiores, mas inútil com minutos de atraso e blackouts.</li>
+<li><strong>Processar tudo no servidor da nave:</strong> Bom para modelos médios, mas o relógio ficaria sem alerta se o servidor ou a rede local caíssem.</li>
+</ul>
+<h4>Consequências</h4>
+<p><strong>Positivas</strong></p>
+<ul>
+<li>Alerta crítico em menos de 1 s, mesmo sem rede local.</li>
+<li>A tripulação continua protegida durante blackouts.</li>
+</ul>
+<p><strong>Negativas</strong></p>
+<ul>
+<li>Modelos a bordo são menores e precisam de validação cuidadosa.</li>
+<li>Mais software para manter em vários nós.</li>
+</ul></div></details>
+<details class="adr" id="adr-0002"><summary><span class="adr-n">ADR-002</span><span class="adr-t">Motor de decisões determinístico separado do LLM</span></summary><div class="adr-b"><ul>
+<li><strong>Status:</strong> aceita</li>
+<li><strong>Data:</strong> 2026-11-11</li>
+<li><strong>Relacionadas:</strong> <a href="#adr-0003">ADR-003</a>, <a href="#adr-0004">ADR-004</a>, <a href="#adr-0008">ADR-008</a></li>
+</ul>
+<h4>Contexto</h4>
+<p>LLMs são ótimos para conversar, explicar e resumir, mas podem alucinar e são difíceis de certificar. Uma decisão clínica precisa ser previsível, testável e auditável.</p>
+<h4>Decisão</h4>
+<p>Só o motor de decisões (regras + máquina de estados) muda o estado de um evento. A Cosmo (LLM + RAG) lê o estado, explica evidências e conversa, mas não tem permissão de ação. Toda saída do LLM que sugira ação vira uma Sugestão, nunca uma Decisão.</p>
+<h4>Alternativas consideradas</h4>
+<ul>
+<li><strong>Agente de LLM decidindo (CrewAI/LangChain com ferramentas de ação):</strong> Flexível, mas imprevisível, difícil de testar e vulnerável a injeção de instruções.</li>
+<li><strong>Sem LLM:</strong> Mais simples, mas perde a conversa, a explicabilidade e os resumos para Houston.</li>
+</ul>
+<h4>Consequências</h4>
+<p><strong>Positivas</strong></p>
+<ul>
+<li>Comportamento previsível e testável com Robot Framework e pytest.</li>
+<li>Injeção de instruções no LLM não consegue aprovar nada.</li>
+</ul>
+<p><strong>Negativas</strong></p>
+<ul>
+<li>Regras precisam ser escritas e mantidas à mão.</li>
+<li>Duas peças para integrar: motor e Cosmo.</li>
+</ul></div></details>
+<details class="adr" id="adr-0003"><summary><span class="adr-n">ADR-003</span><span class="adr-t">Níveis de autonomia de 0 a 4 e a lista do que a IA nunca faz sozinha</span></summary><div class="adr-b"><ul>
+<li><strong>Status:</strong> aceita</li>
+<li><strong>Data:</strong> 2026-11-11</li>
+<li><strong>Relacionadas:</strong> <a href="#adr-0002">ADR-002</a>, <a href="#adr-0004">ADR-004</a></li>
+</ul>
+<h4>Contexto</h4>
+<p>Ações diferentes têm risco e reversibilidade diferentes: acender a rota até o abrigo não se compara a liberar um medicamento.</p>
+<h4>Decisão</h4>
+<p>Cada tipo de evento tem um nível: 0 observar, 1 informar, 2 sugerir, 3 preparar e pedir confirmação, 4 agir e avisar com desfazer (só ações urgentes e reversíveis). Medicação, procedimentos invasivos, compartilhar saúde mental e tirar alguém de tarefa crítica nunca acontecem sem um humano.</p>
+<h4>Alternativas consideradas</h4>
+<ul>
+<li><strong>Autonomia ligada ou desligada:</strong> Simples de explicar, mas força o mesmo tratamento para riscos muito diferentes.</li>
+<li><strong>Autonomia decidida caso a caso pelo LLM:</strong> Imprevisível e impossível de auditar.</li>
+</ul>
+<h4>Consequências</h4>
+<p><strong>Positivas</strong></p>
+<ul>
+<li>Política de autonomia explícita e revisável pelo time médico.</li>
+<li>A banca vê com clareza onde a IA para.</li>
+</ul>
+<p><strong>Negativas</strong></p>
+<ul>
+<li>Cada novo evento precisa ser classificado antes de entrar em produção.</li>
+</ul></div></details>
+<details class="adr" id="adr-0004"><summary><span class="adr-n">ADR-004</span><span class="adr-t">Um humano responsável por tipo de decisão; sem resposta, escala para outro humano</span></summary><div class="adr-b"><ul>
+<li><strong>Status:</strong> aceita</li>
+<li><strong>Data:</strong> 2026-11-11</li>
+<li><strong>Relacionadas:</strong> <a href="#adr-0003">ADR-003</a>, <a href="#adr-0008">ADR-008</a></li>
+</ul>
+<h4>Contexto</h4>
+<p>Sob pressão de tempo, é tentador deixar a IA decidir quando ninguém responde. Isso tiraria a responsabilidade humana justo nos momentos mais críticos.</p>
+<h4>Decisão</h4>
+<p>Cada tipo de decisão tem um papel responsável (astronauta, oficial médico, comandante) e um prazo. Prazo vencido escala para o próximo humano da cadeia, nunca para a IA. Exceção: ações de nível 4, que já são reversíveis.</p>
+<h4>Alternativas consideradas</h4>
+<ul>
+<li><strong>A IA assume depois do prazo:</strong> Rápido, mas transfere decisões clínicas para a máquina.</li>
+<li><strong>Esperar indefinidamente pelo responsável:</strong> Mantém a responsabilidade, mas pode custar vidas.</li>
+</ul>
+<h4>Consequências</h4>
+<p><strong>Positivas</strong></p>
+<ul>
+<li>Responsabilidade humana preservada e registrada.</li>
+<li>Tempo de resposta limitado pela cadeia de escalonamento.</li>
+</ul>
+<p><strong>Negativas</strong></p>
+<ul>
+<li>Exige definir a cadeia de substitutos de cada papel.</li>
+</ul></div></details>
+<details class="adr" id="adr-0005"><summary><span class="adr-n">ADR-005</span><span class="adr-t">DTN com Bundle Protocol e fila por prioridade</span></summary><div class="adr-b"><ul>
+<li><strong>Status:</strong> aceita</li>
+<li><strong>Data:</strong> 2026-11-11</li>
+<li><strong>Relacionadas:</strong> <a href="#adr-0006">ADR-006</a>, <a href="#adr-0011">ADR-011</a></li>
+</ul>
+<h4>Contexto</h4>
+<p>Protocolos comuns da internet assumem conexão contínua e atrasos de milissegundos. Entre a nave e a Terra há minutos de atraso e quedas de dias.</p>
+<h4>Decisão</h4>
+<p>A comunicação nave ⇄ Terra usa DTN (Bundle Protocol), com custódia, reenvio e quatro classes de prioridade: P1 alertas, SOS e decisões médicas; P2 telemetria e exames; P3 mensagens e escala; P4 rotina e gamificação. P1 tem banda reservada e nunca é descartado.</p>
+<h4>Alternativas consideradas</h4>
+<ul>
+<li><strong>TCP/IP direto:</strong> Quebra com atrasos longos e quedas.</li>
+<li><strong>MQTT ponta a ponta:</strong> Ótimo na rede local, mas não foi feito para minutos de atraso e blackouts.</li>
+</ul>
+<h4>Consequências</h4>
+<p><strong>Positivas</strong></p>
+<ul>
+<li>Nada se perde no blackout; alertas chegam primeiro.</li>
+<li>Alinhado ao que a NASA já usa (ION).</li>
+</ul>
+<p><strong>Negativas</strong></p>
+<ul>
+<li>No hackathon, o DTN é simulado em Python.</li>
+</ul></div></details>
+<details class="adr" id="adr-0006"><summary><span class="adr-n">ADR-006</span><span class="adr-t">A Terra vê snapshots atrasados, com a hora de origem</span></summary><div class="adr-b"><ul>
+<li><strong>Status:</strong> aceita</li>
+<li><strong>Data:</strong> 2026-11-11</li>
+<li><strong>Relacionadas:</strong> <a href="#adr-0005">ADR-005</a></li>
+</ul>
+<h4>Contexto</h4>
+<p>Mostrar dados de 12 minutos atrás como se fossem ao vivo leva Houston a decidir sobre uma situação que já mudou.</p>
+<h4>Decisão</h4>
+<p>Toda informação carrega a hora em que foi gerada e a hora em que chegou. O console mostra "você está vendo o passado" e o atraso do perfil de missão. Pareceres de Houston são revisões, não comandos.</p>
+<h4>Alternativas consideradas</h4>
+<ul>
+<li><strong>Esconder o atraso:</strong> Interface mais limpa, mas engana quem decide.</li>
+</ul>
+<h4>Consequências</h4>
+<p><strong>Positivas</strong></p>
+<ul>
+<li>Houston decide sabendo de quando é o dado.</li>
+</ul>
+<p><strong>Negativas</strong></p>
+<ul>
+<li>Interfaces mostram dois relógios, o de geração e o de recebimento.</li>
+</ul></div></details>
+<details class="adr" id="adr-0007"><summary><span class="adr-n">ADR-007</span><span class="adr-t">Consentimento granular para saúde mental; exceção só em risco de vida</span></summary><div class="adr-b"><ul>
+<li><strong>Status:</strong> aceita</li>
+<li><strong>Data:</strong> 2026-11-11</li>
+<li><strong>Relacionadas:</strong> <a href="#adr-0002">ADR-002</a></li>
+</ul>
+<h4>Contexto</h4>
+<p>Se o astronauta achar que tudo o que sente vai para o médico e para a Terra, ele esconde sintomas, e o sistema perde valor justamente no isolamento.</p>
+<h4>Decisão</h4>
+<p>Alertas de bem-estar ficam só com o astronauta até ele autorizar. O consentimento é por tipo de dado e por destinatário, e pode ser revogado. Sem consentimento, nada sai do relógio. A única exceção é risco de vida, que vai ao médico e fica registrado na auditoria.</p>
+<h4>Alternativas consideradas</h4>
+<ul>
+<li><strong>O médico vê tudo:</strong> Mais informação clínica, menos confiança da tripulação.</li>
+<li><strong>Nada é monitorado:</strong> Privacidade total, mas o risco de isolamento fica sem resposta.</li>
+</ul>
+<h4>Consequências</h4>
+<p><strong>Positivas</strong></p>
+<ul>
+<li>Confiança da tripulação no sistema.</li>
+<li>Alinhado à LGPD (dado sensível).</li>
+</ul>
+<p><strong>Negativas</strong></p>
+<ul>
+<li>O médico pode não saber de algo que ele gostaria de saber.</li>
+</ul></div></details>
+<details class="adr" id="adr-0008"><summary><span class="adr-n">ADR-008</span><span class="adr-t">Trilha de auditoria só de inclusão, com hash encadeado</span></summary><div class="adr-b"><ul>
+<li><strong>Status:</strong> aceita</li>
+<li><strong>Data:</strong> 2026-11-11</li>
+<li><strong>Relacionadas:</strong> <a href="#adr-0004">ADR-004</a></li>
+</ul>
+<h4>Contexto</h4>
+<p>Depois de um evento, é preciso saber o que a IA sugeriu, quem decidiu e quando, e provar que nada foi alterado.</p>
+<h4>Decisão</h4>
+<p>Cada transição de estado, sugestão, decisão e escalonamento gera um registro só de inclusão, com o hash do registro anterior. A trilha é copiada para a Terra em P2.</p>
+<h4>Alternativas consideradas</h4>
+<ul>
+<li><strong>Logs comuns da aplicação:</strong> Fáceis, mas editáveis e incompletos.</li>
+</ul>
+<h4>Consequências</h4>
+<p><strong>Positivas</strong></p>
+<ul>
+<li>Revisão confiável de decisões; base para pareceres e para a pesquisa.</li>
+</ul>
+<p><strong>Negativas</strong></p>
+<ul>
+<li>Mais armazenamento e mais tráfego de baixa prioridade.</li>
+</ul></div></details>
+<details class="adr" id="adr-0009"><summary><span class="adr-n">ADR-009</span><span class="adr-t">Com sinal ruim, perguntar ao astronauta antes de alarmar</span></summary><div class="adr-b"><ul>
+<li><strong>Status:</strong> aceita</li>
+<li><strong>Data:</strong> 2026-11-11</li>
+<li><strong>Relacionadas:</strong> <a href="#adr-0004">ADR-004</a></li>
+</ul>
+<h4>Contexto</h4>
+<p>Sensores de pulso erram quando o relógio está folgado. Alarmes falsos cansam a equipe médica, e alarmes descartados em silêncio escondem eventos reais.</p>
+<h4>Decisão</h4>
+<p>Quando a qualidade do sinal é baixa, a Cosmo pergunta ao astronauta se o relógio está folgado. Se ele ajusta e a leitura volta, o trecho vira artefato. Se ele confirma, ou não responde em 20 s, o caso vai ao oficial médico.</p>
+<h4>Alternativas consideradas</h4>
+<ul>
+<li><strong>Alarmar sempre:</strong> Seguro no papel, mas gera fadiga de alarme.</li>
+<li><strong>Descartar leituras ruins em silêncio:</strong> Sem ruído, mas pode esconder um evento real.</li>
+</ul>
+<h4>Consequências</h4>
+<p><strong>Positivas</strong></p>
+<ul>
+<li>Menos alarmes falsos sem esconder eventos reais.</li>
+</ul>
+<p><strong>Negativas</strong></p>
+<ul>
+<li>Exige um bom estimador de qualidade de sinal.</li>
+</ul></div></details>
+<details class="adr" id="adr-0010"><summary><span class="adr-n">ADR-010</span><span class="adr-t">Modelos novos entram em modo sombra e exigem aprovação médica</span></summary><div class="adr-b"><ul>
+<li><strong>Status:</strong> aceita</li>
+<li><strong>Data:</strong> 2026-11-11</li>
+<li><strong>Relacionadas:</strong> <a href="#adr-0001">ADR-001</a>, <a href="#adr-0008">ADR-008</a></li>
+</ul>
+<h4>Contexto</h4>
+<p>A Terra pode treinar modelos melhores durante a missão, mas um modelo novo pode piorar justamente em casos raros.</p>
+<h4>Decisão</h4>
+<p>Um modelo novo roda em paralelo, sem agir, comparando suas previsões com as do modelo atual. Só entra em uso depois que o oficial médico aprova, e a versão fica registrada em cada sugestão.</p>
+<h4>Alternativas consideradas</h4>
+<ul>
+<li><strong>Atualização automática vinda da Terra:</strong> Rápida, mas arrisca trocar um modelo bom por um pior no meio da missão.</li>
+</ul>
+<h4>Consequências</h4>
+<p><strong>Positivas</strong></p>
+<ul>
+<li>Atualizações seguras e rastreáveis.</li>
+</ul>
+<p><strong>Negativas</strong></p>
+<ul>
+<li>Atualizações demoram mais para valer.</li>
+</ul></div></details>
+<details class="adr" id="adr-0011"><summary><span class="adr-n">ADR-011</span><span class="adr-t">Stack híbrida: padrão NASA nos diagramas, stack do time no protótipo</span></summary><div class="adr-b"><ul>
+<li><strong>Status:</strong> aceita</li>
+<li><strong>Data:</strong> 2026-11-11</li>
+<li><strong>Relacionadas:</strong> <a href="#adr-0005">ADR-005</a></li>
+</ul>
+<h4>Contexto</h4>
+<p>O hackathon dura 48 h. Implementar ION, firmware de relógio e modelos certificados não cabe nesse prazo, mas a banca espera uma arquitetura plausível.</p>
+<h4>Decisão</h4>
+<p>Os diagramas descrevem a referência para produção (DTN/ION, modelos embarcados, LLM local). O protótipo implementa as mesmas fronteiras com Python, FastAPI, LangChain ou CrewAI, ChromaDB, Ollama, SQLite e um simulador de atraso.</p>
+<h4>Alternativas consideradas</h4>
+<ul>
+<li><strong>Implementar o ION real no hackathon:</strong> Mais fiel, mas consome o evento inteiro.</li>
+<li><strong>Só a stack do time, sem referência NASA:</strong> Rápido, mas menos convincente para a banca.</li>
+</ul>
+<h4>Consequências</h4>
+<p><strong>Positivas</strong></p>
+<ul>
+<li>Entrega em 48 h sem mudar as fronteiras do sistema.</li>
+</ul>
+<p><strong>Negativas</strong></p>
+<ul>
+<li>Parte do valor depende de explicar bem a diferença entre referência e protótipo.</li>
+</ul></div></details>
+<details class="adr" id="adr-0012"><summary><span class="adr-n">ADR-012</span><span class="adr-t">Linha de base com z robusto e Isolation Forest</span></summary><div class="adr-b"><ul>
+<li><strong>Status:</strong> aceita</li>
+<li><strong>Data:</strong> 2026-11-12</li>
+<li><strong>Relacionadas:</strong> <a href="#adr-0002">ADR-002</a>, <a href="#adr-0003">ADR-003</a>, <a href="#adr-0010">ADR-010</a></li>
+</ul>
+<h4>Contexto</h4>
+<p>O M3 descreve o padrão de cada tripulante. O z robusto diz, sinal por sinal, se a leitura está no padrão, em atenção ou crítica. Uma combinação pode sair do padrão da pessoa mesmo quando nenhum sinal cruza a faixa sozinho. O plano de 11/11 deixava o Isolation Forest para se sobrasse tempo.</p>
+<h4>Decisão</h4>
+<p>O M3 entra no hackathon com as duas peças, e as duas saem de <code>analisar(leitura)</code>.</p>
+<ul>
+<li>O <strong>z robusto</strong> (mediana e MAD de cada tripulante, por sinal) define a faixa de FC, SpO₂, HRV, temperatura, sono e hidratação. A soma dessas faixas vira o estado de três níveis e a homeostase do relógio e do painel.</li>
+<li>O <strong>Isolation Forest</strong> (<code>m3-if-0.1</code>) é um modelo por tripulante, treinado só nos minutos normais dos vitais sintéticos. O pipeline ajusta um <code>RobustScaler</code> naquela pessoa e, em seguida, a floresta. O limiar é o escore que, na validação, gera no máximo 1 alarme por pessoa por dia simulado. A explicação troca cada sinal pela mediana daquela pessoa e lista os que mais reduzem o escore.</li>
+</ul>
+<p>O bloco <code>isolation_forest</code> traz <code>anomalo</code>, <code>score</code>, <code>limiar</code>, <code>evidencias</code> e <code>versao_modelo</code>. O escore não substitui a frase por sinal.</p>
+<p>O motor abre uma sugestão de nível 1 só quando as três condições valem juntas: o Isolation Forest marca anomalia, o M2 classifica o sinal como bom e nenhum sinal está crítico sozinho. A sugestão não muda estado clínico. Se o M1 já abriu fibrilação atrial, ou se um sinal está crítico, permanece o evento aberto. A família não recebe escore nem faixa.</p>
+<h4>Alternativas consideradas</h4>
+<ul>
+<li><strong>Só o z robusto:</strong> Explica cada sinal e deixa passar a combinação em que nenhum sinal cruza a faixa sozinho.</li>
+<li><strong>Só o Isolation Forest:</strong> Marca a combinação e não diz qual sinal subiu ou desceu, que é o que o relógio e o painel mostram.</li>
+<li><strong>Isolation Forest no lugar do M1:</strong> O M1 classifica fibrilação atrial em ECG rotulado e devolve classe, confiança e atributos de RR. A floresta não faz isso.</li>
+</ul>
+<h4>Consequências</h4>
+<p><strong>Positivas</strong></p>
+<ul>
+<li>O painel mostra a faixa de cada sinal e, quando cabe, a combinação que saiu do padrão.</li>
+<li>A versão <code>m3-if-0.1</code> fica registrada em cada sugestão.</li>
+</ul>
+<p><strong>Negativas</strong></p>
+<ul>
+<li>Mais um artefato para treinar e um limiar para calibrar.</li>
+<li>O escore não é probabilidade clínica.</li>
+</ul></div></details></section>
+  </main>
+</div>
+<footer>Gerada a partir dos arquivos do repositório (ferramentas/gerar_pagina.py). Metas numéricas são de projeto, a validar em teste. Não é um dispositivo médico.</footer>
+
+<script>
+(function(){
+  "use strict";
+  /* Filtros dos requisitos funcionais */
+  var sec = document.getElementById('requisitos');
+  var tabela = sec && sec.querySelector('table');
+  if (tabela) {
+    var linhas = Array.prototype.slice.call(tabela.tBodies[0].rows);
+    var ordem = ['Essencial (MVP)','Importante','Desejável'];
+    linhas.forEach(function(tr){
+      var c = tr.cells[4]; var t = c.textContent.trim(); var i = ordem.indexOf(t);
+      c.innerHTML = '<span class="pri p' + (i < 0 ? 2 : i) + '">' + t + '</span>';
+    });
+    var atores = []; linhas.forEach(function(tr){ var a = tr.cells[2].textContent.trim(); if (atores.indexOf(a) < 0) atores.push(a); });
+    var f = { ator: 'Todos', pri: 'Todas' };
+    var box = document.createElement('div'); box.className = 'filtros';
+    function grupo(rot, chave, valores){
+      var d = document.createElement('div'); d.setAttribute('role','group'); d.setAttribute('aria-label', rot);
+      d.innerHTML = '<span class="rot">' + rot + '</span>';
+      valores.forEach(function(v){
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = v;
+        b.setAttribute('aria-pressed', String(v === f[chave]));
+        b.addEventListener('click', function(){ f[chave] = v; d.querySelectorAll('.chip').forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); }); aplicar(); });
+        d.appendChild(b);
+      });
+      return d;
+    }
+    box.appendChild(grupo('Ator','ator',['Todos'].concat(atores)));
+    box.appendChild(grupo('Prioridade','pri',['Todas'].concat(ordem)));
+    var cont = document.createElement('div'); cont.className = 'contagem'; box.appendChild(cont);
+    tabela.closest('.tbl').before(box);
+    function aplicar(){
+      var n = 0;
+      linhas.forEach(function(tr){
+        var ok = (f.ator === 'Todos' || tr.cells[2].textContent.trim() === f.ator) && (f.pri === 'Todas' || tr.cells[4].textContent.trim() === f.pri);
+        tr.hidden = !ok; if (ok) n++;
+      });
+      cont.textContent = n + ' de ' + linhas.length + ' requisitos';
+    }
+    aplicar();
+  }
+
+  /* Copiar o JSON do contrato */
+  document.querySelectorAll('.copiar').forEach(function(b){
+    b.addEventListener('click', function(){
+      var alvo = document.getElementById(b.dataset.alvo); var txt = alvo.textContent;
+      function ok(){ b.textContent = 'Copiado'; setTimeout(function(){ b.textContent = 'Copiar'; }, 1600); }
+      try { navigator.clipboard.writeText(txt).then(ok, function(){ selecionar(alvo); }); } catch (e) { selecionar(alvo); }
+    });
+  });
+  function selecionar(el){ var r = document.createRange(); r.selectNodeContents(el); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+
+  /* ADRs: abrir todas e abrir pelo link */
+  var botaoAdrs = document.getElementById('abrir-adrs');
+  if (botaoAdrs) botaoAdrs.addEventListener('click', function(){
+    var todos = document.querySelectorAll('details.adr'); var abrir = botaoAdrs.textContent === 'Abrir todas';
+    todos.forEach(function(d){ d.open = abrir; }); botaoAdrs.textContent = abrir ? 'Fechar todas' : 'Abrir todas';
+  });
+  function abrirPeloHash(){ var h = location.hash.slice(1); if (h.indexOf('adr-') === 0) { var d = document.getElementById(h); if (d) d.open = true; } }
+  window.addEventListener('hashchange', abrirPeloHash); abrirPeloHash();
+
+  /* Índice: destaca a seção visível */
+  var links = {}; document.querySelectorAll('nav.indice a').forEach(function(a){ links[a.dataset.nav] = a; });
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) {
+        Object.keys(links).forEach(function(k){ links[k].classList.toggle('ativo', k === e.target.id); });
+        var a = links[e.target.id]; if (a && a.scrollIntoView && window.innerWidth <= 900) a.scrollIntoView({block:'nearest', inline:'center'});
+      } });
+    }, { rootMargin: '-30% 0px -65% 0px' });
+    document.querySelectorAll('section.secao').forEach(function(s){ io.observe(s); });
+  }
+})();
+</script>

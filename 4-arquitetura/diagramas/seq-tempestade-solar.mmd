@@ -1,0 +1,22 @@
+sequenceDiagram
+  autonumber
+  participant D as Dosímetro
+  participant M as Motor + Cosmo
+  participant C as Relógio da comandante
+  participant T as Tablet
+  participant G as Gateway DTN
+  participant E as Houston e família
+  D->>M: fluxo de prótons subindo
+  M->>M: nível 4: acende a rota até o abrigo
+  M->>C: abrigo para todos?
+  opt comandante adia 5 min
+    C->>M: aguardar
+    M->>C: fluxo ainda subindo, pergunta de novo
+  end
+  C->>M: abrigo para todos
+  M->>T: dose de cada tripulante
+  M->>G: alerta P1: tripulação no abrigo
+  G--)E: chega minutos depois
+  D->>M: fluxo caindo
+  M->>C: liberar a tripulação?
+  C->>M: libera

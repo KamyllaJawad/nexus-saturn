@@ -1,0 +1,13 @@
+flowchart LR
+  r[Relógios] --> fila
+  t[Tablet do médico] --> fila
+  m[Motor de decisões] --> fila
+  subgraph fila[Gateway DTN · fila por prioridade]
+    direction TB
+    p1[P1 · alertas, SOS, decisões médicas]
+    p2[P2 · telemetria contínua e exames]
+    p3[P3 · mensagens e escala]
+    p4[P4 · rotina e gamificação]
+  end
+  fila --> j[Janela de contato<br/>P1 primeiro, custódia e reenvio]
+  j --> s[Servidor da Terra<br/>confirma recebimento, devolve pareceres]

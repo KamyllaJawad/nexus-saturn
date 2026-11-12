@@ -1,0 +1,167 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-11T12:00:00Z"
+  },
+  "title": "AstroHealth MVP · telas principais",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 300,
+      "w": 400,
+      "h": 400,
+      "title": "Relógio · início (avatar e estado)"
+    },
+    "Relogio-Insight.dc.html": {
+      "x": 480,
+      "y": 300,
+      "w": 400,
+      "h": 400,
+      "title": "Relógio · insight da Cosmo"
+    },
+    "Relogio-Chat.dc.html": {
+      "x": 960,
+      "y": 300,
+      "w": 400,
+      "h": 400,
+      "title": "Relógio · chat com a Cosmo"
+    },
+    "Relogio-Jogo.dc.html": {
+      "x": 1440,
+      "y": 300,
+      "w": 400,
+      "h": 400,
+      "title": "Relógio · missões da estufa"
+    },
+    "Relogio-Elo.dc.html": {
+      "x": 1920,
+      "y": 300,
+      "w": 400,
+      "h": 400,
+      "title": "Relógio · Elo com a família"
+    },
+    "Relogio-Sincronia.dc.html": {
+      "x": 2400,
+      "y": 300,
+      "w": 400,
+      "h": 400,
+      "title": "Relógio · sincronia com a Terra"
+    },
+    "Relogio-Folgado.dc.html": {
+      "x": 2880,
+      "y": 300,
+      "w": 400,
+      "h": 400,
+      "title": "Relógio · relógio folgado? (M2)"
+    },
+    "Relogio-Alerta.dc.html": {
+      "x": 3360,
+      "y": 300,
+      "w": 400,
+      "h": 400,
+      "title": "Relógio · alerta de FA (M1)"
+    },
+    "Bordo.dc.html": {
+      "x": 0,
+      "y": 1120,
+      "w": 720,
+      "h": 781,
+      "title": "Painel de bordo · rotina"
+    },
+    "Bordo-Emergencia.dc.html": {
+      "x": 800,
+      "y": 1120,
+      "w": 720,
+      "h": 1107,
+      "title": "Painel de bordo · protocolo da Cosmo"
+    },
+    "Familia.dc.html": {
+      "x": 0,
+      "y": 2647,
+      "w": 420,
+      "h": 780,
+      "title": "Celular da família · rotina"
+    },
+    "Familia-Emergencia.dc.html": {
+      "x": 500,
+      "y": 2647,
+      "w": 420,
+      "h": 780,
+      "title": "Celular da família · durante o alerta"
+    },
+    "Houston.dc.html": {
+      "x": 0,
+      "y": 3847,
+      "w": 1360,
+      "h": 732,
+      "title": "Houston · rotina"
+    },
+    "Houston-Emergencia.dc.html": {
+      "x": 1440,
+      "y": 3847,
+      "w": 1360,
+      "h": 732,
+      "title": "Houston · alerta recebido"
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Relogio-Insight.dc.html",
+    "Relogio-Chat.dc.html",
+    "Relogio-Jogo.dc.html",
+    "Relogio-Elo.dc.html",
+    "Relogio-Sincronia.dc.html",
+    "Relogio-Folgado.dc.html",
+    "Relogio-Alerta.dc.html",
+    "Bordo.dc.html",
+    "Bordo-Emergencia.dc.html",
+    "Familia.dc.html",
+    "Familia-Emergencia.dc.html",
+    "Houston.dc.html",
+    "Houston-Emergencia.dc.html"
+  ],
+  "notes": {
+    "t-relogio": {
+      "x": 0,
+      "y": 0,
+      "text": "Relógio · no pulso da Sarah",
+      "kind": "title1",
+      "maxW": 3800
+    },
+    "t-bordo": {
+      "x": 0,
+      "y": 820,
+      "text": "Painel de bordo · oficial médico",
+      "kind": "title1",
+      "maxW": 1520
+    },
+    "t-familia": {
+      "x": 0,
+      "y": 2347,
+      "text": "Celular da família · na Terra",
+      "kind": "title1",
+      "maxW": 1520
+    },
+    "t-houston": {
+      "x": 0,
+      "y": 3547,
+      "text": "Houston · flight surgeon, com atraso",
+      "kind": "title1",
+      "maxW": 2800
+    },
+    "n-fluxo": {
+      "x": 3880,
+      "y": 300,
+      "w": 320,
+      "text": "Telas tiradas da demo original do AstroHealth OS, que é o MVP. Fluxo-herói: o M2 confere o sinal, o M1 detecta FA no relógio da Sarah, o painel de bordo mostra o protocolo da Cosmo e o Dr. Marcus confirma; Houston e a família recebem depois, com atraso. Valores são de dados simulados.",
+      "size": "m",
+      "fill": "blue"
+    }
+  },
+  "designSystems": []
+}

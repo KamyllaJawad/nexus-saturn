@@ -1,0 +1,14 @@
+sequenceDiagram
+  autonumber
+  participant N as Nave (motor)
+  participant G as Fila DTN
+  participant T as Terra
+  Note over N,T: link cai (conjunção solar)
+  N->>G: P2 telemetria (guardada)
+  N->>G: P1 alerta (guardado)
+  T->>T: mensagens da Terra esperam do lado da Terra
+  Note over N,T: janela de contato abre
+  G--)T: P1 primeiro
+  G--)T: depois P2, P3 e P4
+  T--)G: confirma cada pacote
+  T->>T: copiloto de Houston resume o período

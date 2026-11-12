@@ -1,0 +1,221 @@
+<!DOCTYPE html><html lang="pt-BR" class="dark"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat IA Cosmo — AstroHealth OS</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'accent': '#00E5FF',
+        'optimal': '#10B981',
+        'attention': '#F59E0B',
+        'critical': '#EF4444',
+        'hydration': '#3B82F6',
+        'cycle': '#EC4899',
+        'sleep': '#8B5CF6',
+        'light-primary': '#006878',
+        'light-on-primary': '#FFFFFF',
+        'light-surface': '#080B14',
+        'light-on-surface': '#F3F4F6',
+        'dark-primary': '#00E5FF',
+        'dark-on-primary': '#051820',
+        'dark-surface': '#05070E',
+        'dark-on-surface': '#F8FAFC',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'DEFAULT': '12px',
+        'md': '16px',
+        'lg': '20px',
+        'xl': '28px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '12px',
+        'gutter-lg': '16px',
+        'gutter-xl': '20px',
+        'section': '24px',
+        'page-margin': '16px',
+      },
+      fontFamily: {
+        'display': ['"Space Grotesk"', 'sans-serif'],
+        'headline': ['"Space Grotesk"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg': ['28px', { lineHeight: '32px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['24px', { lineHeight: '28px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'headline-lg': ['20px', { lineHeight: '24px', letterSpacing: '-0.2px', fontWeight: '600' }],
+        'headline-lg-mobile': ['18px', { lineHeight: '22px', letterSpacing: '-0.2px', fontWeight: '600' }],
+        'body-md': ['13px', { lineHeight: '17px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['12px', { lineHeight: '16px', letterSpacing: '0.5px', fontWeight: '600' }],
+        'label-sm': ['10px', { lineHeight: '13px', letterSpacing: '0.2px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '150ms',
+        'pulse-vital': '1000ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'pulse-vital': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'pulse-vital': 'ease-in-out',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <style>
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="bg-black text-slate-100 font-body min-h-[884px] flex items-center justify-center p-2 selection:bg-cyan-500/30" data-stitch-vh="min-h-[884px]===min-h-screen">
+
+  <!-- Smartwatch Case Simulation -->
+  <main class="w-[370px] min-h-[780px] bg-[#07090F] border-[10px] border-[#1C202F] rounded-[54px] shadow-2xl relative overflow-hidden flex flex-col p-4">
+    
+    <!-- Smartwatch Top Status Bar -->
+    <header class="flex items-center justify-between pt-2 px-3 pb-1 border-b border-slate-800/40">
+      <div class="flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+        <span class="font-display text-[13px] font-bold tracking-tight text-cyan-400">COSMO AI CHAT</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="font-display text-label-lg font-bold text-slate-300 tabular-nums">09:42</span>
+        <span class="material-symbols-outlined text-[15px] text-cyan-300">smart_toy</span>
+      </div>
+    </header>
+
+    <!-- Navigation Pills / Screens Switcher -->
+    <nav class="flex items-center justify-center gap-1.5 my-2.5 bg-slate-900/80 p-1 rounded-full border border-slate-800" aria-label="Smartwatch Screens">
+      <a href="../astronaut-vital-home/AstronautVitalHome.html" class="px-3 py-1 text-slate-400 hover:text-slate-200 rounded-full font-headline text-[11px] flex items-center gap-1 transition-colors">
+        <span class="material-symbols-outlined text-[13px]">person</span> Corpo
+      </a>
+      <a href="AiHealthChat.html" class="px-3 py-1 bg-cyan-500/20 text-accent border border-cyan-500/40 rounded-full font-headline text-[11px] font-semibold flex items-center gap-1">
+        <span class="material-symbols-outlined text-[13px]">smart_toy</span> IA Chat
+      </a>
+      <a href="../biometric-metrics/BiometricMetrics.html" class="px-3 py-1 text-slate-400 hover:text-slate-200 rounded-full font-headline text-[11px] flex items-center gap-1 transition-colors">
+        <span class="material-symbols-outlined text-[13px]">monitoring</span> Gráficos
+      </a>
+    </nav>
+
+    <!-- CHAT MESSAGES SCROLL AREA (OPTIMIZED FOR SMARTWATCH THUMB SWIPE) -->
+    <div class="flex-1 overflow-y-auto space-y-3 pr-1 pb-2">
+
+      <!-- Cosmo Assistant Greeting with Biometric Scan -->
+      <div class="flex items-start gap-2">
+        <!-- Mini Astronaut Avatar Bubble -->
+        <div class="w-8 h-8 rounded-full bg-cyan-950 border border-cyan-400/50 flex-shrink-0 flex items-center justify-center text-cyan-300 shadow-md">
+          <span class="material-symbols-outlined text-[18px]">support_agent</span>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 p-2.5 rounded-2xl rounded-tl-sm max-w-[84%] shadow-sm">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-headline text-[10px] font-bold text-cyan-400">COSMO BIO-ASSISTANT</span>
+            <span class="font-display text-[9px] text-slate-500">09:38</span>
+          </div>
+          <p class="font-body text-[11.5px] leading-relaxed text-slate-200">
+            Sua frequência cardíaca subiu para <strong>138 BPM</strong> durante a subida de escadas. Como você está se sentindo agora?
+          </p>
+        </div>
+      </div>
+
+      <!-- User Quick Tap Response -->
+      <div class="flex justify-end">
+        <div class="bg-cyan-600/30 border border-cyan-400/40 text-slate-100 p-2.5 rounded-2xl rounded-tr-sm max-w-[80%]">
+          <p class="font-body text-[11.5px]">
+            Sinto um pouco de cansaço mental e sede leve.
+          </p>
+          <span class="block text-right font-display text-[8.5px] text-cyan-300 mt-1">09:39 • Pulso</span>
+        </div>
+      </div>
+
+      <!-- Cosmo AI Deep Diagnostic & Real-Time Action Card -->
+      <div class="flex items-start gap-2">
+        <div class="w-8 h-8 rounded-full bg-cyan-950 border border-cyan-400/50 flex-shrink-0 flex items-center justify-center text-cyan-300 shadow-md">
+          <span class="material-symbols-outlined text-[18px]">psychology</span>
+        </div>
+        <div class="bg-slate-900 border border-cyan-500/30 p-2.5 rounded-2xl rounded-tl-sm max-w-[84%] space-y-2">
+          <div class="flex items-center gap-1 text-attention">
+            <span class="material-symbols-outlined text-[14px]">warning</span>
+            <span class="font-headline text-[10px] font-bold">INSIGHT CORPO &amp; MENTE</span>
+          </div>
+          <p class="font-body text-[11px] leading-tight text-slate-200">
+            Cruzamento biométrico instantâneo:
+          </p>
+          
+          <!-- Micro Data pills -->
+          <div class="space-y-1 text-[10px] font-body bg-slate-950/60 p-2 rounded-xl border border-slate-800">
+            <div class="flex justify-between items-center text-slate-300">
+              <span class="flex items-center gap-1"><span class="text-blue-400">💧</span> Déficit hídrico:</span>
+              <span class="font-bold text-attention">-550 ml</span>
+            </div>
+            <div class="flex justify-between items-center text-slate-300">
+              <span class="flex items-center gap-1"><span class="text-pink-400">🌸</span> Ciclo menstrual:</span>
+              <span class="font-bold text-pink-300">Janela Fértil (Dia 14)</span>
+            </div>
+            <div class="flex justify-between items-center text-slate-300">
+              <span class="flex items-center gap-1"><span class="text-purple-400">🌙</span> Sono REM:</span>
+              <span class="font-bold text-slate-300">1h 15m (Normal)</span>
+            </div>
+          </div>
+
+          <p class="font-body text-[11px] text-slate-200">
+            Sugiro <strong>200ml de água fria</strong> e <strong>3 respirações profundas de 4 segundos</strong> para diminuir o cortisol.
+          </p>
+
+          <!-- Interactive Action inside Chat -->
+          <div class="pt-1 flex flex-col gap-1.5">
+            <button class="w-full py-1.5 px-2 bg-optimal/20 border border-optimal/50 text-optimal rounded-xl font-headline text-[10.5px] font-bold flex items-center justify-center gap-1.5 active:bg-optimal/30">
+              <span class="material-symbols-outlined text-[14px]">air</span> Iniciar Exercício Respiratório (1 min)
+            </button>
+            <button class="w-full py-1.5 px-2 bg-blue-500/20 border border-blue-500/40 text-blue-300 rounded-xl font-headline text-[10.5px] font-bold flex items-center justify-center gap-1.5 active:bg-blue-500/30">
+              <span class="material-symbols-outlined text-[14px]">local_drink</span> Confirmar Ingestão de Água (+200ml)
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- QUICK SMART REPLIES (Wrist Tap Suggestions) -->
+    <div class="py-1 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+      <button class="px-2.5 py-1 bg-slate-900 border border-slate-800 text-slate-300 rounded-full font-headline text-[10px] whitespace-nowrap active:border-cyan-400">
+        🩺 Fazer ECG rápido
+      </button>
+      <button class="px-2.5 py-1 bg-slate-900 border border-slate-800 text-slate-300 rounded-full font-headline text-[10px] whitespace-nowrap active:border-cyan-400">
+        💧 Bebi água agora
+      </button>
+      <button class="px-2.5 py-1 bg-slate-900 border border-slate-800 text-slate-300 rounded-full font-headline text-[10px] whitespace-nowrap active:border-cyan-400">
+        🧘 Analisar Estresse
+      </button>
+    </div>
+
+    <!-- VOICE / QUICK INPUT BOTTOM DOCK -->
+    <footer class="mt-2 pt-2 border-t border-slate-800 flex items-center gap-2">
+      <!-- Voice Input / Mic Button (Primary watch interaction) -->
+      <button class="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-500 to-emerald-400 text-slate-950 flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+        <span class="material-symbols-outlined text-[20px]">mic</span>
+      </button>
+      <!-- Simulated Quick Input Field -->
+      <div class="flex-1 bg-slate-900 border border-slate-800 rounded-full px-3 py-2 flex items-center justify-between">
+        <span class="font-body text-[11px] text-slate-400">Diga ou digite à Cosmo...</span>
+        <span class="material-symbols-outlined text-slate-500 text-[16px]">send</span>
+      </div>
+    </footer>
+
+  </main>
+
+
+</body></html>

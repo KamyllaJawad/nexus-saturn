@@ -1,0 +1,31 @@
+stateDiagram-v2
+  state "Detectado" as Detectado
+  state "Confirmação com o astronauta" as Confirmacao
+  state "Proposto" as Proposto
+  state "Aguardando humano" as Aguardando
+  state "Escalonado" as Escalonado
+  state "Decidido" as Decidido
+  state "Em execução" as Execucao
+  state "Resolvido" as Resolvido
+  state "Encerrado" as Encerrado
+  state "Agendado com veto" as Agendado
+  state "Aplicado" as Aplicado
+
+  [*] --> Detectado
+  Detectado --> Confirmacao: sinal ruim
+  Confirmacao --> Encerrado: ajustou o sensor
+  Confirmacao --> Proposto: confirmou ou 20 s sem resposta
+  Detectado --> Proposto: nível 2 ou 3
+  Detectado --> Agendado: nível 4
+  Proposto --> Aguardando
+  Aguardando --> Escalonado: prazo vencido
+  Escalonado --> Aguardando: próximo humano, novo prazo
+  Aguardando --> Decidido: humano confirma, ajusta ou recusa
+  Decidido --> Execucao: confirmado
+  Decidido --> Encerrado: recusado
+  Execucao --> Resolvido
+  Agendado --> Aplicado: sem veto
+  Agendado --> Encerrado: vetado
+  Aplicado --> Encerrado: mantido ou desfeito
+  Resolvido --> [*]
+  Encerrado --> [*]

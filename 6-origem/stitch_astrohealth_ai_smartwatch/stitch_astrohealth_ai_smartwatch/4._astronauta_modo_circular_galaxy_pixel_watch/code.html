@@ -1,0 +1,199 @@
+<!DOCTYPE html><html lang="pt-BR" class="dark"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Astronauta Circular — Galaxy / Pixel Watch — AstroHealth OS</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'accent': '#00E5FF',
+        'optimal': '#10B981',
+        'attention': '#F59E0B',
+        'critical': '#EF4444',
+        'hydration': '#3B82F6',
+        'cycle': '#EC4899',
+        'sleep': '#8B5CF6',
+        'light-primary': '#006878',
+        'light-on-primary': '#FFFFFF',
+        'light-surface': '#080B14',
+        'light-on-surface': '#F3F4F6',
+        'dark-primary': '#00E5FF',
+        'dark-on-primary': '#051820',
+        'dark-surface': '#05070E',
+        'dark-on-surface': '#F8FAFC',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'DEFAULT': '12px',
+        'md': '16px',
+        'lg': '20px',
+        'xl': '28px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '12px',
+        'gutter-lg': '16px',
+        'gutter-xl': '20px',
+        'section': '24px',
+        'page-margin': '16px',
+      },
+      fontFamily: {
+        'display': ['"Space Grotesk"', 'sans-serif'],
+        'headline': ['"Space Grotesk"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg': ['28px', { lineHeight: '32px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['24px', { lineHeight: '28px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'headline-lg': ['20px', { lineHeight: '24px', letterSpacing: '-0.2px', fontWeight: '600' }],
+        'headline-lg-mobile': ['18px', { lineHeight: '22px', letterSpacing: '-0.2px', fontWeight: '600' }],
+        'body-md': ['13px', { lineHeight: '17px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['12px', { lineHeight: '16px', letterSpacing: '0.5px', fontWeight: '600' }],
+        'label-sm': ['10px', { lineHeight: '13px', letterSpacing: '0.2px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '150ms',
+        'pulse-vital': '1000ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'pulse-vital': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'pulse-vital': 'ease-in-out',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <style>
+    @keyframes floatAstroCirc {
+      0%, 100% { transform: translateY(0px) scale(0.98); }
+      50% { transform: translateY(-5px) scale(1.02); }
+    }
+    .animate-float-circ {
+      animation: floatAstroCirc 3.5s ease-in-out infinite;
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="bg-black text-slate-100 font-body min-h-[884px] flex items-center justify-center p-2 selection:bg-cyan-500/30" data-stitch-vh="min-h-[884px]===min-h-screen">
+
+  <!-- Smartwatch Case Simulation (Circular Dial / Galaxy Watch & Pixel Watch) -->
+  <main class="w-[390px] h-[390px] bg-[#07090F] border-[12px] border-[#1E2333] rounded-full shadow-2xl relative overflow-hidden flex flex-col items-center justify-between p-6 select-none">
+    
+    <!-- Outer Curved Gauge Track (Ring Biométrico Circular 360°) -->
+    <svg class="absolute inset-0 w-full h-full pointer-events-none -rotate-90">
+      <!-- Background Track -->
+      <circle cx="195" cy="195" r="172" fill="none" stroke="#1E293B" stroke-width="4" stroke-opacity="0.5"></circle>
+      <!-- Sector 1: ÓTIMO (Verde) -->
+      <circle cx="195" cy="195" r="172" fill="none" stroke="#10B981" stroke-width="5" stroke-dasharray="250 850" stroke-linecap="round"></circle>
+      <!-- Sector 2: ATENÇÃO (Âmbar) -->
+      <circle cx="195" cy="195" r="172" fill="none" stroke="#F59E0B" stroke-width="5" stroke-dasharray="140 960" stroke-dashoffset="-280" stroke-linecap="round"></circle>
+      <!-- Sector 3: RUIM / CRÍTICO (Rubi) -->
+      <circle cx="195" cy="195" r="172" fill="none" stroke="#EF4444" stroke-width="5" stroke-dasharray="60 1040" stroke-dashoffset="-450" stroke-linecap="round"></circle>
+    </svg>
+
+    <!-- Top Time & Vital Battery Header -->
+    <header class="w-full flex items-center justify-between px-8 pt-1 z-10">
+      <div class="flex items-center gap-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-optimal animate-pulse"></span>
+        <span class="font-display text-[10px] text-cyan-400 font-bold">COSMO</span>
+      </div>
+      <span class="font-display text-[14px] font-bold text-slate-100 tabular-nums">09:44</span>
+      <div class="flex items-center gap-0.5 text-cyan-300">
+        <span class="material-symbols-outlined text-[12px]">battery_charging_full</span>
+        <span class="font-display text-[10px] font-bold">92%</span>
+      </div>
+    </header>
+
+    <!-- CENTERPIECE: Astronaut with Live Rings & 3 State Indicators -->
+    <div class="relative flex flex-col items-center justify-center my-auto z-10">
+      
+      <!-- Mini Floating Astronaut Body -->
+      <div class="w-28 h-28 relative flex items-center justify-center animate-float-circ">
+        <svg viewBox="0 0 200 240" class="w-full h-full drop-shadow-[0_4px_16px_rgba(0,229,255,0.4)]">
+          <defs>
+            <linearGradient id="circVisor" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00E5FF"></stop>
+              <stop offset="60%" stop-color="#0F172A"></stop>
+              <stop offset="100%" stop-color="#10B981"></stop>
+            </linearGradient>
+          </defs>
+          <rect x="50" y="65" width="100" height="90" rx="18" fill="#1E293B" stroke="#334155" stroke-width="2"></rect>
+          <rect x="68" y="155" width="26" height="46" rx="10" fill="#1E293B" stroke="#334155" stroke-width="2"></rect>
+          <rect x="106" y="155" width="26" height="46" rx="10" fill="#1E293B" stroke="#334155" stroke-width="2"></rect>
+          <rect x="60" y="80" width="80" height="85" rx="22" fill="#0F172A" stroke="#38BDF8" stroke-width="2"></rect>
+          <!-- Chest reactor -->
+          <rect x="78" y="96" width="44" height="30" rx="8" fill="#05070E" stroke="#00E5FF" stroke-width="1.5"></rect>
+          <path d="M84,111 L90,111 L93,103 L97,118 L101,110 L104,113 L116,113" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round"></path>
+          <!-- Helmet -->
+          <circle cx="100" cy="58" r="40" fill="#0F172A" stroke="#475569" stroke-width="3"></circle>
+          <ellipse cx="100" cy="58" rx="31" ry="24" fill="url(#circVisor)" stroke="#00E5FF" stroke-width="2"></ellipse>
+          <ellipse cx="91" cy="57" rx="3" ry="4.5" fill="#FFFFFF"></ellipse>
+          <ellipse cx="109" cy="57" rx="3" ry="4.5" fill="#FFFFFF"></ellipse>
+        </svg>
+      </div>
+
+      <!-- Quick 3 State Badges arranged Radially around Center -->
+      <div class="flex items-center gap-1.5 mt-0.5">
+        <!-- Ótimo Indicator -->
+        <div class="px-2 py-0.5 bg-emerald-950/90 border border-optimal/60 rounded-full flex items-center gap-1 shadow-md">
+          <span class="w-1.5 h-1.5 rounded-full bg-optimal"></span>
+          <span class="font-headline text-[9.5px] font-bold text-optimal">Ótimo</span>
+        </div>
+        <!-- Atenção Indicator -->
+        <div class="px-2 py-0.5 bg-amber-950/90 border border-attention/60 rounded-full flex items-center gap-1 shadow-md">
+          <span class="w-1.5 h-1.5 rounded-full bg-attention"></span>
+          <span class="font-headline text-[9.5px] font-bold text-attention">Atenção</span>
+        </div>
+        <!-- Ruim Indicator -->
+        <div class="px-2 py-0.5 bg-rose-950/90 border border-critical/50 rounded-full flex items-center gap-1 shadow-md">
+          <span class="w-1.5 h-1.5 rounded-full bg-critical"></span>
+          <span class="font-headline text-[9.5px] font-bold text-critical">Ruim</span>
+        </div>
+      </div>
+
+      <!-- AI Real-time Whisper -->
+      <p class="font-body text-[10px] text-center text-slate-300 mt-1 max-w-[240px] leading-tight">
+        &#34;Recuperação em <span class="text-optimal font-bold">94%</span>. Hidratação pede <span class="text-attention font-bold">+250ml</span> agora.&#34;
+      </p>
+    </div>
+
+    <!-- Bottom Quick Action & Circular Nav Pill -->
+    <footer class="w-full flex flex-col items-center gap-1.5 pb-2 z-10">
+      <div class="flex items-center gap-2">
+        <a href="../astronaut-vital-home/AstronautVitalHome.html" class="w-7 h-7 rounded-full bg-slate-900 border border-slate-700 text-slate-300 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform" title="Tela Squircle">
+          <span class="material-symbols-outlined text-[14px]">crop_square</span>
+        </a>
+        <a href="../ai-health-chat/AiHealthChat.html" class="w-7 h-7 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform" title="Abrir Chat IA">
+          <span class="material-symbols-outlined text-[14px]">smart_toy</span>
+        </a>
+        <a href="../biometric-metrics/BiometricMetrics.html" class="w-7 h-7 rounded-full bg-slate-900 border border-slate-700 text-slate-300 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform" title="Abrir Gráficos">
+          <span class="material-symbols-outlined text-[14px]">monitoring</span>
+        </a>
+        <a href="../space-gamification-pve/SpaceGamificationPve.html" class="w-7 h-7 rounded-full bg-emerald-950/80 border border-optimal/40 text-optimal flex items-center justify-center hover:scale-105 active:scale-95 transition-transform" title="Abrir Gamificação">
+          <span class="material-symbols-outlined text-[14px]">potted_plant</span>
+        </a>
+        <a href="../nasa-sync-management/NasaSyncManagement.html" class="w-7 h-7 rounded-full bg-amber-950/80 border border-amber-500/40 text-amber-300 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform" title="Abrir NASA Sync">
+          <span class="material-symbols-outlined text-[14px]">sync</span>
+        </a>
+      </div>
+      <span class="font-display text-[8px] text-slate-500 tracking-wider">DIAL CIRCULAR INTERATIVO</span>
+    </footer>
+
+  </main>
+
+
+</body></html>

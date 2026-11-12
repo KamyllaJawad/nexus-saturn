@@ -1,0 +1,341 @@
+<!DOCTYPE html><html lang="pt-BR" class="dark"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AstroHealth Desktop — Estado de Emergência Médica (Alerta Vermelho)</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'accent': '#00E5FF',
+        'optimal': '#10B981',
+        'attention': '#F59E0B',
+        'critical': '#EF4444',
+        'hydration': '#3B82F6',
+        'cycle': '#EC4899',
+        'sleep': '#8B5CF6',
+        'light-primary': '#006878',
+        'light-on-primary': '#FFFFFF',
+        'light-surface': '#080B14',
+        'light-on-surface': '#F3F4F6',
+        'dark-primary': '#00E5FF',
+        'dark-on-primary': '#051820',
+        'dark-surface': '#05070E',
+        'dark-on-surface': '#F8FAFC',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'DEFAULT': '12px',
+        'md': '16px',
+        'lg': '20px',
+        'xl': '28px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '12px',
+        'gutter-lg': '16px',
+        'gutter-xl': '20px',
+        'section': '24px',
+        'page-margin': '16px',
+      },
+      fontFamily: {
+        'display': ['"Space Grotesk"', 'sans-serif'],
+        'headline': ['"Space Grotesk"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+      },
+      fontSize: {
+        'display-lg': ['28px', { lineHeight: '32px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['24px', { lineHeight: '28px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'headline-lg': ['20px', { lineHeight: '24px', letterSpacing: '-0.2px', fontWeight: '600' }],
+        'headline-lg-mobile': ['18px', { lineHeight: '22px', letterSpacing: '-0.2px', fontWeight: '600' }],
+        'body-md': ['13px', { lineHeight: '17px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['12px', { lineHeight: '16px', letterSpacing: '0.5px', fontWeight: '600' }],
+        'label-sm': ['10px', { lineHeight: '13px', letterSpacing: '0.2px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '150ms',
+        'pulse-vital': '1000ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'pulse-vital': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'pulse-vital': 'ease-in-out',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#090306] text-slate-100 font-body min-h-[1024px] flex flex-col selection:bg-rose-500/30" data-stitch-vh="min-h-[1024px]===min-h-screen">
+
+  <!-- TOP EMERGENCY BANNER -->
+  <div class="bg-rose-600 text-white font-headline text-[13px] font-bold py-1.5 px-6 flex items-center justify-between animate-pulse">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-[18px]">warning</span>
+      <span>ALERTA MÉDICO DE NÍVEL 1: ARRITMIA CARDÍACA E QUEDA DE OXIGÊNIO DETECTADOS NA ESTAÇÃO GATEWAY</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="font-display">HOUSTON FLIGHT SURGEON INTERVENTION ACTIVE</span>
+      <a href="../desktop-mission-control/DesktopMissionControl.html" class="px-2 py-0.5 bg-black/40 hover:bg-black/60 rounded text-[11px]">
+        Voltar ao Estado Normal
+      </a>
+    </div>
+  </div>
+
+  <!-- CONSOLE HEADER IN RED ALERT -->
+  <header class="h-16 border-b border-rose-900/60 bg-[#12050B]/90 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2">
+        <span class="w-3.5 h-3.5 rounded-full bg-critical animate-ping"></span>
+        <span class="font-display text-headline-lg font-bold tracking-wider text-rose-400">ASTROHEALTH OS</span>
+        <span class="px-2 py-0.5 rounded bg-rose-950/80 border border-rose-500/50 text-rose-300 font-display text-[10px] font-bold">EMERGENCY PROTOCOL ACTIVE</span>
+      </div>
+      <div class="hidden md:flex items-center gap-2 pl-4 border-l border-rose-900/40 text-[12px] text-slate-400">
+        <span>Tripulante: <strong class="text-rose-200">Comandante Sarah Connor</strong></span>
+        <span>•</span>
+        <span>Módulo: <strong class="text-rose-300">Câmara Hiperbárica EVA-2</strong></span>
+      </div>
+    </div>
+
+    <!-- Quick Switcher to Other States -->
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-1.5 bg-slate-950 border border-rose-900/50 p-1 rounded-xl text-[11px]">
+        <a href="../desktop-mission-control/DesktopMissionControl.html" class="px-2.5 py-1 text-slate-400 hover:text-slate-200 rounded-lg">
+          Estado Normal
+        </a>
+        <span class="px-2.5 py-1 bg-rose-500/20 text-rose-300 border border-rose-500/40 rounded-lg font-bold">
+          Emergência (Atual)
+        </span>
+        <a href="../desktop-mission-control-offline/DesktopMissionControlOffline.html" class="px-2.5 py-1 text-slate-400 hover:text-slate-200 rounded-lg">
+          Blackout / Offline
+        </a>
+      </div>
+      <button class="px-4 py-2 bg-rose-600 text-white font-headline text-label-lg font-bold rounded-xl flex items-center gap-2 shadow-[0_0_20px_rgba(239,68,68,0.5)]">
+        <span class="material-symbols-outlined text-[18px]">medical_services</span> Injetar Oxigênio Reserva
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN RED ALERT WORKSPACE -->
+  <div class="flex-1 p-6 grid grid-cols-12 gap-6 max-w-[1700px] w-full mx-auto">
+
+    <!-- LEFT COLUMN: ASTRONAUT CRITICAL STATUS (COLS 1-4) -->
+    <section class="col-span-12 lg:col-span-4 flex flex-col gap-6">
+      
+      <div class="bg-[#15070D] border-2 border-rose-500/60 rounded-3xl p-6 relative overflow-hidden flex flex-col items-center shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+        <div class="w-full flex items-center justify-between mb-2">
+          <h2 class="font-headline text-headline-lg text-rose-300 flex items-center gap-2">
+            <span class="material-symbols-outlined text-rose-400 animate-spin">rotate_right</span>
+            <span>Varredura de Trauma Corpóreo</span>
+          </h2>
+          <span class="px-2.5 py-1 bg-rose-950 border border-critical text-critical font-headline text-[11px] font-bold rounded-full animate-pulse">
+            HOMEOSTASE: 38% CRÍTICA
+          </span>
+        </div>
+
+        <!-- Red Alert Astronaut Visor & Core -->
+        <div class="relative w-64 h-64 flex items-center justify-center my-2">
+          <div class="absolute inset-0 bg-rose-600/20 rounded-full blur-3xl animate-ping"></div>
+          
+          <svg viewBox="0 0 200 240" class="w-full h-full drop-shadow-[0_10px_30px_rgba(239,68,68,0.6)]">
+            <defs>
+              <linearGradient id="emergVisor" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#EF4444" stop-opacity="0.9"></stop>
+                <stop offset="60%" stop-color="#450A0A" stop-opacity="0.95"></stop>
+                <stop offset="100%" stop-color="#F43F5E" stop-opacity="0.8"></stop>
+              </linearGradient>
+            </defs>
+            <rect x="45" y="65" width="110" height="95" rx="20" fill="#2A0B14" stroke="#EF4444" stroke-width="2"></rect>
+            <rect x="68" y="160" width="28" height="52" rx="12" fill="#2A0B14" stroke="#EF4444" stroke-width="2"></rect>
+            <rect x="104" y="160" width="28" height="52" rx="12" fill="#2A0B14" stroke="#EF4444" stroke-width="2"></rect>
+            <rect x="58" y="80" width="84" height="90" rx="24" fill="#1F060D" stroke="#EF4444" stroke-width="2.5"></rect>
+            
+            <!-- Chest reactor in alert -->
+            <rect x="76" y="96" width="48" height="34" rx="10" fill="#0A0204" stroke="#EF4444" stroke-width="2"></rect>
+            <path d="M82,113 L88,113 L91,95 L95,128 L99,102 L103,120 L118,113" fill="none" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round"></path>
+            
+            <circle cx="100" cy="58" r="42" fill="#1F060D" stroke="#EF4444" stroke-width="3"></circle>
+            <ellipse cx="100" cy="58" rx="33" ry="26" fill="url(#emergVisor)" stroke="#F87171" stroke-width="2"></ellipse>
+            <ellipse cx="90" cy="57" rx="3" ry="4" fill="#FFFFFF"></ellipse>
+            <ellipse cx="110" cy="57" rx="3" ry="4" fill="#FFFFFF"></ellipse>
+          </svg>
+
+          <!-- Critical Floating Badges -->
+          <div class="absolute -right-2 top-8 bg-rose-950 border border-critical px-3 py-1 rounded-xl shadow-lg">
+            <div class="text-[10px] text-rose-300 font-bold">HIPÓXIA</div>
+            <div class="font-display text-[14px] font-bold text-critical animate-pulse">SpO2 88% ↓</div>
+          </div>
+          <div class="absolute -left-2 bottom-12 bg-rose-950 border border-critical px-3 py-1 rounded-xl shadow-lg">
+            <div class="text-[10px] text-rose-300 font-bold">TAQUICARDIA</div>
+            <div class="font-display text-[14px] font-bold text-critical">178 BPM ↑</div>
+          </div>
+        </div>
+
+        <!-- 3 INDICATORS IN EMERGENCY STATE -->
+        <div class="w-full grid grid-cols-3 gap-3 mt-4">
+          <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-3 text-center opacity-60">
+            <div class="font-headline text-[12px] font-bold text-slate-400">ÓTIMO</div>
+            <div class="font-display text-[18px] font-bold text-slate-400 tabular-nums">0/10</div>
+            <div class="text-[9.5px] text-slate-500 mt-1">Comprometido</div>
+          </div>
+
+          <div class="bg-amber-950/40 border border-attention/40 rounded-2xl p-3 text-center">
+            <div class="font-headline text-[12px] font-bold text-attention">ATENÇÃO</div>
+            <div class="font-display text-[18px] font-bold text-slate-100 tabular-nums">1 Alerta</div>
+            <div class="text-[9.5px] text-slate-400 mt-1">Desidratação</div>
+          </div>
+
+          <div class="bg-rose-950 border-2 border-critical rounded-2xl p-3 text-center shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+            <div class="font-headline text-[12px] font-bold text-critical animate-pulse">CRÍTICO</div>
+            <div class="font-display text-[18px] font-bold text-white tabular-nums">2 ANOMALIAS</div>
+            <div class="text-[9.5px] text-rose-200 mt-1 font-bold">SpO2 &amp; Arritmia</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Cosmo AI Autonomous Emergency Override -->
+      <div class="bg-gradient-to-r from-[#20050C] to-rose-950 border border-rose-500/60 rounded-3xl p-5 shadow-lg">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-rose-400">psychology</span>
+            <h3 class="font-headline text-label-lg font-bold text-rose-300">PROTOCOLO MÉDICO AUTÔNOMO DA IA</h3>
+          </div>
+          <span class="px-2 py-0.5 rounded bg-rose-600 text-white text-[10px] font-bold">AUTO-OVERRIDE</span>
+        </div>
+        <p class="font-body text-body-md text-rose-100 leading-relaxed">
+          &#34;Devido ao delay de 4.2 minutos com Houston, a IA Cosmo acionou a pressurização do traje para 4.3 psi e injetou 200ml de solução salina pré-programada no cateter biométrico.&#34;
+        </p>
+      </div>
+
+    </section>
+
+    <!-- CENTER COLUMN: SPIKE ANOMALY GRAPHS (COLS 5-8) -->
+    <section class="col-span-12 lg:col-span-5 flex flex-col gap-6">
+      
+      <!-- Graph: Arrhythmia Spike ECG -->
+      <div class="bg-[#15070D] border border-rose-900/60 rounded-3xl p-5 shadow-xl">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h3 class="font-headline text-headline-lg-mobile font-bold text-rose-200 flex items-center gap-2">
+              <span class="material-symbols-outlined text-critical animate-pulse">crisis_alert</span>
+              <span>Eletrocardiograma em Fibrilação / Pico Anômalo</span>
+            </h3>
+            <p class="text-[12px] text-rose-400">Frequência cardíaca saltou de 72 para 178 BPM em 45 segundos</p>
+          </div>
+          <div class="text-right">
+            <span class="font-display text-display-lg text-critical font-bold tabular-nums">178</span>
+            <span class="text-[12px] text-rose-400">BPM</span>
+          </div>
+        </div>
+
+        <!-- SVG Line Chart in Arrhythmia -->
+        <div class="h-36 w-full bg-black/80 rounded-2xl p-3 border border-rose-900/80 relative overflow-hidden">
+          <svg viewBox="0 0 500 100" class="w-full h-full overflow-visible">
+            <line x1="0" y1="20" x2="500" y2="20" stroke="#EF4444" stroke-dasharray="3,3" stroke-width="0.8" opacity="0.4"></line>
+            <line x1="0" y1="80" x2="500" y2="80" stroke="#EF4444" stroke-dasharray="3,3" stroke-width="0.8" opacity="0.4"></line>
+            
+            <!-- Wild spike path -->
+            <path d="M0,60 L80,58 L120,62 L150,55 L180,85 L200,10 L210,95 L220,15 L230,90 L240,20 L270,75 L300,15 L320,80 L350,25 L400,85 L450,15 L500,90" fill="none" stroke="#EF4444" stroke-width="3" stroke-linecap="round"></path>
+          </svg>
+          <div class="flex justify-between text-[10px] text-rose-400 font-display mt-1">
+            <span>09:40 (Normal)</span><span class="text-white font-bold">09:48:12 (INÍCIO DA ANOMALIA)</span><span>09:50 (Agora)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Emergency Vitals Grid -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-[#15070D] border border-rose-900/60 rounded-3xl p-4">
+          <span class="font-headline text-[13px] font-bold text-rose-300 block mb-1">Pressão Arterial Estimada</span>
+          <div class="font-display text-[22px] font-bold text-critical">165 / 105 mmHg</div>
+          <span class="text-[11px] text-rose-400 mt-1 block">Hipertensão transitória por estresse agudo</span>
+        </div>
+
+        <div class="bg-[#15070D] border border-rose-900/60 rounded-3xl p-4">
+          <span class="font-headline text-[13px] font-bold text-rose-300 block mb-1">Nível de Lactato no Sangue</span>
+          <div class="font-display text-[22px] font-bold text-attention">4.8 mmol/L</div>
+          <span class="text-[11px] text-amber-300 mt-1 block">Acidose metabólica incipiente</span>
+        </div>
+      </div>
+
+      <!-- Action: Houston Surgeon Telemetry Lock -->
+      <div class="bg-rose-950/60 border border-rose-500/40 p-4 rounded-3xl flex items-center justify-between">
+        <div>
+          <div class="font-headline text-[14px] font-bold text-white">Telemetria Trancada para Houston (Banda Máxima)</div>
+          <div class="text-[12px] text-rose-200">100% dos canais da DSN alocados para o módulo da comandante.</div>
+        </div>
+        <button class="px-3 py-1.5 bg-rose-600 text-white font-headline text-[12px] font-bold rounded-xl shadow-lg">
+          Voz Direta com a Nave
+        </button>
+      </div>
+
+    </section>
+
+    <!-- RIGHT COLUMN: CREW SUPPORT & EMERGENCY BURST (COLS 9-12) -->
+    <section class="col-span-12 lg:col-span-3 flex flex-col gap-6">
+      
+      <!-- Crew Cooperative Response -->
+      <div class="bg-[#15070D] border border-rose-900/60 rounded-3xl p-5 shadow-xl">
+        <h3 class="font-headline text-headline-lg-mobile font-bold text-rose-300 mb-3 flex items-center gap-2">
+          <span class="material-symbols-outlined text-rose-400">group</span>
+          <span>Apoio da Tripulação (PvE)</span>
+        </h3>
+        
+        <div class="space-y-2 text-[12px]">
+          <div class="bg-black/60 p-2.5 rounded-xl border border-rose-900/40 flex items-center justify-between">
+            <span class="text-slate-200">Dr. Marcus (Médico):</span>
+            <span class="text-optimal font-bold">A caminho do EVA-2</span>
+          </div>
+          <div class="bg-black/60 p-2.5 rounded-xl border border-rose-900/40 flex items-center justify-between">
+            <span class="text-slate-200">Estufa &amp; Suporte de Vida:</span>
+            <span class="text-cyan-300 font-bold">O2 a 120%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Emergency Checklist Actions -->
+      <div class="bg-[#15070D] border-2 border-rose-500/40 rounded-3xl p-5 shadow-xl flex-1 flex flex-col justify-between">
+        <div>
+          <h4 class="font-headline text-[14px] font-bold text-white mb-2">Checklist de Sobrevivência Imediata</h4>
+          <ul class="space-y-2 text-[12px] text-rose-100">
+            <li class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-optimal text-[16px]">check_box</span>
+              <span>Isolar válvula de gás tóxico EVA-2</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-optimal text-[16px]">check_box</span>
+              <span>Disparar pacote de ECG bruto para Terra</span>
+            </li>
+            <li class="flex items-center gap-2 text-rose-300 font-bold">
+              <span class="material-symbols-outlined text-critical text-[16px]">indeterminate_check_box</span>
+              <span>Retornar astronauta à eclusa pressurizada</span>
+            </li>
+          </ul>
+        </div>
+
+        <button class="w-full py-3 bg-gradient-to-r from-rose-600 to-red-700 text-white font-headline text-[13px] font-bold rounded-2xl shadow-xl active:scale-95 transition-transform flex items-center justify-center gap-2 mt-4">
+          <span class="material-symbols-outlined text-[20px]">door_sliding</span>
+          Iniciar Trava de Pressurização Rápida
+        </button>
+      </div>
+
+    </section>
+
+  </div>
+
+
+
+</body></html>
