@@ -29,3 +29,4 @@ Depois, adicione as issues a um GitHub Project e atribua as pessoas. O script n�
 ## Jira
 
 Em **Configurações do sistema → Importação externa → CSV**, mapeie: `Titulo` → Resumo, `Descricao` → Descrição, `Prazo` → Data limite, `Estimativa (h)` → Estimativa original, `Labels` → Rótulos (separador `;`).
+

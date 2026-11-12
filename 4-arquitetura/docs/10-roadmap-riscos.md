@@ -2,20 +2,7 @@
 
 O MVP precisa dos 16 requisitos essenciais funcionando até o fechamento das submissões, em 15/11 às 23:59. A versão acadêmica, para a pós, fica para a semana seguinte.
 
-```mermaid
-gantt
-  title AstroHealth OS · roadmap
-  dateFormat YYYY-MM-DD
-  axisFormat %d/%m
-  section Preparação
-  Revisar arquitetura e amarrar o enunciado :a1, 2026-11-11, 3d
-  Esqueleto do protótipo                    :a2, 2026-11-12, 2d
-  section Hackathon
-  Motor + simulador DTN + Cosmo nave        :crit, b1, 2026-11-14, 2d
-  Vídeo e submissão até 23h59               :milestone, crit, b2, 2026-11-15, 0d
-  section Pós-hackathon
-  ADRs completos, avaliação ATAM, testes Robot :c1, 2026-11-16, 3d
-```
+![diagrama roadmap](../diagramas/svg/roadmap.svg)
 
 O que a demo atual já mostra não precisa ser reimplementado no hackathon. O código novo são o motor de decisões, o simulador DTN e a Cosmo nave com RAG.
 

@@ -14,6 +14,7 @@ O hackathon é no sábado 14/11 e no domingo 15/11, com entrega às 15h de domin
 | `4-arquitetura/` | Arquitetura em formato de repositório: docs, 12 ADRs, contratos JSON, diagramas Mermaid e SVG, e a página interativa. |
 | `5-plano-do-time/` | CSV com as 25 tarefas para 3 pessoas, as partes só simuladas e o script que cria as issues no GitHub. |
 | `6-origem/` | As telas do Stitch que deram origem ao projeto. |
+| `7-pitch/` | Guia, mapa de uso e parcerias em potencial para quem monta o pitch. |
 
 ## Versões online (editáveis)
 
