@@ -15,6 +15,7 @@ O hackathon é no sábado 14/11 e no domingo 15/11, com entrega às 15h de domin
 | `5-plano-do-time/` | CSV com as 25 tarefas para 3 pessoas, as partes só simuladas e o script que cria as issues no GitHub. |
 | `6-origem/` | As telas do Stitch que deram origem ao projeto. |
 | `7-pitch/` | Guia, mapa de uso e parcerias em potencial para quem monta o pitch. |
+| `8-pesquisa/` | Pesquisa sobre saúde da mulher astronauta: lacunas, artigos, dados, parceiros, onde a proposta entra no projeto e respostas para a banca. |
 
 ## Versões online (editáveis)
 
