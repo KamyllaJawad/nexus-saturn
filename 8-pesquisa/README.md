@@ -317,7 +317,7 @@ O projeto se chama AstroHealth OS, e a Cosmo é a IA de bordo que explica as sug
 3. **Banco e consentimento:** incluir o método hormonal no perfil (ciclo natural, pílula, DIU ou implante) e um tipo de consentimento "saúde reprodutiva", como pede o artigo da NASA de 2025.
 4. **Pitch:** um slide e uma resposta pronta para "e as mulheres da tripulação?" (seção 10).
 
-Pacote mínimo sugerido para o fim de semana: itens 1, 2 e 4. O item 3 fica como próximo passo.
+Pacote mínimo sugerido para o fim de semana: itens 1, 2 e 4. O item 3 fica como próximo passo. O evento já está na demo (botão "Ciclo e linha de base" e passo 10 do roteiro), e a decisão está na [ADR-013](../4-arquitetura/adr/0013-linha-de-base-por-fase-do-ciclo.md).
 
 ## 10. Respostas para a banca
 

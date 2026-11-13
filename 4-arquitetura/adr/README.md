@@ -1,6 +1,6 @@
 # Decisões de arquitetura (ADRs)
 
-Formato [MADR](https://adr.github.io/madr/). As ADR-001 a ADR-011 foram aceitas em 2026-11-11. A ADR-012, em 2026-11-12.
+Formato [MADR](https://adr.github.io/madr/). As ADR-001 a ADR-011 foram aceitas em 2026-11-11. A ADR-012, em 2026-11-12. A ADR-013 está em proposta.
 
 | ADR | Título |
 | --- | --- |
@@ -16,3 +16,4 @@ Formato [MADR](https://adr.github.io/madr/). As ADR-001 a ADR-011 foram aceitas 
 | [ADR-010](0010-modelos-em-modo-sombra.md) | Modelos novos entram em modo sombra e exigem aprovação médica |
 | [ADR-011](0011-stack-hibrida.md) | Stack híbrida: padrão NASA nos diagramas, stack do time no protótipo |
 | [ADR-012](0012-linha-de-base-com-isolation-forest.md) | Linha de base com z robusto e Isolation Forest |
+| [ADR-013](0013-linha-de-base-por-fase-do-ciclo.md) | Linha de base por fase do ciclo e consentimento de saúde reprodutiva (proposta) |

@@ -521,6 +521,8 @@ const STORY = [
    text:'A Cosmo cruza a queixa da Sarah com o CO₂ da cabine e com os sintomas dos outros tripulantes. No painel de bordo, o Dr. Marcus pede o ajuste do ar à Elena e aprova o ultrassom ocular guiado; as imagens seguem para laudo em Houston.'},
   {event:'mood', focus:['watch-round','watch-sq','tablet'], title:'Saúde mental com consentimento',
    text:'A Cosmo percebe sono mais curto e voz mais baixa. Ela fala só com a Sarah, que decide se conta ao Dr. Marcus. Sem consentimento, nada sai do relógio.'},
+  {event:'cycle', focus:['watch-round','watch-sq','tablet'], title:'Linha de base que entende o ciclo',
+   text:'A FC de repouso da Sarah subiu 3 bpm e a pele 0,3 °C, como acontece depois da ovulação. Uma linha de base única daria alarme todo mês. O M3 compara com o padrão dela nesta fase do ciclo, então a Cosmo só informa, e a Sarah decide se mostra ao Dr. Marcus.'},
   {event:'sleep', focus:['watch-round','watch-sq'], title:'Hora de dormir: a IA age e deixa vetar',
    text:'Ajustar a luz da cabine é reversível, então a Cosmo agenda o modo noite sozinha e dá 15 s para a Sarah vetar. Depois de aplicado, ainda dá para desfazer.'},
   {scenario:'blackout', focus:['tablet','phone'], title:'Sem sinal com a Terra',
@@ -620,7 +622,7 @@ function fresh(){
     typing:false, xp:450, quests:{treino:true,agua:false,powerdown:false},
     tExplain:false, tAsk:null, hAsk:null,
     family:{km:43.6,kmEarth:43.6,goal:60,lucasKm:5,cheers:0,done:false},
-    evt:{}, dose:{sarah:.42,marcus:.40,elena:.45,kenji:.41}, co2:2.4, boneOk:null, rid:Math.random(),
+    evt:{}, cycleShared:false, dose:{sarah:.42,marcus:.40,elena:.45,kenji:.41}, co2:2.4, boneOk:null, rid:Math.random(),
     crew:{marcus:{...CREW_BASE.marcus},elena:{...CREW_BASE.elena},kenji:{...CREW_BASE.kenji}}, tSel:'sarah', hSel:'sarah', remind:{},
     bus:[], log:[], hist:[], preBlackout:null, bufferMB:0
   };
@@ -817,7 +819,7 @@ function answer(q){
     case 'cansada':{
       const falta=Math.max(0,Math.round(v.waterGoal-v.water));
       const acts=[]; if(falta>0) acts.push({label:'+250 ml',act:'w-drink',cls:'water'}); acts.push({label:'Respirar 1 min',act:'w-breath'});
-      return {t:`Cruzei seus dados: hidratação em ${FMT.waterPct(v)}%${falta?` (faltam ${falta.toLocaleString('pt-BR')} ml)`:''}, HRV ${FMT.hrv(v)} ms, REM de 1h15 e ciclo no dia 14, com temperatura basal mais alta. O mais provável é desidratação leve somada ao treino. Sugiro água agora e 1 min de respiração lenta.`,acts};
+      return {t:`Cruzei seus dados: hidratação em ${FMT.waterPct(v)}%${falta?` (faltam ${falta.toLocaleString('pt-BR')} ml)`:''}, HRV ${FMT.hrv(v)} ms, REM de 1h15 e ciclo no dia 16 (fase lútea), com temperatura da pele mais alta, o que é esperado nesta fase. O mais provável é desidratação leve somada ao treino. Sugiro água agora e 1 min de respiração lenta.`,acts};
     }
     case 'houston':
       send('up','Mensagem de voz da Sarah para Houston (0:08)',{prio:3,size:'0,4 MB',aud:['houston']});
@@ -927,7 +929,7 @@ function resetDemo(){
 }
 
 /* ================= Eventos injetáveis: IA local + humano no controle ================= */
-const EVENTS=[['solar','Tempestade solar'],['loose','Sensor solto'],['mood','Queda de humor'],['eva','Prontidão EVA'],['headache','Dor de cabeça'],['sleep','Hora de dormir']];
+const EVENTS=[['solar','Tempestade solar'],['loose','Sensor solto'],['mood','Queda de humor'],['cycle','Ciclo e linha de base'],['eva','Prontidão EVA'],['headache','Dor de cabeça'],['sleep','Hora de dormir']];
 const MISSION_DOSE={leo:38,gateway:96,mars:212,marsSurf:340};
 const DOSE_TICK={leo:.0002,gateway:.0005,mars:.0008,marsSurf:.0003};
 const READY={sarah:88,marcus:90,elena:64,kenji:91};
@@ -953,6 +955,10 @@ function injectEvent(k){
   case 'mood':
     S.evt.mood={phase:'offered',clock:t};
     log('Cosmo','relógio · privado','Padrão de humor em queda detectado. Apoio oferecido só à Sarah; nada foi compartilhado.',0);
+    S.watch.screen='evt'; break;
+  case 'cycle':
+    S.evt.cycle={phase:'informed',clock:t};
+    log('Cosmo · M3','relógio · privado','FC de repouso da Sarah +3 bpm e temperatura da pele +0,3 °C há 3 dias. Pela linha de base única seria atenção; pela linha de base da fase lútea, está no padrão dela. Nada foi compartilhado.',0);
     S.watch.screen='evt'; break;
   case 'eva':
     S.evt.eva={phase:'asking',clock:t};
@@ -1021,6 +1027,17 @@ function evtAction(a){
   case 'mood-meet':{const e=E.mood;if(!e||e.phase!=='shared')return;e.phase='done';
     log('Bordo','oficial médico → relógio da Sarah','Dr. Marcus marcou uma conversa individual com a Sarah às 19:00.',0);
     notify('Conversa com o Dr. Marcus às 19:00');cosmoSay('O Dr. Marcus marcou uma conversa com você às 19:00, só vocês dois.');break;}
+  case 'cycle-share':{const e=E.cycle;if(!e||e.phase!=='informed')return;e.phase='shared';S.cycleShared=true;
+    log('Relógio','Sarah → painel de bordo · rede local','Sarah concedeu consentimento de saúde reprodutiva ao oficial médico: fase do ciclo e método hormonal. Houston e a família não recebem.',0);
+    cosmoSay('Mostrei só ao Dr. Marcus a fase do seu ciclo e a linha de base por fase. Você pode revogar quando quiser.',[{label:'Revogar',act:'cycle-revoke'}]);S.watch.screen='chat';break;}
+  case 'cycle-private':{const e=E.cycle;if(!e||e.phase!=='informed')return;e.phase='done';
+    log('Relógio','Sarah','Sarah manteve o contexto hormonal só no relógio. A linha de base por fase continua funcionando a bordo.',0);
+    cosmoSay('Combinado, fica só aqui. Continuo usando a fase do ciclo para não te dar alarme falso.');S.watch.screen='chat';break;}
+  case 'cycle-revoke':{if(!S.cycleShared)return;S.cycleShared=false;if(S.evt.cycle)S.evt.cycle.phase='done';
+    log('Relógio','Sarah → painel de bordo · rede local','Sarah revogou o consentimento de saúde reprodutiva. O painel de bordo deixou de ver a fase do ciclo.',0);
+    notify('Consentimento revogado');break;}
+  case 'cycle-ack':{const e=E.cycle;if(!e||e.phase!=='shared')return;e.phase='done';
+    log('Bordo','oficial médico','Dr. Marcus registrou ciência: variação de FC e temperatura explicada pela fase lútea, sem conduta.',0);break;}
   case 'eva-swap':{const e=E.eva;if(!e||e.phase!=='asking')return;e.phase='done';e.result='swap';
     log('Relógio','comandante → escala','Sarah trocou a Elena pelo Kenji na EVA das 15:00.',0);
     send('up','Escala da EVA alterada: Kenji no lugar da Elena (decisão da comandante)',{prio:3,aud:['houston']});
@@ -1069,6 +1086,7 @@ function watchEvt(){
   if(E.loose&&E.loose.phase==='asking') return 'loose';
   if(E.eva&&E.eva.phase==='asking') return 'eva';
   if(E.mood&&E.mood.phase==='offered') return 'mood';
+  if(E.cycle&&E.cycle.phase==='informed') return 'cycle';
   if(E.sleep&&['scheduled','applied'].includes(E.sleep.phase)) return 'sleep';
   if(E.loose&&E.loose.phase==='escalated') return 'loose';
   return null;
@@ -1086,6 +1104,7 @@ function evtWatch(round){
   }
   if(k==='eva') return `<div class="w-tag">Escala · EVA 15:00</div><p class="w-text">Prontidão da Elena: <b class="c-warn">64%</b>${round?'':' (sono curto, reação mais lenta)'}. Kenji: <b class="c-ok">91%</b>.</p><button class="w-btn sm2" data-act="eva-swap">Trocar pelo Kenji</button><button class="w-btn ghost sm" data-act="eva-keep">Manter a Elena</button>`;
   if(k==='mood') return `<div class="w-tag" style="color:#c4b5fd">${ic('shield')} Só você vê isto</div><p class="w-text">Seu sono encurtou e sua voz ficou mais baixa nesta semana. Quer conversar?</p><button class="w-btn sm2" data-act="mood-talk">Conversar</button><div class="w-chips"><button data-act="mood-share">Contar ao Dr. Marcus</button><button data-act="mood-private">Só comigo</button></div>`;
+  if(k==='cycle') return `<div class="w-tag" style="color:var(--cycle)">${ic('shield')} Só você vê isto</div><div class="w-big">No seu padrão</div><p class="w-text">${round?'FC +3 bpm e pele +0,3 °C: fase lútea, sem alerta.':'Sua FC de repouso subiu 3 bpm e a pele 0,3 °C. Isso combina com a fase lútea do seu ciclo (dia 16), então não virou alerta.'}</p><button class="w-btn sm2" data-act="cycle-share">Mostrar ao Dr. Marcus</button><div class="w-chips"><button data-act="cycle-private">Só comigo</button></div>`;
   if(k==='sleep'){const e=E.sleep;
     if(e.phase==='scheduled') return `<div class="w-tag" style="color:#c4b5fd">${ic('moon')} Modo noite</div><p class="w-text">Às 21:00 deixo a luz mais quente e silencio avisos. ${round?'':'Sua média de sono na semana foi 6h50.'}</p><div class="w-sub">Aplico em <b data-until="sleep">15</b> s</div><button class="w-btn ghost sm2" data-act="sleep-veto">Vetar</button>`;
     return `<div class="w-tag ok">${ic('moon')} Modo noite ativo</div><p class="w-text">Luz em 2700 K e avisos silenciados até 06:30. Emergências continuam passando.</p><button class="w-btn ghost sm2" data-act="sleep-undo">Desfazer</button>`;
@@ -1099,6 +1118,8 @@ function evtTablet(){
     h+=`<div class="dec dark"><h5>${ic('radiation','c-warn')} Tempestade solar · ${st}</h5><div class="kv">${CREW_IDS.map(id=>`<div><span>${CREW[id].name}</span><b><span data-dose="${id}">${fmtDose(S.dose[id])}</span> mSv</b></div>`).join('')}</div><p>Dose de hoje por tripulante. A decisão de abrigo é da comandante; você acompanha a exposição.</p></div>`;}
   if(E.loose&&E.loose.phase==='escalated') h+=`<div class="dec"><h5>${ic('o2','c-warn')} Leitura suspeita · Sarah</h5><p>SpO₂ de 84% no relógio com sinal de baixa qualidade (M2: sinal suspeito, 0,31). ${E.loose.timedOut?'A Sarah não respondeu em 20 s.':'A Sarah diz que o relógio está firme.'} Sugestão da Cosmo: medir com o oxímetro de dedo do kit.</p><div class="dec-actions"><button class="btn" data-act="loose-kit">Registrar medição do kit: 97%</button></div></div>`;
   if(E.mood&&E.mood.phase==='shared') h+=`<div class="dec" style="border-color:rgba(139,92,246,.5)"><h5>${ic('shield')} Bem-estar · compartilhado pela Sarah</h5><p>Sono 1h10 mais curto em 5 dias, voz mais baixa nas conversas e HRV 15% abaixo do padrão dela. A Sarah autorizou só você a ver este resumo, sem gravações.</p><div class="dec-actions"><button class="btn ghost" data-act="mood-meet">Marcar conversa hoje às 19:00</button></div></div>`;
+  if(S.cycleShared){const e=E.cycle;
+    h+=`<div class="dec" style="border-color:rgba(236,72,153,.5)"><h5>${ic('shield')} Saúde hormonal · compartilhado pela Sarah</h5><div class="kv"><div><span>Método</span><b>Ciclo natural</b></div><div><span>Fase</span><b>Lútea · dia 16</b></div><div><span>FC de repouso</span><b>75 bpm</b></div><div><span>Temp. da pele</span><b>37,1 °C</b></div></div><p>M3 com linha de base por fase do ciclo (m3-fase-0.1): FC e temperatura dentro da faixa da Sarah nesta fase (73 a 77 bpm; 36,9 a 37,2 °C), sem alerta. Com a linha de base única, este padrão daria atenção 4 vezes no último ciclo. Consentimento só para você; Houston e a família não recebem. A Sarah pode revogar no relógio.</p>${e&&e.phase==='shared'?'<div class="dec-actions"><button class="btn ghost" data-act="cycle-ack">Registrar ciência, sem conduta</button></div>':''}</div>`;}
   if(E.eva){const e=E.eva;
     h+=`<div class="dec"><h5>${ic('user','c-acc')} Prontidão para a EVA das 15:00</h5><div class="kv">${CREW_IDS.map(id=>`<div><span>${CREW[id].name}</span><b class="${READY[id]<70?'c-warn':''}">${READY[id]}%</b></div>`).join('')}</div><p>${e.phase==='asking'?'Sono, HRV e tempo de reação. A decisão da escala é da comandante.':e.result==='swap'?'A comandante trocou a Elena pelo Kenji.':'A comandante manteve a Elena; monitoramento de fadiga reforçado.'}</p></div>`;}
   if(E.headache){const e=E.headache, co2=S.co2.toFixed(1).replace('.',',');
@@ -1358,7 +1379,7 @@ function tabletHTML(){
   const tAns={
     crew:'Elena: hidratação baixa e duas noites curtas; vale conversar hoje. Sarah: estresse moderado e hidratação abaixo da meta. Kenji e você: estáveis.',
     resumo: isS
-      ? `Sarah está ${LV[a.level].toLowerCase()}: FC ${FMT.hr(v)} bpm, SpO₂ ${FMT.spo2(v)}%, PA ${FMT.bp(v)}, homeostase ${a.homeo}%. ${e?'Evento cardíaco às '+e.clock.slice(0,5)+'; acompanhar ECG de 12 derivações.':'Sem eventos cardíacos nos últimos 7 dias.'} Ciclo no dia 14 (janela fértil).`
+      ? `Sarah está ${LV[a.level].toLowerCase()}: FC ${FMT.hr(v)} bpm, SpO₂ ${FMT.spo2(v)}%, PA ${FMT.bp(v)}, homeostase ${a.homeo}%. ${e?'Evento cardíaco às '+e.clock.slice(0,5)+'; acompanhar ECG de 12 derivações.':'Sem eventos cardíacos nos últimos 7 dias.'} ${S.cycleShared?'Ciclo no dia 16 (fase lútea): linha de base por fase ativa, sem alerta.':'Contexto hormonal: privado, sem consentimento da Sarah.'}`
       : `${CREW[sel].name}: ${LV[a.level].toLowerCase()}, FC ${FMT.hr(v)} bpm, SpO₂ ${FMT.spo2(v)}%, homeostase ${a.homeo}%. ${COP_SUM[sel]}`,
     kit:'O₂ portátil em 92%, 18 eletrodos de ECG, 6 bolsas de soro, desfibrilador testado ontem. Antiarrítmicos: estoque para 2 tratamentos completos.'
   };
