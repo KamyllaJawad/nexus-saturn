@@ -17,6 +17,7 @@ Projeto para o desafio **Create Health Monitoring Software for Astronauts…** d
 | [docs/08-stack.md](docs/08-stack.md) | Stack híbrida: referência NASA × protótipo |
 | [docs/09-seguranca-privacidade.md](docs/09-seguranca-privacidade.md) | Ameaças (STRIDE + IA) e regras de privacidade |
 | [docs/10-roadmap-riscos.md](docs/10-roadmap-riscos.md) | Roadmap, riscos e próximos passos |
+| [docs/11-dados-lakehouse.md](docs/11-dados-lakehouse.md) | Relógio e sensores até o lakehouse, tratamento e treino |
 | [adr/](adr/) | 13 decisões de arquitetura no formato MADR |
 | [contratos/](contratos/) | JSON Schema da mensagem `evento.atualizado` e exemplo |
 | [diagramas/](diagramas/) | Fonte `.mmd` e SVG de cada diagrama |

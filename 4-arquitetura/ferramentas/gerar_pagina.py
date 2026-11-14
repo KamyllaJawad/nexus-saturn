@@ -25,6 +25,7 @@ SECOES = [
     ("08-stack.md", "stack", "Stack híbrida"),
     ("09-seguranca-privacidade.md", "seguranca", "Segurança e privacidade"),
     ("10-roadmap-riscos.md", "roadmap", "Roadmap e riscos"),
+    ("11-dados-lakehouse.md", "lakehouse", "Dados até o lakehouse"),
 ]
 ANCORA_DOC = {f: a for f, a, _ in SECOES}
 

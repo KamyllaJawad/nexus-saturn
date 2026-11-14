@@ -1,8 +1,12 @@
 erDiagram
+  TRIPULANTE ||--o{ DISPOSITIVO : porta
+  TRIPULANTE ||--o| FICHA : embarca
+  DISPOSITIVO ||--o{ LEITURA : mede
   TRIPULANTE ||--o{ LEITURA : gera
   TRIPULANTE ||--o{ CONSENTIMENTO : concede
   TRIPULANTE ||--o{ EVENTO : envolve
   LEITURA }o--o| EVENTO : abre
+  LOTE ||--o{ MODELO : produz
   EVENTO ||--o{ SUGESTAO : recebe
   EVENTO ||--o{ DECISAO : recebe
   EVENTO ||--o{ PACOTE : vira
@@ -15,15 +19,28 @@ erDiagram
     string papel
     json linha_de_base
   }
+  DISPOSITIVO {
+    string id PK
+    string classe
+    string tripulante_id FK
+    string grandeza
+  }
+  FICHA {
+    string tripulante_id PK
+    bool calendario
+    string metodo
+    date ultima_menstruacao
+  }
   LEITURA {
     string id PK
     string tripulante_id FK
-    string metrica
+    string dispositivo_id FK
+    string canal
     float valor
     string unidade
-    string fonte_sensor
     float qualidade_sinal
     datetime gerada_em
+    datetime recebida_em
   }
   EVENTO {
     string id PK
@@ -84,4 +101,15 @@ erDiagram
     float atraso_ida_s
     string link
     json janelas_previstas
+  }
+  LOTE {
+    string id PK
+    string zona
+    string origem
+  }
+  MODELO {
+    string versao PK
+    string peca
+    string lote_id FK
+    string artefato
   }

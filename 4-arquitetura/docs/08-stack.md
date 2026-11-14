@@ -29,7 +29,7 @@ O calendário do ciclo também sai de `analisar(leitura)`, ao lado do M3, só qu
 
 ## Pipeline de dados e algoritmos
 
-O treino fica em lote e grava artefatos. Cada leitura do simulador, uma por segundo, só passa por `ia.analisar(leitura)`. O motor, o hash e a fila não aprendem. O M2 ainda não tem o estimador escolhido: o plano fixa o dado, o rótulo e o recall.
+O treino fica em lote, lê a zona ouro e grava artefatos. A chegada do relógio e dos outros sensores ao lakehouse, e o tratamento antes do ouro, estão na [seção 11](11-dados-lakehouse.md). Cada leitura do simulador, uma por segundo, só passa por `ia.analisar(leitura)`. O motor, o hash e a fila não aprendem. O M2 ainda não tem o estimador escolhido: o plano fixa o dado, o rótulo e o recall.
 
 ```mermaid
 flowchart TB
@@ -118,6 +118,11 @@ astrohealth/
 │   ├── servidor/          # recepção, confirmação, filtro de privacidade
 │   └── cosmo_terra/       # copiloto de Houston
 ├── apps/                  # relógio, tablet, console, família (web)
+├── dados/
+│   ├── bronze/            # cru: relógio, sensores, CinC, sintético, ficha
+│   ├── prata/             # tratado: unidade, relógio alinhado, qualidade
+│   ├── ouro/              # uma tabela por modelo
+│   └── treino/            # jobs que gravam modelos/*.joblib
 ├── contratos/             # JSON Schemas compartilhados
 └── testes/
     ├── aceitacao/         # Robot Framework, um .robot por fluxo

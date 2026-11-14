@@ -4,10 +4,14 @@ O centro do modelo é o Evento: leituras abrem eventos, a Cosmo anexa sugestões
 
 ```mermaid
 erDiagram
+  TRIPULANTE ||--o{ DISPOSITIVO : porta
+  TRIPULANTE ||--o| FICHA : embarca
+  DISPOSITIVO ||--o{ LEITURA : mede
   TRIPULANTE ||--o{ LEITURA : gera
   TRIPULANTE ||--o{ CONSENTIMENTO : concede
   TRIPULANTE ||--o{ EVENTO : envolve
   LEITURA }o--o| EVENTO : abre
+  LOTE ||--o{ MODELO : produz
   EVENTO ||--o{ SUGESTAO : recebe
   EVENTO ||--o{ DECISAO : recebe
   EVENTO ||--o{ PACOTE : vira
@@ -20,15 +24,28 @@ erDiagram
     string papel
     json linha_de_base
   }
+  DISPOSITIVO {
+    string id PK
+    string classe
+    string tripulante_id FK
+    string grandeza
+  }
+  FICHA {
+    string tripulante_id PK
+    bool calendario
+    string metodo
+    date ultima_menstruacao
+  }
   LEITURA {
     string id PK
     string tripulante_id FK
-    string metrica
+    string dispositivo_id FK
+    string canal
     float valor
     string unidade
-    string fonte_sensor
     float qualidade_sinal
     datetime gerada_em
+    datetime recebida_em
   }
   EVENTO {
     string id PK
@@ -90,7 +107,20 @@ erDiagram
     string link
     json janelas_previstas
   }
+  LOTE {
+    string id PK
+    string zona
+    string origem
+  }
+  MODELO {
+    string versao PK
+    string peca
+    string lote_id FK
+    string artefato
+  }
 ```
+
+`DISPOSITIVO.classe` é `relogio`, `patch`, `kit`, `cabine` ou `registro`. O CO₂ da cabine não tem tripulante: `tripulante_id` fica vazio e a leitura continua válida. A dose do dosímetro é da pessoa. A ficha de solo não é uma leitura. Estresse não é sensor: sai na zona prata, a partir de HRV e sono. O caminho dessas leituras até o lakehouse, o tratamento e o treino estão em [11-dados-lakehouse.md](11-dados-lakehouse.md).
 
 ## Ingestão e saída
 
@@ -99,7 +129,7 @@ A leitura entra pelo tópico MQTT. A ingestão grava fonte, hora e qualidade, e 
 ```mermaid
 flowchart TB
   subgraph entrada[Entrada]
-    src[Relógio e sensores]
+    src[Relógio, sensores de bordo e cabine]
     lei["MQTT tripulante/{id}/leituras"]
     ing["Ingestão<br/>fonte, hora e qualidade"]
   end

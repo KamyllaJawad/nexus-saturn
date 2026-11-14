@@ -11,6 +11,7 @@ AstroHealth OS · Arquitetura · Fase 2
 - [05 Motor de decisões](#decisoes)
 - [06 Fluxos](#fluxos)
 - [07 Modelo de dados](#dados)
+- [Dados até o lakehouse](#lakehouse)
 - [08 Stack híbrida](#stack)
 - [09 Segurança e privacidade](#seguranca)
 - [10 Roadmap e riscos](#roadmap)
@@ -892,6 +893,14 @@ Quem não tem calendário sai no formato de [contratos/exemplos/analise-kenji.js
   }
 }
 ```
+
+<a id="lakehouse"></a>
+
+## Dados até o lakehouse
+
+A NASA não publica o prontuário da tripulação. O treino não espera esse arquivo. O lakehouse fica na Terra. A nave guarda o operacional e manda, em P2, o agregado de 1 minuto, a janela crua de ECG quando um evento abre, o resumo da noite e a ficha. O relógio, o patch, o kit, o registro de água e a cabine publicam o mesmo contrato, com `dispositivo_id` e `canal`. CO₂ não tem tripulante. Estresse é canal derivado, na zona prata. A ficha não é série temporal.
+
+O bronze guarda o cru. A prata alinha o relógio, unifica a unidade e marca a qualidade do M2. O ouro é uma tabela por modelo: CinC 2017 para M1 e M2, vitais sintéticos para o M3, ficha sem treino para o calendário. O job grava o `.joblib`. Esse artefato sobe para a nave. O lakehouse não sobe. O texto completo está em `4-arquitetura/docs/11-dados-lakehouse.md`.
 
 <a id="stack"></a>
 

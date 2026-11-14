@@ -128,6 +128,7 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 <a href="#stack" data-nav="stack"><span>08</span>Stack híbrida</a>
 <a href="#seguranca" data-nav="seguranca"><span>09</span>Segurança e privacidade</a>
 <a href="#roadmap" data-nav="roadmap"><span>10</span>Roadmap e riscos</a>
+<a href="#lakehouse" data-nav="lakehouse"><span>11</span>Dados até o lakehouse</a>
 <a href="#adrs" data-nav="adrs"><span>11</span>Decisões (ADRs)</a></nav>
   <main>
     <div class="abertura">
@@ -519,6 +520,7 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
   link{{Link DTN · menos de 1 s a 22 min · blackouts de dias}}
   subgraph terra[Na Terra]
     srvT[Servidor da Terra&lt;br/&gt;filtro de privacidade]
+    lake[(Lakehouse&lt;br/&gt;bronze, prata, ouro)]
     console[Console de Houston&lt;br/&gt;Cosmo Terra: copiloto]
     app[App da família]
   end
@@ -529,6 +531,7 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
   motor --&gt; dados
   motor --&gt; gw
   gw --&gt; link --&gt; srvT
+  srvT --&gt; lake
   srvT --&gt; console
   srvT --&gt;|só frases, sem sinais vitais| app
 </pre></figure>
@@ -544,8 +547,8 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 <tbody>
 <tr>
 <td>Ingestão de sinais</td>
-<td>Recebe leituras, marca fonte, hora e qualidade do sinal</td>
-<td>Relógios, sensores, motor de decisões</td>
+<td>Recebe o relógio, o patch, o kit, o registro e a cabine. Marca dispositivo, canal, hora gerada e qualidade</td>
+<td>Relógio, sensores, motor de decisões, gateway</td>
 </tr>
 <tr>
 <td>Detectores</td>
@@ -964,10 +967,14 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 </pre></figure></section>
 <section id="dados" class="secao"><p class="sec-n">07</p><h2>Modelo de dados</h2><p>O centro do modelo é o Evento: leituras abrem eventos, a Cosmo anexa sugestões e só humanos registram decisões. Toda entidade carrega a hora em que foi gerada; a Terra acrescenta a hora em que recebeu.</p>
 <figure class="diagrama"><pre class="mermaid">erDiagram
+  TRIPULANTE ||--o{ DISPOSITIVO : porta
+  TRIPULANTE ||--o| FICHA : embarca
+  DISPOSITIVO ||--o{ LEITURA : mede
   TRIPULANTE ||--o{ LEITURA : gera
   TRIPULANTE ||--o{ CONSENTIMENTO : concede
   TRIPULANTE ||--o{ EVENTO : envolve
   LEITURA }o--o| EVENTO : abre
+  LOTE ||--o{ MODELO : produz
   EVENTO ||--o{ SUGESTAO : recebe
   EVENTO ||--o{ DECISAO : recebe
   EVENTO ||--o{ PACOTE : vira
@@ -980,15 +987,28 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
     string papel
     json linha_de_base
   }
+  DISPOSITIVO {
+    string id PK
+    string classe
+    string tripulante_id FK
+    string grandeza
+  }
+  FICHA {
+    string tripulante_id PK
+    bool calendario
+    string metodo
+    date ultima_menstruacao
+  }
   LEITURA {
     string id PK
     string tripulante_id FK
-    string metrica
+    string dispositivo_id FK
+    string canal
     float valor
     string unidade
-    string fonte_sensor
     float qualidade_sinal
     datetime gerada_em
+    datetime recebida_em
   }
   EVENTO {
     string id PK
@@ -1050,12 +1070,24 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
     string link
     json janelas_previstas
   }
+  LOTE {
+    string id PK
+    string zona
+    string origem
+  }
+  MODELO {
+    string versao PK
+    string peca
+    string lote_id FK
+    string artefato
+  }
 </pre></figure>
+<p><code>DISPOSITIVO.classe</code> é <code>relogio</code>, <code>patch</code>, <code>kit</code>, <code>cabine</code> ou <code>registro</code>. O CO₂ da cabine não tem tripulante: <code>tripulante_id</code> fica vazio e a leitura continua válida. A dose do dosímetro é da pessoa. A ficha de solo não é uma leitura. Estresse não é sensor: sai na zona prata, a partir de HRV e sono. O caminho dessas leituras até o lakehouse, o tratamento e o treino estão em <a href="#lakehouse">11-dados-lakehouse.md</a>.</p>
 <h3 id="dados-ingestao-e-saida">Ingestão e saída</h3>
 <p>A leitura entra pelo tópico MQTT. A ingestão grava fonte, hora e qualidade, e o <code>ia.py</code> devolve a análise. O z robusto pinta o estado no relógio e no painel. O motor escolhe o restante da saída. A Cosmo só lê esse estado e anexa a sugestão. O humano devolve a decisão assinada.</p>
 <figure class="diagrama"><pre class="mermaid">flowchart TB
   subgraph entrada[Entrada]
-    src[Relógio e sensores]
+    src[Relógio, sensores de bordo e cabine]
     lei[&quot;MQTT tripulante/{id}/leituras&quot;]
     ing[&quot;Ingestão&lt;br/&gt;fonte, hora e qualidade&quot;]
   end
@@ -1362,7 +1394,7 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 <p>As duas peças saem juntas em <code>analisar(leitura)</code>. O escore não substitui a faixa de cada sinal. A regra de quando o motor abre sugestão de nível 1 está na <a href="#adr-0012">ADR-012</a>. O exemplo de resposta, no quadro de fibrilação atrial da Sarah, está em <a href="#analise-fa">contratos/exemplos/analise-fa.json</a>.</p>
 <p>O calendário do ciclo também sai de <code>analisar(leitura)</code>, ao lado do M3, só quando <code>ficha.calendario</code> é verdadeiro. Sem calendário, <code>ciclo</code> fica nulo e a sugestão usa a linha de base pessoal, como em <a href="#analise-kenji">contratos/exemplos/analise-kenji.json</a>. A previsão, quando existe, conta os dias da ficha de solo e, se a pessoa não está em supressão, ajusta a janela quando a frequência e a temperatura da pele sobem no padrão dela. Não é um classificador de fase. O exemplo com calendário está em <a href="#analise-ciclo">contratos/exemplos/analise-ciclo.json</a>, e a regra na <a href="#adr-0013">ADR-013</a>.</p>
 <h3 id="stack-pipeline-de-dados-e-algoritmos">Pipeline de dados e algoritmos</h3>
-<p>O treino fica em lote e grava artefatos. Cada leitura do simulador, uma por segundo, só passa por <code>ia.analisar(leitura)</code>. O motor, o hash e a fila não aprendem. O M2 ainda não tem o estimador escolhido: o plano fixa o dado, o rótulo e o recall.</p>
+<p>O treino fica em lote, lê a zona ouro e grava artefatos. A chegada do relógio e dos outros sensores ao lakehouse, e o tratamento antes do ouro, estão na <a href="#lakehouse">seção 11</a>. Cada leitura do simulador, uma por segundo, só passa por <code>ia.analisar(leitura)</code>. O motor, o hash e a fila não aprendem. O M2 ainda não tem o estimador escolhido: o plano fixa o dado, o rótulo e o recall.</p>
 <figure class="diagrama"><pre class="mermaid">flowchart TB
   subgraph lote[Treino em lote]
     cinc[&quot;CinC 2017&lt;br/&gt;8.528 ECGs&quot;]
@@ -1505,6 +1537,11 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 │   ├── servidor/          # recepção, confirmação, filtro de privacidade
 │   └── cosmo_terra/       # copiloto de Houston
 ├── apps/                  # relógio, tablet, console, família (web)
+├── dados/
+│   ├── bronze/            # cru: relógio, sensores, CinC, sintético, ficha
+│   ├── prata/             # tratado: unidade, relógio alinhado, qualidade
+│   ├── ouro/              # uma tabela por modelo
+│   └── treino/            # jobs que gravam modelos/*.joblib
 ├── contratos/             # JSON Schemas compartilhados
 └── testes/
     ├── aceitacao/         # Robot Framework, um .robot por fluxo
@@ -1695,6 +1732,236 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 <li><a href="https://www.spaceappschallenge.org/2026/challenges/health-monitoring-software/" target="_blank" rel="noopener">Desafio: Create Health Monitoring Software for Astronauts…</a></li>
 <li><a href="https://www.nasa.gov/space-communications-navigation/interplanetary-overlay-network/" target="_blank" rel="noopener">NASA: Interplanetary Overlay Network (DTN)</a></li>
 </ul></section>
+<section id="lakehouse" class="secao"><p class="sec-n">11</p><h2>Dados até o lakehouse</h2><p>A NASA não publica o prontuário da tripulação. O treino deste projeto não espera esse arquivo. O que existe de aberto, e o que o time gera, entra no lakehouse com a origem escrita no lote. O lakehouse fica na Terra. A nave guarda o operacional no SQLite e manda para baixo só o que cabe no link.</p>
+<h3 id="lakehouse-duas-origens-mais-a-cabine">Duas origens, mais a cabine</h3>
+<p>O relógio não é o único sensor. Cada leitura carrega <code>dispositivo_id</code> e <code>canal</code>. A ficha de solo entra uma vez, antes do voo, e não é uma série temporal.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Classe</th>
+<th>Dispositivo</th>
+<th>Canal</th>
+<th>Cadência a bordo</th>
+<th>Tripulante</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>relogio</code></td>
+<td>PPG e ECG curto</td>
+<td><code>fc</code>, <code>hrv</code>, trecho de ECG</td>
+<td>1 Hz; ECG só em janela</td>
+<td>sim</td>
+</tr>
+<tr>
+<td><code>relogio</code></td>
+<td>Oxímetro do pulso</td>
+<td><code>spo2</code></td>
+<td>1 Hz</td>
+<td>sim</td>
+</tr>
+<tr>
+<td><code>relogio</code></td>
+<td>Temperatura da pele</td>
+<td><code>temp_pele</code></td>
+<td>1 Hz</td>
+<td>sim</td>
+</tr>
+<tr>
+<td><code>relogio</code></td>
+<td>Actigrafia</td>
+<td><code>sono</code></td>
+<td>resumo da noite</td>
+<td>sim</td>
+</tr>
+<tr>
+<td><code>relogio</code></td>
+<td>Acelerômetro</td>
+<td><code>atividade</code></td>
+<td>1 Hz</td>
+<td>sim</td>
+</tr>
+<tr>
+<td><code>patch</code></td>
+<td>Patch torácico</td>
+<td><code>respiracao</code></td>
+<td>1 Hz</td>
+<td>sim</td>
+</tr>
+<tr>
+<td><code>kit</code></td>
+<td>Manguito</td>
+<td><code>pa</code></td>
+<td>sob demanda</td>
+<td>sim</td>
+</tr>
+<tr>
+<td><code>kit</code></td>
+<td>Oxímetro de dedo</td>
+<td><code>spo2_kit</code></td>
+<td>sob demanda, para conferir o pulso</td>
+<td>sim</td>
+</tr>
+<tr>
+<td><code>cabine</code></td>
+<td>Sensor de CO₂</td>
+<td><code>co2</code></td>
+<td>1 min</td>
+<td>não</td>
+</tr>
+<tr>
+<td><code>cabine</code></td>
+<td>Dosímetro</td>
+<td><code>dose</code></td>
+<td>1 min</td>
+<td>sim, a dose é da pessoa</td>
+</tr>
+<tr>
+<td><code>registro</code></td>
+<td>Registro de água</td>
+<td><code>agua</code></td>
+<td>quando a pessoa marca</td>
+<td>sim</td>
+</tr>
+<tr>
+<td>ficha</td>
+<td>Ficha de solo</td>
+<td>calendário, método, última menstruação</td>
+<td>uma vez</td>
+<td>sim</td>
+</tr>
+</tbody>
+</table></div>
+<p>Estresse não nasce num sensor. A zona prata calcula esse canal a partir de HRV e sono. O estado de três níveis também é derivado, e não volta para o bronze como se fosse medida.</p>
+<h3 id="lakehouse-o-que-atravessa-o-link">O que atravessa o link</h3>
+<p>No pulso e no servidor da nave a leitura segue a 1 Hz, no tópico <code>tripulante/{id}/leituras</code>. Cabine publica o mesmo formato, com <code>tripulante_id</code> vazio no CO₂. Isso fica no SQLite da nave e alimenta o <code>ia.analisar</code>.</p>
+<p>Para a Terra, o gateway não manda cada amostra de 1 Hz. O pacote P2 leva:</p>
+<ul>
+<li>agregado de 1 minuto dos canais contínuos, com mediana, mínimo, máximo e a fração de amostras que o M2 marcou como suspeitas;</li>
+<li>a janela crua de ECG quando um evento abre;</li>
+<li>o resumo da noite (sono e actigrafia);</li>
+<li>a ficha, uma vez, e de novo só se ela mudar.</li>
+</ul>
+<p>P1 continua reservado a alerta, SOS e decisão. A família não lê o lakehouse. O filtro de privacidade segue na frente do app, como na <a href="#dados">seção 7</a>.</p>
+<p>No hackathon o simulador grava o mesmo contrato direto nas zonas de arquivo. O lote marca <code>origem</code> como <code>sintetico</code> ou <code>cinc</code>. Não há uma pasta <code>nasa</code>.</p>
+<figure class="diagrama"><pre class="mermaid">flowchart LR
+  subgraph bordo[A bordo]
+    rel[Relógio]
+    pat[Patch, kit e registro]
+    cab[Cabine]
+    mqtt[MQTT]
+    ing[Ingestão]
+    sql[(SQLite operacional)]
+    gw[Gateway DTN · P2]
+  end
+  subgraph terra[Terra · lakehouse]
+    br[(Bronze)]
+    pr[(Prata)]
+    ou[(Ouro)]
+    job[Treino em lote]
+    art[modelos/*.joblib]
+  end
+  rel --&gt; mqtt
+  pat --&gt; mqtt
+  cab --&gt; mqtt
+  mqtt --&gt; ing --&gt; sql
+  ing --&gt; gw
+  gw --&gt;|agregado, janela e resumo| br
+  cinc[CinC 2017] --&gt; br
+  sint[Vitais sintéticos] --&gt; br
+  ficha[Ficha de solo] --&gt; br
+  br --&gt; pr --&gt; ou --&gt; job --&gt; art
+  art --&gt;|sobe para a nave| ing
+</pre></figure>
+<h3 id="lakehouse-zonas">Zonas</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Zona</th>
+<th>Guarda</th>
+<th>Escreve</th>
+<th>Lê</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bronze</td>
+<td>Payload cru, <code>dispositivo_id</code>, <code>canal</code>, hora gerada e hora recebida. Só inclusão</td>
+<td>Gateway da Terra; no hackathon, o export do simulador e a cópia do CinC</td>
+<td>Tratamento</td>
+</tr>
+<tr>
+<td>Prata</td>
+<td>Uma linha por canal, unidade única, relógio alinhado, qualidade do M2. Amostra suspeita permanece, com a marca</td>
+<td>Job de tratamento</td>
+<td>Ciência de dados e treino</td>
+</tr>
+<tr>
+<td>Ouro</td>
+<td>Uma tabela por peça de modelo, já com o corte de treino</td>
+<td>Job de tratamento</td>
+<td>Jobs de treino</td>
+</tr>
+</tbody>
+</table></div>
+<p>Amostra suspeita não entra no ouro. Ciclo, método e sintoma não entram em tabela de atributo. A ficha fica numa tabela à parte, com o mesmo consentimento da <a href="#adr-0013">ADR-013</a>.</p>
+<h3 id="lakehouse-ciencia-de-dados-tratamento">Ciência de dados · tratamento</h3>
+<p>O job da prata faz, nesta ordem:</p>
+<ol>
+<li>Confere unidade e faixa física. Fora da faixa, a linha fica na prata com <code>qualidade = suspeito</code> e não segue.</li>
+<li>Alinha os relógios. Patch, manguito e pulso não amostram no mesmo instante. O minuto do agregado é a chave comum. A hora gerada a bordo prevalece sobre a hora em que a Terra recebeu.</li>
+<li>Aplica o M2. Sinal suspeito, como o relógio folgado, não treina o M1 nem o Isolation Forest.</li>
+<li>Calcula os canais derivados (estresse) só depois da qualidade.</li>
+<li>Separa o que é de uma pessoa do que é da cabine. CO₂ não entra na linha de base do Kenji.</li>
+<li>Monta o ouro com a regra de cada modelo, abaixo. Minutos de fibrilação e de sensor solto ficam de fora do <code>m3-if</code>, como na <a href="#adr-0012">ADR-012</a>.</li>
+</ol>
+<p>Não há rótulo de fase menstrual nesse tratamento. O calendário conta dias da ficha. Sem supressão, a janela se ajusta quando a frequência e a temperatura da pele sobem no padrão daquela pessoa. Isso não é um classificador treinado.</p>
+<h3 id="lakehouse-engenharia-de-dados-treino">Engenharia de dados · treino</h3>
+<p>O treino é em lote. A leitura de 1 Hz na nave não atualiza peso nenhum. O motor, o hash e a fila não aprendem. Cada job lê uma tabela de ouro, grava um artefato com versão e registra o <code>lote_id</code>.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Peça</th>
+<th>Tabela de ouro</th>
+<th>De onde vem o lote</th>
+<th>Artefato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M1 <code>arritmia-borda-0.3</code></td>
+<td>Atributos de RR, split 70/15/15</td>
+<td>CinC 2017, 8.528 ECGs públicos, terrestres</td>
+<td><code>modelos/m1.joblib</code></td>
+</tr>
+<tr>
+<td>M2 <code>qualidade-0.2</code></td>
+<td>Os mesmos ECGs com ruído sintético e o rótulo <code>suspeito</code></td>
+<td>CinC 2017. O estimador ainda não está escolhido. Meta: recall de <code>suspeito</code> ≥ 0,9</td>
+<td><code>modelos/m2.joblib</code></td>
+</tr>
+<tr>
+<td>M3 z <code>m3-z-0.1</code></td>
+<td>Minutos sintéticos por pessoa e por canal</td>
+<td>Simulador. Mediana e MAD</td>
+<td>parâmetros no <code>ia.py</code></td>
+</tr>
+<tr>
+<td>M3 floresta <code>m3-if-0.1</code></td>
+<td>Só minutos normais, um modelo por pessoa, <code>RobustScaler</code> antes da floresta</td>
+<td><code>dados/vitais.csv</code> sintético. Meta: no máximo 1 alarme por pessoa por dia simulado</td>
+<td><code>modelos/m3-if-0.1.joblib</code></td>
+</tr>
+<tr>
+<td>Ciclo <code>ciclo-calendario-0.1</code></td>
+<td>Ficha</td>
+<td>Não há treino. A contagem de dias é regra</td>
+<td>sem <code>.joblib</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>O artefato sobe para a nave. O lakehouse não sobe. Modelo novo entra em modo sombra e só troca o que está em serviço com aprovação médica, pela <a href="#adr-0010">ADR-010</a>.</p>
+<p>No protótipo as zonas são pastas (<code>dados/bronze</code>, <code>dados/prata</code>, <code>dados/ouro</code>) e os jobs são scripts em <code>dados/treino</code>. A fronteira é a mesma de um lakehouse de produção: bronze imutável, prata tratada, ouro por modelo, artefato versionado. Trocar a pasta por Delta ou Iceberg não muda o contrato da leitura nem o <code>ia.analisar</code>.</p></section>
 <section id="adrs" class="secao"><p class="sec-n">11</p><h2>Decisões de arquitetura</h2><p>Decisões no formato MADR, todas aceitas. Abra cada uma para ver contexto, alternativas e consequências.</p><div class="adr-ctl"><button type="button" id="abrir-adrs">Abrir todas</button></div><details class="adr" id="adr-0001"><summary><span class="adr-n">ADR-001</span><span class="adr-t">IA na borda primeiro; a Terra só apoia</span></summary><div class="adr-b"><ul>
 <li><strong>Status:</strong> aceita</li>
 <li><strong>Data:</strong> 2026-11-11</li>
