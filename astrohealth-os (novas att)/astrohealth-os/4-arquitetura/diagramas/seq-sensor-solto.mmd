@@ -1,0 +1,15 @@
+sequenceDiagram
+  autonumber
+  participant S as Oxímetro do relógio
+  participant R as Cosmo borda
+  participant A as Astronauta
+  participant T as Tablet (médico)
+  S->>R: SpO₂ 84% com sinal fraco
+  R->>A: o relógio está folgado?
+  alt ajustou
+    A->>R: ajustei
+    R->>R: leitura volta a 98% e o trecho vira artefato
+  else está firme ou 20 s sem resposta
+    R->>T: leitura suspeita
+    T->>R: oxímetro do kit marca 97%
+  end

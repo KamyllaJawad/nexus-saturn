@@ -133,7 +133,7 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
     <div class="abertura">
       <h1>A nave decide sozinha; a Terra recebe com atraso e revisa</h1>
       <p class="lead">Arquitetura do AstroHealth OS para a NASA Space Apps 2026: monitoramento da tripulação com IA local e um humano responsável por cada decisão clínica.</p>
-      <div class="numeros"><span><b>26</b> requisitos · 16 essenciais</span><span><b>11</b> atributos de qualidade</span><span><b>12</b> diagramas</span><span><b>11</b> ADRs</span><span>submissão <b>15/11 · 23:59</b></span></div>
+      <div class="numeros"><span><b>26</b> requisitos · 16 essenciais</span><span><b>11</b> atributos de qualidade</span><span><b>14</b> diagramas</span><span><b>11</b> ADRs</span><span>submissão <b>15/11 · 23:59</b></span></div>
       <div class="regra"><b>Regra de ouro.</b> O LLM conversa, explica e resume. Só o motor de decisões determinístico muda o estado de um evento, e toda decisão clínica tem um humano responsável.</div>
     </div>
     <section id="visao" class="secao"><p class="sec-n">01</p><h2>Visão geral</h2><p>O AstroHealth OS monitora a saúde da tripulação a bordo e apoia decisões com um humano no controle, mesmo sem contato com a Terra. Esta arquitetura sai direto da demo navegável: cada fluxo dela vira requisito, componente e diagrama.</p>
@@ -197,7 +197,7 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 <p><strong>Pendente:</strong> colar aqui o enunciado oficial e os critérios de avaliação, e cruzar cada critério com os requisitos de <a href="#requisitos">02-requisitos.md</a>.</p>
 </blockquote></section>
 <section id="requisitos" class="secao"><p class="sec-n">02</p><h2>Requisitos</h2><h3 id="requisitos-requisitos-funcionais">Requisitos funcionais</h3>
-<p>São 26 requisitos, 16 deles essenciais para o MVP. Cada um vem de um fluxo que já existe na demo.</p>
+<p>São 27 requisitos, 16 deles essenciais para o MVP. Cada um vem de um fluxo que já existe na demo.</p>
 <div class="tbl"><table>
 <thead>
 <tr>
@@ -391,6 +391,13 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 <td>Perfil de missão</td>
 <td>Importante</td>
 </tr>
+<tr>
+<td>RF27</td>
+<td>Avisar no relógio cólica, inchaço ou humor quando a ficha tem calendário, e seguir a linha de base pessoal quando não tem; o método só entra na explicação; o médico só vê o aviso com consentimento</td>
+<td>Astronauta</td>
+<td>Eventos padrão hormonal e painel do Kenji</td>
+<td>Importante</td>
+</tr>
 </tbody>
 </table></div>
 <h3 id="requisitos-atributos-de-qualidade">Atributos de qualidade</h3>
@@ -542,7 +549,7 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 </tr>
 <tr>
 <td>Detectores</td>
-<td>Modelos pequenos: arritmia, hipóxia, artefato de sensor, prontidão, humor e linha de base. O z robusto classifica cada sinal; o Isolation Forest, um modelo por tripulante, marca a combinação fora do padrão (<a href="#adr-0012">ADR-012</a>)</td>
+<td>Modelos pequenos: arritmia, hipóxia, artefato de sensor, prontidão, humor e linha de base. O z robusto classifica cada sinal; o Isolation Forest, um modelo por tripulante, marca a combinação fora do padrão (<a href="#adr-0012">ADR-012</a>). O calendário do ciclo avisa o trecho intenso a partir da ficha de solo (<a href="#adr-0013">ADR-013</a>)</td>
 <td>Ingestão, motor de decisões</td>
 </tr>
 <tr>
@@ -710,7 +717,7 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 <tr>
 <td>2 · Sugerir</td>
 <td>Propõe; o humano decide</td>
-<td>Beber água, respirar, prontidão para EVA</td>
+<td>Beber água, respirar, treino mais leve no trecho do ciclo, prontidão para EVA</td>
 </tr>
 <tr>
 <td>3 · Preparar e pedir confirmação</td>
@@ -725,12 +732,14 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 <tr>
 <td>Nunca sozinha</td>
 <td>Sempre exige um humano</td>
-<td>Medicação, procedimentos invasivos, compartilhar saúde mental, tirar alguém de tarefa crítica</td>
+<td>Medicação, procedimentos invasivos, compartilhar saúde mental ou o ciclo, tirar alguém de tarefa crítica</td>
 </tr>
 </tbody>
 </table></div>
 <h3 id="decisoes-linha-de-base-no-motor">Linha de base no motor</h3>
 <p>O estado de três níveis sai do z robusto, sinal por sinal. O Isolation Forest não altera esse estado nem abre evento clínico. Ele vira sugestão de nível 1 só quando marca anomalia, o M2 classifica o sinal como bom e nenhum sinal está crítico sozinho. Se o M1 já abriu fibrilação atrial, ou se um sinal está crítico, permanece o evento aberto. A família não recebe escore nem faixa. O modelo está na <a href="#adr-0012">ADR-012</a>.</p>
+<h3 id="decisoes-calendario-do-ciclo-no-motor">Calendário do ciclo no motor</h3>
+<p>A ficha de cada tripulante escolhe a direção. Com calendário, o relógio avisa só essa pessoa cerca de dois dias antes do trecho intenso. Sem calendário, a pergunta de cólica não abre e a Cosmo fica na linha de base pessoal. Na demo, Sarah e Elena têm calendário; Marcus e Kenji não têm. O da Elena não aparece no painel até ela autorizar. O relógio fala dos sintomas (cólica, inchaço ou humor), não do método. O método só entra quando a Cosmo precisa explicar: com supressão, o trecho não é ovulação; sem método, a janela segue a última menstruação. A pergunta só sai quando esse trecho coincide com sinais leves e o M2 classifica o sinal como bom. O cuidado é nível 2. O estado de três níveis não muda. Analgésico do kit fica com o oficial médico, em passo separado. Médico e Houston só veem com consentimento. A família não recebe fase, calendário, método nem sintoma. A decisão está na <a href="#adr-0013">ADR-013</a>.</p>
 <h3 id="decisoes-quem-decide-cada-tipo-de-evento">Quem decide cada tipo de evento</h3>
 <p>Os prazos são metas de projeto, a validar com o time médico.</p>
 <div class="tbl"><table>
@@ -780,6 +789,12 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 <td>Ninguém; exceção só em risco de vida</td>
 </tr>
 <tr>
+<td>Compartilhar o ciclo</td>
+<td>A própria astronauta</td>
+<td>Não escala</td>
+<td>Ninguém; a família não recebe</td>
+</tr>
+<tr>
 <td>Ação de nível 4</td>
 <td>O próprio astronauta, por veto</td>
 <td>15 s para vetar</td>
@@ -821,7 +836,7 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
   Encerrado --&gt; [*]
 </pre></figure>
 <p>Cada transição grava na auditoria: evento, estado anterior e novo, quem decidiu, quando, versão do modelo e evidências usadas. O escalonamento sempre aponta para outro humano, nunca para a IA (<a href="#adr-0004">ADR-004</a>).</p></section>
-<section id="fluxos" class="secao"><p class="sec-n">06</p><h2>Fluxos</h2><p>Nos cinco fluxos, a decisão acontece a bordo, e a Terra fica sabendo depois. Setas <code>--)</code> cruzam o link com a Terra e levam de menos de 1 s a 22 min, conforme o perfil de missão.</p>
+<section id="fluxos" class="secao"><p class="sec-n">06</p><h2>Fluxos</h2><p>Nos seis fluxos, a decisão acontece a bordo, e a Terra fica sabendo depois. Setas <code>--)</code> cruzam o link com a Terra e levam de menos de 1 s a 22 min, conforme o perfil de missão.</p>
 <h3 id="fluxos-emergencia-cardiaca">Emergência cardíaca</h3><p class="na-demo">Na demo: <b>Cenário → Emergência; depois confirme o protocolo no tablet</b> · <a href="https://claude.ai/artifact/CE5bxpHxaLhi8Af9SY7NmU" target="_blank" rel="noopener" target="_blank" rel="noopener">abrir a demo</a></p>
 <figure class="diagrama"><pre class="mermaid">sequenceDiagram
   autonumber
@@ -904,6 +919,32 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
     A-&gt;&gt;C: só comigo
     Note over C: nada sai do relógio
   end
+</pre></figure>
+<h3 id="fluxos-calendario-do-ciclo">Calendário do ciclo</h3>
+<figure class="diagrama"><pre class="mermaid">sequenceDiagram
+  autonumber
+  participant C as Cosmo (relógio)
+  participant A as Astronauta
+  participant T as Tablet (médico)
+  participant F as Família
+  C-&gt;&gt;C: ficha de solo marca o trecho intenso em 2 dias
+  C-&gt;&gt;A: aviso privado no relógio
+  C-&gt;&gt;A: sinais leves no trecho. Cólica, inchaço ou humor?
+  alt estou bem
+    A-&gt;&gt;C: estou bem
+    Note over C: o estado segue ótimo
+  else estou
+    A-&gt;&gt;C: confirmar sintoma
+    C-&gt;&gt;A: respirar, treino leve ou modo noite
+    alt contar ao médico
+      A-&gt;&gt;C: contar ao Dr. Marcus
+      C-&gt;&gt;T: sintomas e cuidado leve, sem alarme
+    else só comigo
+      A-&gt;&gt;C: só comigo
+      Note over C: nada sai do relógio
+    end
+  end
+  Note over F: a família não recebe fase nem sintoma
 </pre></figure>
 <h3 id="fluxos-blackout-e-volta-do-sinal">Blackout e volta do sinal</h3><p class="na-demo">Na demo: <b>Cenário → Blackout; depois Normal</b> · <a href="https://claude.ai/artifact/CE5bxpHxaLhi8Af9SY7NmU" target="_blank" rel="noopener" target="_blank" rel="noopener">abrir a demo</a></p>
 <figure class="diagrama"><pre class="mermaid">sequenceDiagram
@@ -1010,6 +1051,61 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
     json janelas_previstas
   }
 </pre></figure>
+<h3 id="dados-ingestao-e-saida">Ingestão e saída</h3>
+<p>A leitura entra pelo tópico MQTT. A ingestão grava fonte, hora e qualidade, e o <code>ia.py</code> devolve a análise. O z robusto pinta o estado no relógio e no painel. O motor escolhe o restante da saída. A Cosmo só lê esse estado e anexa a sugestão. O humano devolve a decisão assinada.</p>
+<figure class="diagrama"><pre class="mermaid">flowchart TB
+  subgraph entrada[Entrada]
+    src[Relógio e sensores]
+    lei[&quot;MQTT tripulante/{id}/leituras&quot;]
+    ing[&quot;Ingestão&lt;br/&gt;fonte, hora e qualidade&quot;]
+  end
+
+  subgraph analise[Análise]
+    ia[&quot;ia.analisar(leitura)&quot;]
+    z[Z robusto por sinal]
+    det[&quot;M1 arritmia · M2 qualidade&lt;br/&gt;Isolation Forest · calendário&quot;]
+  end
+
+  subgraph decisao[Decisão a bordo]
+    motor[Motor de decisões]
+    cosmo[Cosmo]
+    humano[&quot;POST /decisoes assinado&quot;]
+  end
+
+  subgraph saida[Saída]
+    painel[&quot;Estado de três níveis&lt;br/&gt;relógio e painel&quot;]
+    evento[Evento clínico]
+    n1[&quot;Sugestão nível 1&lt;br/&gt;sem abrir evento&quot;]
+    aviso[&quot;Aviso no relógio&lt;br/&gt;dessa pessoa&quot;]
+    msg[&quot;evento.atualizado&lt;br/&gt;MQTT eventos/{id}&quot;]
+    local[&quot;Rede local&lt;br/&gt;relógio, tablet e gateway&quot;]
+    dtn[Pacote DTN]
+    terra[&quot;Terra&lt;br/&gt;filtro de privacidade&quot;]
+    houston[Console de Houston]
+    familia[&quot;App da família&lt;br/&gt;só frases&quot;]
+    audit[(Auditoria)]
+  end
+
+  src --&gt; lei --&gt; ing --&gt; ia
+  ia --&gt; z
+  ia --&gt; det
+  z --&gt; motor
+  det --&gt; motor
+  motor --&gt;|&quot;estado, só leitura&quot;| cosmo
+  cosmo --&gt;|anexa sugestão| motor
+  humano --&gt; motor
+  z --&gt; painel
+  motor --&gt;|FA ou sinal crítico| evento
+  motor --&gt;|&quot;anomalia, sinal bom&lt;br/&gt;e nenhum sinal crítico&quot;| n1
+  motor --&gt;|calendário na ficha| aviso
+  evento --&gt; msg
+  msg --&gt; local
+  msg --&gt; dtn --&gt; terra
+  terra --&gt; houston
+  terra --&gt; familia
+  motor --&gt; audit
+</pre></figure>
+<p>A sugestão de nível 1 sai quando o Isolation Forest marca anomalia, o M2 diz que o sinal é bom e nenhum sinal está crítico sozinho. Se o M1 já abriu fibrilação atrial, ou se um sinal está crítico, permanece o evento aberto, no contrato <code>evento.atualizado</code>. Com calendário na ficha, o aviso do trecho intenso fica no relógio dessa pessoa. A Terra recebe o pacote DTN e aplica o filtro: Houston vê o necessário para o parecer, e a família recebe frases prontas, sem escore, faixa ou ciclo. No relógio, com o servidor fora, seguem a ingestão, o detector de arritmia, o de artefato e a fila local.</p>
 <h3 id="dados-regras-de-escrita">Regras de escrita</h3>
 <ul>
 <li><strong>Sugestão:</strong> escrita só pela Cosmo; nunca muda o estado do evento.</li>
@@ -1020,6 +1116,8 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 <p>O mesmo formato vai para o tablet pela rede local e para a Terra num pacote DTN. Schema em <a href="#contrato">contratos/evento-atualizado.schema.json</a>; exemplo em <a href="#contrato">contratos/exemplos/evento-arritmia.json</a>.</p>
 <h3 id="dados-analise-dos-modelos">Análise dos modelos</h3>
 <p>O <code>ia.py</code> devolve M1, M2 e M3 no formato de <a href="#analise-fa">contratos/exemplos/analise-fa.json</a>. Os números desse arquivo são ilustrativos, até o treino do sábado. Em <code>m3.metricas</code>, cada sinal traz o z robusto e a faixa (<code>padrao</code>, <code>atencao</code>, <code>critico</code>). Em <code>m3.isolation_forest</code>, <code>score</code> é o <code>-score_samples</code> depois do <code>RobustScaler</code> daquela pessoa: quanto maior, mais a combinação se afasta do padrão dela. <code>evidencias</code> lista os sinais cuja troca pela mediana mais reduz esse escore. Quem decide se isso vira sugestão é o motor, pela <a href="#adr-0012">ADR-012</a>.</p>
+<p>O calendário do ciclo sai no formato de <a href="#analise-ciclo">contratos/exemplos/analise-ciclo.json</a>. Os números também são ilustrativos. <code>ficha.calendario</code> diz se a Cosmo pode falar de ciclo. <code>ciclo.na_janela</code> e <code>ciclo.aviso_dias</code> vêm dessa ficha. <code>ciclo.perguntar</code> só fica verdadeiro quando a janela coincide com sinais leves e o M2 diz que o sinal é bom. <code>ciclo.compartilhado</code> começa falso: médico e Houston só entram depois do consentimento. A família não está nesse contrato.</p>
+<p>Quem não tem calendário sai no formato de <a href="#analise-kenji">contratos/exemplos/analise-kenji.json</a>. <code>ciclo</code> fica nulo e a sugestão usa a linha de base pessoal. A regra dos dois caminhos está na <a href="#adr-0013">ADR-013</a>.</p>
 <h3 id="dados-interfaces-do-prototipo">Interfaces do protótipo</h3>
 <div class="tbl"><table>
 <thead>
@@ -1132,6 +1230,70 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
     }
   }
 }
+</code></pre></div><h3 id="analise-ciclo">Exemplo de análise do calendário do ciclo</h3><div class="codigo"><button class="copiar" type="button" data-alvo="json-ciclo">Copiar</button><pre id="json-ciclo"><code>{
+  &quot;tripulante_id&quot;: &quot;sarah&quot;,
+  &quot;ficha&quot;: {
+    &quot;sexo&quot;: &quot;feminino&quot;,
+    &quot;calendario&quot;: true,
+    &quot;metodo&quot;: &quot;pilula_combinada_continua&quot;,
+    &quot;ultima_menstruacao&quot;: &quot;2026-06-02&quot;,
+    &quot;duracao_tipica_dias&quot;: 28,
+    &quot;trecho_intenso&quot;: &quot;segunda_quinzena&quot;,
+    &quot;versao_ficha&quot;: &quot;pre-voo-0.1&quot;
+  },
+  &quot;m2&quot;: {
+    &quot;qualidade&quot;: &quot;bom&quot;,
+    &quot;confianca&quot;: 0.94,
+    &quot;versao_modelo&quot;: &quot;qualidade-0.2&quot;
+  },
+  &quot;m3&quot;: {
+    &quot;estado&quot;: &quot;otimo&quot;,
+    &quot;versao_z&quot;: &quot;m3-z-0.1&quot;,
+    &quot;metricas&quot;: {
+      &quot;fc&quot;: {&quot;z&quot;: 0.6, &quot;faixa&quot;: &quot;padrao&quot;},
+      &quot;temperatura&quot;: {&quot;z&quot;: 0.4, &quot;faixa&quot;: &quot;padrao&quot;},
+      &quot;hrv&quot;: {&quot;z&quot;: -0.7, &quot;faixa&quot;: &quot;padrao&quot;},
+      &quot;sono&quot;: {&quot;z&quot;: -0.9, &quot;faixa&quot;: &quot;padrao&quot;}
+    }
+  },
+  &quot;ciclo&quot;: {
+    &quot;na_janela&quot;: true,
+    &quot;aviso_dias&quot;: 2,
+    &quot;sinais_leves&quot;: [&quot;fc&quot;, &quot;temperatura&quot;, &quot;sono&quot;],
+    &quot;perguntar&quot;: true,
+    &quot;sugestoes&quot;: [&quot;respirar&quot;, &quot;treino_leve&quot;],
+    &quot;compartilhado&quot;: false,
+    &quot;versao&quot;: &quot;ciclo-calendario-0.1&quot;
+  }
+}
+</code></pre></div><h3 id="analise-kenji">Exemplo sem calendário de ciclo</h3><div class="codigo"><button class="copiar" type="button" data-alvo="json-kenji">Copiar</button><pre id="json-kenji"><code>{
+  &quot;tripulante_id&quot;: &quot;kenji&quot;,
+  &quot;ficha&quot;: {
+    &quot;sexo&quot;: &quot;masculino&quot;,
+    &quot;calendario&quot;: false,
+    &quot;versao_ficha&quot;: &quot;pre-voo-0.1&quot;
+  },
+  &quot;m2&quot;: {
+    &quot;qualidade&quot;: &quot;bom&quot;,
+    &quot;confianca&quot;: 0.91,
+    &quot;versao_modelo&quot;: &quot;qualidade-0.2&quot;
+  },
+  &quot;m3&quot;: {
+    &quot;estado&quot;: &quot;otimo&quot;,
+    &quot;versao_z&quot;: &quot;m3-z-0.1&quot;,
+    &quot;metricas&quot;: {
+      &quot;fc&quot;: {&quot;z&quot;: 0.2, &quot;faixa&quot;: &quot;padrao&quot;},
+      &quot;sono&quot;: {&quot;z&quot;: 0.1, &quot;faixa&quot;: &quot;padrao&quot;},
+      &quot;hrv&quot;: {&quot;z&quot;: 0.4, &quot;faixa&quot;: &quot;padrao&quot;}
+    }
+  },
+  &quot;ciclo&quot;: null,
+  &quot;sugestao&quot;: {
+    &quot;nivel&quot;: 2,
+    &quot;texto&quot;: &quot;Manter o treino resistivo. A ficha não tem calendário de ciclo.&quot;,
+    &quot;versao&quot;: &quot;linha-de-base-0.1&quot;
+  }
+}
 </code></pre></div></section>
 <section id="stack" class="secao"><p class="sec-n">08</p><h2>Stack híbrida</h2><p>Os diagramas descrevem o sistema como ele seria numa nave real. O protótipo do hackathon implementa as mesmas fronteiras com a stack que o time já domina. Regra para as duas colunas: o LLM conversa, explica e resume, mas quem decide o estado de um evento é o motor de decisões determinístico.</p>
 <div class="tbl"><table>
@@ -1198,11 +1360,143 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 <li><strong>Isolation Forest (<code>m3-if-0.1</code>):</strong> um modelo por tripulante, treinado só nos minutos normais de <code>dados/vitais.csv</code>. O pipeline leva um <code>RobustScaler</code> daquela pessoa e depois a floresta. O limiar cabe em no máximo 1 alarme por pessoa por dia simulado. A explicação troca cada sinal pela mediana e fica com os que mais reduzem o escore.</li>
 </ul>
 <p>As duas peças saem juntas em <code>analisar(leitura)</code>. O escore não substitui a faixa de cada sinal. A regra de quando o motor abre sugestão de nível 1 está na <a href="#adr-0012">ADR-012</a>. O exemplo de resposta, no quadro de fibrilação atrial da Sarah, está em <a href="#analise-fa">contratos/exemplos/analise-fa.json</a>.</p>
+<p>O calendário do ciclo também sai de <code>analisar(leitura)</code>, ao lado do M3, só quando <code>ficha.calendario</code> é verdadeiro. Sem calendário, <code>ciclo</code> fica nulo e a sugestão usa a linha de base pessoal, como em <a href="#analise-kenji">contratos/exemplos/analise-kenji.json</a>. A previsão, quando existe, conta os dias da ficha de solo e, se a pessoa não está em supressão, ajusta a janela quando a frequência e a temperatura da pele sobem no padrão dela. Não é um classificador de fase. O exemplo com calendário está em <a href="#analise-ciclo">contratos/exemplos/analise-ciclo.json</a>, e a regra na <a href="#adr-0013">ADR-013</a>.</p>
+<h3 id="stack-pipeline-de-dados-e-algoritmos">Pipeline de dados e algoritmos</h3>
+<p>O treino fica em lote e grava artefatos. Cada leitura do simulador, uma por segundo, só passa por <code>ia.analisar(leitura)</code>. O motor, o hash e a fila não aprendem. O M2 ainda não tem o estimador escolhido: o plano fixa o dado, o rótulo e o recall.</p>
+<figure class="diagrama"><pre class="mermaid">flowchart TB
+  subgraph lote[Treino em lote]
+    cinc[&quot;CinC 2017&lt;br/&gt;8.528 ECGs&quot;]
+    rr[&quot;Atributos de RR&lt;br/&gt;split 70/15/15&quot;]
+    m1[&quot;Random Forest&lt;br/&gt;modelos/m1.joblib&quot;]
+    ruido[&quot;CinC 2017&lt;br/&gt;+ ruído sintético&quot;]
+    m2[&quot;Detector de qualidade&lt;br/&gt;qualidade-0.2&quot;]
+    vitais[&quot;vitais.csv&lt;br/&gt;só minutos normais&quot;]
+    mad[&quot;Mediana e MAD&lt;br/&gt;m3-z-0.1&quot;]
+    scaler[&quot;RobustScaler&lt;br/&gt;por tripulante&quot;]
+    ifo[&quot;Isolation Forest&lt;br/&gt;m3-if-0.1.joblib&quot;]
+    ficha[&quot;Ficha de solo&quot;]
+  end
+
+  subgraph serve[ia.analisar por leitura]
+    leitura[&quot;Simulador&lt;br/&gt;1 leitura por segundo&quot;]
+    qm{&quot;M2&quot;}
+    pred[&quot;predict_proba&lt;br/&gt;classe e atributos de RR&quot;]
+    faixa[&quot;z robusto&lt;br/&gt;faixa do sinal&quot;]
+    score[&quot;−score_samples&lt;br/&gt;contra o limiar&quot;]
+    troca[&quot;Troca de cada sinal&lt;br/&gt;pela mediana&quot;]
+    dias[&quot;Contagem de dias da ficha&quot;]
+  end
+
+  subgraph pos[Depois da análise]
+    motor[&quot;Máquina de estados&quot;]
+    sql[&quot;SQLite&lt;br/&gt;só inclusão&quot;]
+    cadeia[&quot;Hash do registro anterior&quot;]
+    fila[&quot;Fila P1 a P4&lt;br/&gt;chega_em&quot;]
+    rag[&quot;ChromaDB + Ollama&lt;br/&gt;só leitura&quot;]
+    frase[&quot;Dicionário&lt;br/&gt;estado para frase&quot;]
+  end
+
+  cinc --&gt; rr --&gt; m1
+  ruido --&gt; m2
+  vitais --&gt; mad
+  vitais --&gt; scaler --&gt; ifo
+  m1 --&gt; pred
+  m2 --&gt; qm
+  mad --&gt; faixa
+  ifo --&gt; score
+  ficha --&gt; dias
+  leitura --&gt; qm
+  qm --&gt;|suspeito| parado[&quot;M1 não dispara&quot;]
+  qm --&gt;|bom| pred
+  leitura --&gt; faixa
+  leitura --&gt; score --&gt; troca
+  leitura --&gt; dias
+  pred --&gt; motor
+  faixa --&gt; motor
+  troca --&gt; motor
+  dias --&gt; motor
+  motor --&gt; sql --&gt; cadeia
+  motor --&gt; fila
+  motor --&gt;|estado, só leitura| rag
+  fila --&gt; frase
+</pre></figure>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Peça</th>
+<th>Algoritmo</th>
+<th>Entrada</th>
+<th>Saída</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M1 <code>arritmia-borda-0.3</code></td>
+<td>Random Forest sobre atributos de RR. Guarda a probabilidade e os 3 atributos que mais pesaram</td>
+<td>CinC 2017, split 70/15/15. Meta: F1 da classe FA ≥ 0,75</td>
+<td><code>classe</code>, <code>confianca</code>, atributos de RR em <code>modelos/m1.joblib</code></td>
+</tr>
+<tr>
+<td>M2 <code>qualidade-0.2</code></td>
+<td>Detector de qualidade. O estimador ainda não está escolhido</td>
+<td>CinC 2017 com ruído sintético. Meta: recall de <code>suspeito</code> ≥ 0,9</td>
+<td><code>bom</code> ou <code>suspeito</code>. Com sinal suspeito, o M1 não dispara</td>
+</tr>
+<tr>
+<td>M3 z <code>m3-z-0.1</code></td>
+<td>Mediana e MAD de cada tripulante, por sinal</td>
+<td>Minutos dos vitais sintéticos</td>
+<td>Faixa <code>padrao</code>, <code>atencao</code> ou <code>critico</code>. A soma vira o estado de três níveis</td>
+</tr>
+<tr>
+<td>M3 floresta <code>m3-if-0.1</code></td>
+<td><code>RobustScaler</code> da pessoa e, em seguida, Isolation Forest. Um modelo por tripulante</td>
+<td>Só os minutos normais de <code>dados/vitais.csv</code>. Cenários de FA e de relógio folgado ficam fora</td>
+<td><code>−score_samples</code>. O limiar, na validação, cabe em no máximo 1 alarme por pessoa por dia simulado</td>
+</tr>
+<tr>
+<td>Evidência da floresta</td>
+<td>Troca cada sinal pela mediana da pessoa e mede a queda do escore</td>
+<td>Vetor já escalado daquela leitura</td>
+<td><code>evidencias</code>: os sinais que mais reduzem o escore</td>
+</tr>
+<tr>
+<td>Ciclo <code>ciclo-calendario-0.1</code></td>
+<td>Contagem de dias da ficha. Sem supressão, a janela se ajusta quando FC e temperatura da pele sobem no padrão dela</td>
+<td>Ficha de solo. Não é classificador de fase</td>
+<td><code>na_janela</code>, <code>aviso_dias</code>. Sem calendário, <code>ciclo</code> fica nulo</td>
+</tr>
+<tr>
+<td>Motor</td>
+<td>Máquina de estados determinística, biblioteca <code>transitions</code> ou dicionário próprio</td>
+<td>JSON do <code>ia.analisar</code> e as regras da <a href="#adr-0012">ADR-012</a> e da <a href="#adr-0013">ADR-013</a></td>
+<td>Estado do evento. A Cosmo não escreve nesse estado</td>
+</tr>
+<tr>
+<td>Cosmo</td>
+<td>Busca no ChromaDB e geração no Ollama, pela LangChain ou CrewAI</td>
+<td>Protocolos indexados e o estado, só para leitura</td>
+<td>Texto com a fonte citada. Nenhuma rota que muda estado</td>
+</tr>
+<tr>
+<td>Auditoria</td>
+<td>Hash do registro anterior, só inclusão</td>
+<td>Transição, sugestão, decisão e escalonamento</td>
+<td>Trilha no SQLite, copiada para a Terra em P2</td>
+</tr>
+<tr>
+<td>Link</td>
+<td>Fila por prioridade. <code>chega_em = agora + atraso</code> do perfil de missão</td>
+<td><code>evento.atualizado</code></td>
+<td>P1 a P4. O feed da família sai de um dicionário de estado para frase</td>
+</tr>
+</tbody>
+</table></div>
 <h3 id="stack-estrutura-sugerida-do-codigo-do-prototipo">Estrutura sugerida do código do protótipo</h3>
 <pre><code class="language-text">astrohealth/
 ├── nave/
 │   ├── ingestao/          # leituras + qualidade de sinal
-│   ├── detectores/        # arritmia, artefato, linha de base (z e Isolation Forest), prontidão, humor
+│   ├── detectores/        # arritmia, artefato, linha de base (z e Isolation Forest), calendário do ciclo, prontidão, humor
 │   ├── motor/             # máquina de estados + regras + prazos
 │   ├── cosmo/             # LangChain/CrewAI + ChromaDB + Ollama
 │   ├── auditoria/         # log com hash encadeado (SQLite)
@@ -1244,7 +1538,7 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 <tr>
 <td>Vazamento de informação</td>
 <td>A família ou terceiros veem dados clínicos</td>
-<td>Filtro de privacidade no servidor da Terra, cifragem e consentimento para saúde mental</td>
+<td>Filtro de privacidade no servidor da Terra, cifragem e consentimento para saúde mental e para o ciclo</td>
 </tr>
 <tr>
 <td>Negação de serviço</td>
@@ -1270,7 +1564,7 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 </table></div>
 <h3 id="seguranca-regras-de-privacidade">Regras de privacidade</h3>
 <ul>
-<li><strong>Consentimento granular e revogável:</strong> por tipo de dado (sinais vitais, saúde mental, localização) e por destinatário (oficial médico, Houston, família).</li>
+<li><strong>Consentimento granular e revogável:</strong> por tipo de dado (sinais vitais, saúde mental, ciclo, localização) e por destinatário (oficial médico, Houston, família).</li>
 <li><strong>Exceção única:</strong> risco de vida vai ao médico sem consentimento, e isso fica registrado na auditoria.</li>
 <li><strong>Minimização:</strong> a família recebe frases prontas, nunca números; Houston recebe o necessário para o parecer.</li>
 <li><strong>Dado de saúde é dado sensível:</strong> tratar com o rigor da LGPD (art. 11) no Brasil, usando a HIPAA como referência de mercado nos EUA.</li>
@@ -1313,6 +1607,14 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 <td>Não</td>
 </tr>
 <tr>
+<td>Calendário e sintomas do ciclo</td>
+<td>Sim</td>
+<td>Só com consentimento</td>
+<td>Não</td>
+<td>Só com consentimento</td>
+<td>Não</td>
+</tr>
+<tr>
 <td>Dose de radiação</td>
 <td>Sim</td>
 <td>Sim</td>
@@ -1339,19 +1641,7 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 </tbody>
 </table></div></section>
 <section id="roadmap" class="secao"><p class="sec-n">10</p><h2>Roadmap e riscos</h2><p>O MVP precisa dos 16 requisitos essenciais funcionando até o fechamento das submissões, em 15/11 às 23:59. A versão acadêmica, para a pós, fica para a semana seguinte.</p>
-<figure class="diagrama"><pre class="mermaid">gantt
-  title AstroHealth OS - roadmap
-  dateFormat YYYY-MM-DD
-  includes 2026-11-14, 2026-11-15
-  section Preparação
-  Revisar arquitetura e amarrar o enunciado :a1, 2026-11-11, 3d
-  Esqueleto do protótipo :a2, 2026-11-12, 2d
-  section Hackathon
-  Motor e simulador DTN e Cosmo nave :crit, b1, 2026-11-14, 2d
-  Vídeo e submissão até 23h59 :milestone, b2, 2026-11-15, 0d
-  section Pós-hackathon
-  ADRs completos e avaliação ATAM e testes Robot :c1, 2026-11-16, 3d
-</pre></figure>
+<p><img alt="diagrama roadmap" src="../diagramas/svg/roadmap.svg" /></p>
 <p>O que a demo atual já mostra não precisa ser reimplementado no hackathon. O código novo são o motor de decisões, o simulador DTN e a Cosmo nave com RAG.</p>
 <h3 id="roadmap-riscos">Riscos</h3>
 <div class="tbl"><table>
@@ -1694,6 +1984,37 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 <ul>
 <li>Mais um artefato para treinar e um limiar para calibrar.</li>
 <li>O escore não é probabilidade clínica.</li>
+</ul></div></details>
+<details class="adr" id="adr-0013"><summary><span class="adr-n">ADR-013</span><span class="adr-t">Calendário do ciclo no relógio, com cuidado leve</span></summary><div class="adr-b"><ul>
+<li><strong>Status:</strong> aceita</li>
+<li><strong>Data:</strong> 2026-11-12</li>
+<li><strong>Relacionadas:</strong> <a href="#adr-0007">ADR-007</a>, <a href="#adr-0012">ADR-012</a></li>
+</ul>
+<h4>Contexto</h4>
+<p>Homens e mulheres voam. Cada pessoa embarca com a própria ficha de solo, e a Cosmo lê essa ficha antes de falar. Quando a ficha tem calendário menstrual, ela traz o método hormonal, a última menstruação, a duração típica e o trecho em que os sintomas costumavam ser mais intensos. Esse calendário foi fechado em solo, meses antes do lançamento. No pulso, uma variação leve de frequência, temperatura, sono ou HRV nesse trecho pode parecer anomalia. A família não participa dessa leitura.</p>
+<h4>Decisão</h4>
+<p>A direção da resposta sai da ficha, não de um gênero genérico. Se a ficha tem calendário, a Cosmo prevê o trecho intenso e avisa só aquela pessoa, cerca de dois dias antes. Se a ficha não tem calendário, a pergunta de cólica não abre, e a Cosmo segue a linha de base pessoal: sono, hidratação, treino e osso. Na tripulação da demo, Sarah e Elena têm calendário; Marcus e Kenji não têm. O calendário da Elena fica no relógio dela até ela autorizar. O relógio avisa os sintomas do trecho intenso: cólica, inchaço ou humor mais baixo. O método não fica repetido na tela. A Cosmo só cita supressão (pílula, DIU ou implante) ou ausência de método quando precisa explicar uma resposta. Na supressão, essa explicação não trata o trecho como ovulação. Sem método, a janela segue a última menstruação e a duração típica. A tela não fala em ovulação nem em janela fértil.</p>
+<p>A pergunta de cólica, inchaço ou humor só aparece quando as três condições valem juntas: o calendário diz que ela está no trecho intenso, os sinais leves acompanham (frequência e temperatura da pele um pouco acima da mediana dela, sono mais curto ou HRV mais baixo) e o M2 classifica o sinal como bom. O estado de três níveis não muda por causa desse trecho.</p>
+<p>O cuidado é nível 2, e ela aceita ou recusa: respirar um minuto, treino mais leve, modo noite mais cedo, água só se a hidratação do dia estiver baixa. Analgésico do kit continua com o oficial médico, em passo separado, e só se ela pedir. A Cosmo não troca método e não recomenda suprimir.</p>
+<p>O oficial médico e Houston só veem o calendário e o sintoma com consentimento dela. A comandante, quando for outra pessoa, não vê. A família não recebe fase, calendário, método nem sintoma. Fora da janela, sinal crítico ou fibrilação atrial seguem o fluxo da <a href="0012-linha-de-base-com-isolation-forest.md"><a href="#adr-0012">ADR-012</a></a>.</p>
+<p>O método na ficha é nenhum, pílula combinada contínua, DIU de levonorgestrel ou implante. A injeção trimestral de progestina fica de fora: a perda óssea do voo é tratada como irreversível, e essa injeção reduz a massa óssea.</p>
+<h4>Alternativas consideradas</h4>
+<ul>
+<li><strong>Detectar a fase pelo relógio:</strong> Não há estudo que valide essa detecção em microgravidade. A ficha de solo já traz o calendário.</li>
+<li><strong>Tratar a supressão como ciclo ovulatório:</strong> A pílula contínua não mantém fase ovulatória. A Cosmo só diz isso quando a resposta precisa desse contexto.</li>
+<li><strong>Avisar a família:</strong> O dado é de quem tem o calendário. O feed da família continua em frases de status, sem ciclo.</li>
+<li><strong>Uma resposta só, igual para toda a tripulação:</strong> Homens e mulheres voam, e a ficha de cada um muda o que a Cosmo pode perguntar.</li>
+</ul>
+<h4>Consequências</h4>
+<p><strong>Positivas</strong></p>
+<ul>
+<li>O alarme mensal falso não abre, e o cuidado leve chega antes do trecho intenso.</li>
+<li>A privacidade segue o mesmo desenho da saúde mental.</li>
+</ul>
+<p><strong>Negativas</strong></p>
+<ul>
+<li>A previsão enfraquece quando a última data confirmada fica velha ou o ritmo de sono quebra. Ela pode corrigir o dia no relógio.</li>
+<li>O efeito da pílula contínua sobre o osso em microgravidade segue em aberto. A Cosmo cita essa lacuna só quando explica a resposta, não no cartão que o médico vê o tempo todo.</li>
 </ul></div></details></section>
   </main>
 </div>

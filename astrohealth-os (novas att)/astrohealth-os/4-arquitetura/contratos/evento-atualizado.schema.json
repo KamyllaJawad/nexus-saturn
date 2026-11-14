@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://astrohealth.example/contratos/evento-atualizado.schema.json",
+  "title": "evento.atualizado",
+  "description": "Mensagem publicada pelo motor de decisões a cada mudança de estado de um evento. Vai para o tablet pela rede local e para a Terra num pacote DTN.",
+  "type": "object",
+  "required": [
+    "tipo_msg",
+    "versao_contrato",
+    "evento",
+    "pacote"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "tipo_msg": {
+      "const": "evento.atualizado"
+    },
+    "versao_contrato": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+$"
+    },
+    "evento": {
+      "type": "object",
+      "required": [
+        "id",
+        "tipo",
+        "tripulante_id",
+        "estado",
+        "nivel_autonomia",
+        "responsavel_papel",
+        "gerado_em"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "tipo": {
+          "enum": [
+            "arritmia",
+            "hipoxia",
+            "sensor_suspeito",
+            "tempestade_solar",
+            "prontidao_eva",
+            "dor_de_cabeca",
+            "bem_estar",
+            "modo_noite"
+          ]
+        },
+        "tripulante_id": {
+          "type": "string"
+        },
+        "estado": {
+          "enum": [
+            "detectado",
+            "confirmacao_astronauta",
+            "proposto",
+            "aguardando_humano",
+            "escalonado",
+            "decidido",
+            "em_execucao",
+            "resolvido",
+            "encerrado",
+            "agendado",
+            "aplicado"
+          ]
+        },
+        "nivel_autonomia": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "responsavel_papel": {
+          "enum": [
+            "astronauta",
+            "oficial_medico",
+            "comandante"
+          ]
+        },
+        "prazo_em": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "gerado_em": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "recebido_em": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Preenchido só na Terra."
+        }
+      }
+    },
+    "sugestao": {
+      "type": "object",
+      "required": [
+        "texto",
+        "confianca",
+        "versao_modelo"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "texto": {
+          "type": "string"
+        },
+        "confianca": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "alternativa": {
+          "type": "string"
+        },
+        "evidencias": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "versao_modelo": {
+          "type": "string"
+        }
+      }
+    },
+    "decisao": {
+      "type": "object",
+      "required": [
+        "humano_id",
+        "acao",
+        "assinatura",
+        "decidida_em"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "humano_id": {
+          "type": "string"
+        },
+        "acao": {
+          "enum": [
+            "confirmar",
+            "recusar",
+            "assumir",
+            "vetar",
+            "desfazer",
+            "liberar_medicacao",
+            "compartilhar",
+            "manter_privado"
+          ]
+        },
+        "dose": {
+          "type": "string"
+        },
+        "assinatura": {
+          "type": "string"
+        },
+        "decidida_em": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "pacote": {
+      "type": "object",
+      "required": [
+        "prioridade",
+        "destinos"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "prioridade": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "destinos": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "oficial_medico",
+              "comandante",
+              "astronauta",
+              "houston",
+              "familia"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

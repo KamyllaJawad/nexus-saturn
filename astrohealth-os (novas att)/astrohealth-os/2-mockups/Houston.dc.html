@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Houston · rotina</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="demo.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#04060c}
+a{color:#00e5ff}a:hover{color:#7df3ff}
+</style>
+</helmet>
+<div style="width: 1360px; height: 732px; box-sizing: border-box; padding: 40px; background: #04060c; display: flex; align-items: flex-start; justify-content: center; font-family: Inter, system-ui, sans-serif; color: #eef2f8;">
+<div class="dev" data-dev="desktop">
+<div class="mon frame ds"><div class="mon-chrome"><i></i><i></i><i></i><span>AstroHealth · Console do Flight Surgeon · Mission Control, Houston</span></div><div data-render="desktop"><div class="ds-head">
+    <div><div class="eyebrow">Mission Control · Flight Surgeon</div><h3>ISS · órbita baixa</h3><div class="sub">Estação Espacial Internacional · a 408 km de altitude</div></div>
+    <div class="ds-link"><span>Link ativo</span><b>Satélites TDRS</b><span>Atraso nave → Terra: &lt; 1 s</span></div>
+    <div class="ds-clock"><small>Hora da nave</small><span data-clock="hms">09:41:06</span></div>
+  </div><div class="ds-banner live"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18v-2M10 18v-5M15 18v-8M20 18V7"></path></svg>Dados em tempo real via Satélites TDRS.</div>
+  <div class="ds-grid">
+    <div class="ds-col">
+      <div class="ds-h">Tripulação</div>
+      <div class="crew" style="border:0;padding:0" role="group" aria-label="Tripulação"><button class="crew-i sel" data-arg="sarah" aria-pressed="true"><i class="l0"></i><span>Sarah</span><small>Comandante · Água 60%</small></button><button class="crew-i " data-arg="marcus" aria-pressed="false"><i class="l0"></i><span>Dr. Marcus</span><small>Oficial médico</small></button><button class="crew-i " data-arg="elena" aria-pressed="false"><i class="l1"></i><span>Elena</span><small>Engenheira de voo · Água 52%</small></button><button class="crew-i " data-arg="kenji" aria-pressed="false"><i class="l0"></i><span>Kenji</span><small>Especialista de missão</small></button></div>
+      <div class="auto"><b>Modo de autonomia</b>Houston acompanha em tempo real e pode decidir junto com a tripulação.</div>
+    </div>
+    <div class="ds-col main">
+      <div class="pt-head"><b style="font:600 16px var(--fd)">Sarah · Comandante</b><span class="state-pill l0">Ótimo · homeostase 94%</span><span class="chip"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>dado de 09:41:03</span></div>
+      <div class="ecg-wrap"><svg class="ecg" viewBox="0 0 800 80" preserveAspectRatio="none" style="height:104px;padding:6px 0;box-sizing:border-box" role="img" aria-label="Traçado de ECG"><path d="M0 45h40l6-5 5 5h12l5-30 6 52 5-22h30l5-6 5 6h8l5-30 6 52 5-22h48l6-5 5 5h20l5-30 6 52 5-22h40l6-5 5 5h30l5-30 6 52 5-22h40l6-5 5 5h22l5-30 6 52 5-22h50l6-5 5 5h20l5-30 6 52 5-22h40" fill="none" stroke="#34d399" stroke-width="1.6" stroke-linejoin="round"></path></svg></div>
+      <div><div class="ds-h">Frequência cardíaca · últimos 60 s recebidos</div><svg class="spark" viewBox="0 0 600 64" preserveAspectRatio="none" aria-hidden="true"><line class="gl" x1="0" x2="600" y1="16" y2="16"></line><line class="gl" x1="0" x2="600" y1="48" y2="48"></line><path class="area" data-spark="area" d="M545.8 48.3 L551.0 48.5 L555.6 48.8 L556.0 48.5 L561.0 48.5 L562.9 48.1 L566.0 48.0 L570.2 48.3 L571.0 48.0 L576.0 47.7 L577.3 47.5 L581.0 47.9 L584.5 47.8 L586.0 48.1 L591.0 48.0 L591.8 47.7 L596.0 47.5 L596.0 64 L545.8 64 Z"></path><path class="ln" data-spark="line" d="M545.8 48.3 L551.0 48.5 L555.6 48.8 L556.0 48.5 L561.0 48.5 L562.9 48.1 L566.0 48.0 L570.2 48.3 L571.0 48.0 L576.0 47.7 L577.3 47.5 L581.0 47.9 L584.5 47.8 L586.0 48.1 L591.0 48.0 L591.8 47.7 L596.0 47.5"></path></svg></div>
+      <div class="ds-tiles"><div class="tile b0"><div class="l"><svg class="ic c-crit" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg>Frequência cardíaca</div><div class="v"><span data-v="hr" data-who="sarah" data-s="e">74</span><small>bpm</small></div><div class="src">Relógio · PPG + ECG</div></div><div class="tile b0"><div class="l"><svg class="ic c-acc" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="12" r="5"></circle><path d="M16 15.5c0-1 2.5-1.6 2.5-3a1.3 1.3 0 0 0-2.5-.3M16 19h3"></path></svg>Saturação de O₂</div><div class="v"><span data-v="spo2" data-who="sarah" data-s="e">98</span><small>%</small></div><div class="src">Relógio · oxímetro</div></div><div class="tile b0"><div class="l"><svg class="ic c-acc" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17a8 8 0 1 1 16 0M12 17l4-5"></path></svg>Pressão arterial</div><div class="v"><span data-v="bp" data-who="sarah" data-s="e">118/75</span><small>mmHg</small></div><div class="src">Manguito do kit médico</div></div><div class="tile b0"><div class="l"><svg class="ic c-acc" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h11a3 3 0 1 0-3-3M3 15h14a3 3 0 1 1-3 3"></path></svg>Respiração</div><div class="v"><span data-v="rr" data-who="sarah" data-s="e">14</span><small>irpm</small></div><div class="src">Patch torácico</div></div><div class="tile b0"><div class="l"><svg class="ic c-acc" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2-5 4 10 2-5h6"></path></svg>Variabilidade cardíaca</div><div class="v"><span data-v="hrv" data-who="sarah" data-s="e">64</span><small>ms</small></div><div class="src">Relógio · PPG</div></div><div class="tile b1"><div class="l"><svg class="ic c-warn" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5a3.5 3.5 0 0 0-6.4 2A3 3 0 0 0 5 12.5 3 3 0 0 0 8 18h4zM12 5a3.5 3.5 0 0 1 6.4 2 3 3 0 0 1 .6 5.5A3 3 0 0 1 16 18h-4zM12 5v13"></path></svg>Estresse</div><div class="v"><span data-v="stress" data-who="sarah" data-s="e">41</span><small>/100</small></div><div class="src">Cosmo · HRV + sono</div></div><div class="tile b1"><div class="l"><svg class="ic c-water" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"></path></svg>Hidratação</div><div class="v"><span data-v="water" data-who="sarah" data-s="e">1.450</span><small>ml</small></div><div class="src">Registro + estimativa</div></div><div class="tile b0"><div class="l"><svg class="ic c-sleep" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg>Sono</div><div class="v"><span data-v="sleep" data-who="sarah" data-s="e">7h40</span><small></small></div><div class="src">Relógio · actigrafia</div></div><div class="tile b0"><div class="l"><svg class="ic c-acc" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14V5a2 2 0 0 1 4 0v9a4 4 0 1 1-4 0z"></path></svg>Temperatura</div><div class="v"><span data-v="temp" data-who="sarah" data-s="e">36,8</span><small>°C</small></div><div class="src">Relógio · pele</div></div><div class="tile b0"><div class="l"><svg class="ic c-ok" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3L5 14h6l-1 7 8-11h-6z"></path></svg>Atividade</div><div class="v"><span data-v="act" data-who="sarah" data-s="e">45 min</span><small></small></div><div class="src">Relógio · acelerômetro</div></div></div>
+    </div>
+    <div class="ds-col">
+      <div class="ds-h">Recebido da nave</div>
+      <div class="empty">Nada recebido ainda nesta sessão.</div>
+      <div class="ds-h">Copiloto Cosmo</div>
+      <div class="cop"><div class="cop-chips"><button data-arg="resumo" aria-pressed="false">O que aconteceu desde o último contato?</button><button data-arg="decisao" aria-pressed="false">Explique a decisão tomada a bordo</button><button data-arg="tendencia" aria-pressed="false">Tendência da FC</button></div></div>
+      <div class="ds-h">Enviar para a nave</div>
+      <button class="btn ghost"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l16-8-6 16-3-7z"></path></svg> Enviar recomendação de treino</button>
+      
+    </div>
+  </div></div></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1360,"height":732}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

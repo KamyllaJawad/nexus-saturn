@@ -1,0 +1,207 @@
+<title>Arquitetura AstroHealth OS</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: cabeçalho fixo + índice lateral (vira faixa no celular) + coluna de leitura de ~860px.
+   Diagramas sempre sobre cartão claro, para ficarem legíveis nos dois temas. */
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --surface2:#eef2f7; --ink:#0d1526; --ink2:#4b5a73; --ink3:#73819a;
+  --line:#dde3ec; --accent:#0e7490; --accent-soft:rgba(14,116,144,.1); --ok:#047857; --warn:#b45309; --low:#6b7280;
+  --fd:"Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fb:"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fm:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#070a12; --surface:#0e1424; --surface2:#151d33; --ink:#e8edf6; --ink2:#a3afc4; --ink3:#7a879e;
+  --line:rgba(148,163,184,.18); --accent:#22d3ee; --accent-soft:rgba(34,211,238,.12); --ok:#34d399; --warn:#fbbf24; --low:#9ca3af; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#070a12; --surface:#0e1424; --surface2:#151d33; --ink:#e8edf6; --ink2:#a3afc4; --ink3:#7a879e;
+  --line:rgba(148,163,184,.18); --accent:#22d3ee; --accent-soft:rgba(34,211,238,.12); --ok:#34d399; --warn:#fbbf24; --low:#9ca3af; color-scheme:dark }
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--fb);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+a{color:var(--accent);text-underline-offset:2px}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+h1,h2,h3,h4{font-family:var(--fd);text-wrap:balance;margin:0}
+code{font-family:var(--fm);font-size:.88em;background:var(--surface2);padding:1px 5px;border-radius:4px}
+.topo{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;margin-left:calc(-1*max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1*max(16px,env(safe-area-inset-right,0px)));padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.marca{display:flex;align-items:center;gap:10px;margin-right:auto;font:600 15px var(--fd)}
+.marca svg{width:26px;height:26px;color:var(--accent)}
+.marca small{display:block;font:500 10.5px var(--fm);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 13px var(--fd);text-decoration:none;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.prim{background:var(--accent);border-color:transparent;color:var(--bg)}
+.grade{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:230px minmax(0,1fr);gap:40px;padding-top:28px}
+nav.indice{position:sticky;top:96px;align-self:start;display:flex;flex-direction:column;gap:2px;max-height:calc(100vh - 120px);overflow:auto}
+nav.indice a{display:flex;gap:10px;padding:6px 10px;border-radius:8px;color:var(--ink2);text-decoration:none;font-size:13.5px}
+nav.indice a span{font:500 11.5px var(--fm);color:var(--ink3);padding-top:2px}
+nav.indice a:hover{background:var(--surface2);color:var(--ink)}
+nav.indice a.ativo{background:var(--accent-soft);color:var(--ink);font-weight:600}
+nav.indice a.ativo span{color:var(--accent)}
+main{min-width:0;max-width:860px}
+.abertura{padding-bottom:28px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.abertura h1{font-size:clamp(28px,4vw,40px);letter-spacing:-.02em;line-height:1.1}
+.abertura p.lead{font-size:17px;color:var(--ink2);max-width:62ch;margin:12px 0 0}
+.numeros{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.numeros span{font:500 12.5px var(--fm);padding:5px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--ink2)}
+.numeros b{color:var(--ink);font-weight:600}
+.regra{margin-top:18px;padding:14px 16px;border-radius:12px;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);font-size:14.5px}
+.regra b{font-family:var(--fd)}
+.secao{padding:36px 0 12px;border-bottom:1px solid var(--line)}
+.secao > p, .secao li{max-width:68ch}
+.sec-n{font:500 12px var(--fm);color:var(--accent);margin:0 0 4px;letter-spacing:.08em}
+.secao h2{font-size:26px;letter-spacing:-.01em;margin-bottom:12px}
+.secao h3{font-size:18px;margin:28px 0 10px}
+.secao h4{font-size:15px;margin:20px 0 8px;color:var(--ink)}
+.secao ul,.secao ol{padding-left:22px}
+.tbl{overflow-x:auto;margin:14px 0;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;line-height:1.45}
+th{text-align:left;font:600 12px var(--fd);letter-spacing:.02em;color:var(--ink2);background:var(--surface2);padding:9px 12px;white-space:nowrap}
+td{padding:9px 12px;border-top:1px solid var(--line);vertical-align:top}
+tr[hidden]{display:none}
+figure.diagrama{margin:16px 0;padding:16px;background:#ffffff;border:1px solid var(--line);border-radius:14px;overflow-x:auto}
+figure.diagrama pre{margin:0;background:none;color:#0d1526;font:12px var(--fm);white-space:pre}
+figure.diagrama svg{max-width:100%;height:auto}
+@media (max-width:600px){figure.diagrama svg{max-width:none!important;min-width:560px}}
+.na-demo{font-size:13px;color:var(--ink2);margin:-4px 0 8px}
+.filtros{display:flex;flex-direction:column;gap:8px;margin:16px 0 6px}
+.filtros div{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.filtros .rot{font:500 11px var(--fm);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-right:4px}
+.chip{font:500 12.5px var(--fb);padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.contagem{font:500 12px var(--fm);color:var(--ink3)}
+.pri{display:inline-block;padding:2px 8px;border-radius:999px;font:600 11.5px var(--fd);white-space:nowrap}
+.pri.p0{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}
+.pri.p1{background:color-mix(in srgb,var(--warn) 15%,transparent);color:var(--warn)}
+.pri.p2{background:color-mix(in srgb,var(--low) 15%,transparent);color:var(--low)}
+.codigo{position:relative;margin:12px 0}
+.codigo pre{margin:0;padding:14px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--line);overflow-x:auto;font:12.5px/1.5 var(--fm)}
+.codigo pre code{background:none;padding:0}
+.copiar{position:absolute;top:8px;right:8px;font:600 12px var(--fd);padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);cursor:pointer}
+.secao pre:not(.mermaid){padding:14px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--line);overflow-x:auto;font:12.5px/1.5 var(--fm)}
+.secao pre:not(.mermaid) code{background:none;padding:0}
+.caixa{display:inline-block;width:13px;height:13px;border:1.5px solid var(--ink3);border-radius:3px;vertical-align:-1px}
+.adr-ctl{margin:6px 0 10px}
+details.adr{border:1px solid var(--line);border-radius:12px;background:var(--surface);margin:8px 0}
+details.adr summary{display:flex;gap:12px;align-items:baseline;padding:12px 14px;cursor:pointer;list-style:none}
+details.adr summary::-webkit-details-marker{display:none}
+details.adr summary::after{content:"+";margin-left:auto;font:600 16px var(--fd);color:var(--ink3)}
+details.adr[open] summary::after{content:"–"}
+.adr-n{font:600 12px var(--fm);color:var(--accent);white-space:nowrap}
+.adr-t{font:600 14.5px var(--fd)}
+.adr-b{padding:0 16px 14px;font-size:14px}
+.adr-b h4{font-size:13.5px;margin:14px 0 4px;color:var(--ink2)}
+.adr-b ul{margin:4px 0}
+blockquote{margin:14px 0;padding:10px 14px;border-left:3px solid var(--warn);background:color-mix(in srgb,var(--warn) 8%,transparent);border-radius:0 10px 10px 0}
+blockquote p{margin:0}
+footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
+@media (max-width:900px){
+  .topo{flex-wrap:nowrap;gap:8px;padding-top:10px;padding-bottom:10px}
+  .marca small{display:none}
+  .btn{padding:6px 10px;font-size:12px;white-space:nowrap}
+  .grade{grid-template-columns:minmax(0,1fr);gap:0;padding-top:12px}
+  nav.indice{position:sticky;top:50px;z-index:4;flex-direction:row;overflow-x:auto;max-height:none;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);scrollbar-width:none}
+  nav.indice::-webkit-scrollbar{display:none}
+  nav.indice a{white-space:nowrap;flex:none}
+  html{scroll-padding-top:128px}
+}
+</style>
+
+<header class="topo">
+  <div class="marca"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="62 20" transform="rotate(-60 16 16)"/><path d="M8 17h4l2-5 4 10 2-5h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div>AstroHealth OS<small>Arquitetura · Fase 2</small></div></div>
+  <a class="btn" href="{{DOC}}" target="_blank" rel="noopener">Documento</a>
+  <a class="btn prim" href="{{DEMO}}" target="_blank" rel="noopener">Abrir a demo</a>
+</header>
+
+<div class="grade">
+  <nav class="indice" aria-label="Seções">{{NAV}}</nav>
+  <main>
+    <div class="abertura">
+      <h1>A nave decide sozinha; a Terra recebe com atraso e revisa</h1>
+      <p class="lead">Arquitetura do AstroHealth OS para a NASA Space Apps 2026: monitoramento da tripulação com IA local e um humano responsável por cada decisão clínica.</p>
+      <div class="numeros"><span><b>26</b> requisitos · 16 essenciais</span><span><b>11</b> atributos de qualidade</span><span><b>12</b> diagramas</span><span><b>11</b> ADRs</span><span>submissão <b>15/11 · 23:59</b></span></div>
+      <div class="regra"><b>Regra de ouro.</b> O LLM conversa, explica e resume. Só o motor de decisões determinístico muda o estado de um evento, e toda decisão clínica tem um humano responsável.</div>
+    </div>
+    {{SECOES}}
+  </main>
+</div>
+<footer>Gerada a partir dos arquivos do repositório (ferramentas/gerar_pagina.py). Metas numéricas são de projeto, a validar em teste. Não é um dispositivo médico.</footer>
+
+<script>
+(function(){
+  "use strict";
+  /* Filtros dos requisitos funcionais */
+  var sec = document.getElementById('requisitos');
+  var tabela = sec && sec.querySelector('table');
+  if (tabela) {
+    var linhas = Array.prototype.slice.call(tabela.tBodies[0].rows);
+    var ordem = ['Essencial (MVP)','Importante','Desejável'];
+    linhas.forEach(function(tr){
+      var c = tr.cells[4]; var t = c.textContent.trim(); var i = ordem.indexOf(t);
+      c.innerHTML = '<span class="pri p' + (i < 0 ? 2 : i) + '">' + t + '</span>';
+    });
+    var atores = []; linhas.forEach(function(tr){ var a = tr.cells[2].textContent.trim(); if (atores.indexOf(a) < 0) atores.push(a); });
+    var f = { ator: 'Todos', pri: 'Todas' };
+    var box = document.createElement('div'); box.className = 'filtros';
+    function grupo(rot, chave, valores){
+      var d = document.createElement('div'); d.setAttribute('role','group'); d.setAttribute('aria-label', rot);
+      d.innerHTML = '<span class="rot">' + rot + '</span>';
+      valores.forEach(function(v){
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = v;
+        b.setAttribute('aria-pressed', String(v === f[chave]));
+        b.addEventListener('click', function(){ f[chave] = v; d.querySelectorAll('.chip').forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); }); aplicar(); });
+        d.appendChild(b);
+      });
+      return d;
+    }
+    box.appendChild(grupo('Ator','ator',['Todos'].concat(atores)));
+    box.appendChild(grupo('Prioridade','pri',['Todas'].concat(ordem)));
+    var cont = document.createElement('div'); cont.className = 'contagem'; box.appendChild(cont);
+    tabela.closest('.tbl').before(box);
+    function aplicar(){
+      var n = 0;
+      linhas.forEach(function(tr){
+        var ok = (f.ator === 'Todos' || tr.cells[2].textContent.trim() === f.ator) && (f.pri === 'Todas' || tr.cells[4].textContent.trim() === f.pri);
+        tr.hidden = !ok; if (ok) n++;
+      });
+      cont.textContent = n + ' de ' + linhas.length + ' requisitos';
+    }
+    aplicar();
+  }
+
+  /* Copiar o JSON do contrato */
+  document.querySelectorAll('.copiar').forEach(function(b){
+    b.addEventListener('click', function(){
+      var alvo = document.getElementById(b.dataset.alvo); var txt = alvo.textContent;
+      function ok(){ b.textContent = 'Copiado'; setTimeout(function(){ b.textContent = 'Copiar'; }, 1600); }
+      try { navigator.clipboard.writeText(txt).then(ok, function(){ selecionar(alvo); }); } catch (e) { selecionar(alvo); }
+    });
+  });
+  function selecionar(el){ var r = document.createRange(); r.selectNodeContents(el); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+
+  /* ADRs: abrir todas e abrir pelo link */
+  var botaoAdrs = document.getElementById('abrir-adrs');
+  if (botaoAdrs) botaoAdrs.addEventListener('click', function(){
+    var todos = document.querySelectorAll('details.adr'); var abrir = botaoAdrs.textContent === 'Abrir todas';
+    todos.forEach(function(d){ d.open = abrir; }); botaoAdrs.textContent = abrir ? 'Fechar todas' : 'Abrir todas';
+  });
+  function abrirPeloHash(){ var h = location.hash.slice(1); if (h.indexOf('adr-') === 0) { var d = document.getElementById(h); if (d) d.open = true; } }
+  window.addEventListener('hashchange', abrirPeloHash); abrirPeloHash();
+
+  /* Índice: destaca a seção visível */
+  var links = {}; document.querySelectorAll('nav.indice a').forEach(function(a){ links[a.dataset.nav] = a; });
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) {
+        Object.keys(links).forEach(function(k){ links[k].classList.toggle('ativo', k === e.target.id); });
+        var a = links[e.target.id]; if (a && a.scrollIntoView && window.innerWidth <= 900) a.scrollIntoView({block:'nearest', inline:'center'});
+      } });
+    }, { rootMargin: '-30% 0px -65% 0px' });
+    document.querySelectorAll('section.secao').forEach(function(s){ io.observe(s); });
+  }
+})();
+</script>

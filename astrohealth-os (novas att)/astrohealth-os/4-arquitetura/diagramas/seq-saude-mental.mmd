@@ -1,0 +1,20 @@
+sequenceDiagram
+  autonumber
+  participant C as Cosmo (relógio)
+  participant A as Astronauta
+  participant T as Tablet (médico)
+  participant F as Família
+  C->>C: sono, voz e HRV indicam queda de humor
+  C->>A: só você vê isto. Quer conversar?
+  opt pede chamada com a família
+    A->>C: pedir chamada
+    C--)F: pedido de chamada (P3)
+  end
+  alt compartilhar
+    A->>C: contar ao Dr. Marcus
+    C->>T: resumo, sem gravações
+    T->>A: conversa marcada às 19:00
+  else só comigo
+    A->>C: só comigo
+    Note over C: nada sai do relógio
+  end

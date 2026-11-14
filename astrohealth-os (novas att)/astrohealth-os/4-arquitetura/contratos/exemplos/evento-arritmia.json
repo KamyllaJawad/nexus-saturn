@@ -1,0 +1,32 @@
+{
+  "tipo_msg": "evento.atualizado",
+  "versao_contrato": "1.0",
+  "evento": {
+    "id": "evt-0042",
+    "tipo": "arritmia",
+    "tripulante_id": "sarah",
+    "estado": "aguardando_humano",
+    "nivel_autonomia": 3,
+    "responsavel_papel": "oficial_medico",
+    "prazo_em": "2026-11-14T09:43:12Z",
+    "gerado_em": "2026-11-14T09:42:12Z"
+  },
+  "sugestao": {
+    "texto": "Repouso, O2 a 2 L/min e ECG de 12 derivações",
+    "confianca": 0.87,
+    "alternativa": "taquicardia sinusal por esforço",
+    "evidencias": [
+      "rr_irregular_30s",
+      "fc_acima_150",
+      "spo2_abaixo_90_40s"
+    ],
+    "versao_modelo": "arritmia-borda-0.3"
+  },
+  "pacote": {
+    "prioridade": 1,
+    "destinos": [
+      "oficial_medico",
+      "houston"
+    ]
+  }
+}

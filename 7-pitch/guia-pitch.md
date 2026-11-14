@@ -112,6 +112,7 @@ O pipeline analítico do AstroHealth OS utiliza modelos de aprendizado de máqui
 * **Método Matemático:** Cálculo de escores padronizados robustos baseados na mediana individual e no desvio absoluto da mediana (MAD), atualizados continuamente ao longo dos dias de missão.
 * **Interface:** Consolidação dos parâmetros no Avatar de Homeostase exibido no relógio em três estados visuais intuitivos (Ótimo, Atenção, Crítico).
 * **Combinação de sinais:** O z robusto continua definindo a faixa de cada sinal. Ao lado dele, um Isolation Forest por tripulante (`m3-if-0.1`, [ADR-012](../4-arquitetura/adr/0012-linha-de-base-com-isolation-forest.md)) marca quando a combinação sai do padrão daquela pessoa, mesmo sem um sinal sozinho na faixa crítica. O motor só abre sugestão de nível 1 se a floresta marcar anomalia, o M2 classificar o sinal como bom e nenhum sinal estiver crítico. A família não recebe o escore.
+* **Calendário do ciclo:** A ficha de cada pessoa escolhe a direção. Sarah e Elena têm calendário: a Cosmo avisa no relógio delas, cerca de dois dias antes, que podem vir cólica, inchaço ou humor mais baixo, e oferece cuidado leve. O método (supressão ou nenhum) não fica repetido na tela; a Cosmo só cita quando precisa explicar. Marcus e Kenji não têm calendário: essa pergunta não abre, e a resposta segue a linha de base pessoal (sono, hidratação, treino e osso). O médico só vê o aviso com consentimento, e o texto diz exatamente o que ele recebe. A família não recebe fase, método nem sintoma ([ADR-013](../4-arquitetura/adr/0013-calendario-do-ciclo.md)).
 
 ### 4.4. Cosmo: Copiloto Médico com RAG Local
 
@@ -214,6 +215,9 @@ A banca avaliadora da NASA ou de desafios de inovação costuma pressionar os ti
 ### Pergunta 6: "Por que a família não pode ver a frequência cardíaca ou a oximetria do astronauta?"
 * **Resposta do Time:** *"Por respeito à psicologia de isolamento e ética médica. O atraso de sinal de até 22 minutos significa que qualquer métrica anormal vista pela família na Terra já teria ocorrido há quase meia hora, gerando estresse e desespero desnecessários a milhares de quilômetros de distância sem que a família pudesse agir. O App da Família implementa um filtro estrito de privacidade gerenciado no servidor da Terra que traduz a situação em frases simples de acolhimento e status humano, preservando o sigilo médico da tripulação."*
 
+### Pergunta 7: "Vocês detectam o ciclo menstrual pelo relógio?"
+* **Resposta do Time:** *"Não. Homens e mulheres voam, e a Cosmo lê a ficha de cada um. Se a ficha tem calendário, avisamos aquela pessoa cerca de dois dias antes: cólica, inchaço ou humor mais baixo, e um cuidado leve que ela aceita ou recusa. Se ela suprimiu a menstruação, ou se não usa método nenhum, o relógio fala dos sintomas do mesmo jeito. O método só entra quando a Cosmo precisa explicar a resposta. Marcus e Kenji não têm calendário: essa pergunta não abre. O médico só vê se a pessoa autorizar, e vê o que foi enviado. A família não fica sabendo."*
+
 ---
 
 ## 8. Checklist de Prontidão Técnica para o Pitch
@@ -225,6 +229,7 @@ Antes de iniciar a gravação do vídeo ou a apresentação presencial para os a
 * **Execução dos Quatro Ativos:** O navegador está com as quatro telas abertas em abas pré-configuradas (Relógio, Painel de Bordo, Console de Houston e App da Família).
 * **Plano B Ativo:** Caso o ambiente de execução local com Ollama enfrente lentidão de inferência na máquina de apresentação, o botão de chaveamento para respostas pré-sintetizadas do mock está funcional no arquivo de front-end.
 * **Demonstração do M2:** O clique de teste para o evento *"Sensor Solto"* confirma a exibição da mensagem de pulseira folgada sem disparar o protocolo de arritmia médica.
+* **Padrão hormonal, de reserva:** Os eventos *"Padrão hormonal · supressão"* e *"Padrão hormonal · sem método"* no relógio mantêm o anel em Ótimo. Os dois avisam cólica, inchaço ou humor. O método só aparece se a Cosmo for explicar. A família e Houston não recebem fase nem sintoma.
 * **Controle do Cronômetro:** O roteiro narrativo foi cronometrado e não excede os 90 segundos estipulados para a demonstração principal.
 ---
 
@@ -278,7 +283,7 @@ Para assegurar a rastreabilidade acadêmica, a integridade metodológica e o rig
 17. **Clifford, G. D., Liu, C., Moody, B., Lehman, L. H., Silva, I., Li, Q., Johnson, A. E., & Mark, R. G. (2017).** *AF Classification from a Short Single Lead ECG Recording: The PhysioNet/Computing in Cardiology Challenge 2017.* Computing in Cardiology, 44, 1–4. Licença aberta ODC-By. Repositório PhysioNet (physionet.org/content/challenge-2017/1.0.0/).
     * **Contribuição ao Projeto:** Dataset de padrão ouro com 8.528 traçados de ECG de 1 derivação utilizado para treinamento e teste do modelo M1 de detecção de fibrilação atrial do AstroHealth OS.
 18. **Documentação Arquitetural e Especificações Técnicas AstroHealth OS (2026):**
-    * *Arquitetura de Software (ADR-001 a ADR-012):* Especificação formal da arquitetura orientada a eventos, isolamento do motor determinístico, barramento DTN, trilha de auditoria criptográfica com hash encadeado e linha de base do M3 com z robusto e Isolation Forest (ADR-012).
+    * *Arquitetura de Software (ADR-001 a ADR-013):* Especificação formal da arquitetura orientada a eventos, isolamento do motor determinístico, barramento DTN, trilha de auditoria criptográfica com hash encadeado, linha de base do M3 com z robusto e Isolation Forest (ADR-012) e calendário do ciclo no relógio (ADR-013).
     * *MVP — Dados, Modelos e Telas:* Definição dos contratos de dados JSON, pipelines dos modelos M1/M2/M3, governança de autonomia de Níveis 0 a 4 e especificações de interface dos quatro ativos (Relógio, Painel de Bordo, Console de Houston e App da Família).
     * *Plano Operacional da Equipe:* Cronograma de entrega de 48 horas, matriz de riscos técnicos e divisão de papéis da equipe no NASA Space Apps Challenge.
 

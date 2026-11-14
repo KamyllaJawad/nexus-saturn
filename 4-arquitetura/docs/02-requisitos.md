@@ -2,7 +2,7 @@
 
 ## Requisitos funcionais
 
-São 26 requisitos, 16 deles essenciais para o MVP. Cada um vem de um fluxo que já existe na demo.
+São 27 requisitos, 16 deles essenciais para o MVP. Cada um vem de um fluxo que já existe na demo.
 
 | ID | Requisito | Ator | Origem na demo | Prioridade |
 | --- | --- | --- | --- | --- |
@@ -32,6 +32,7 @@ São 26 requisitos, 16 deles essenciais para o MVP. Cada um vem de um fluxo que 
 | RF24 | Escalonar ao próximo humano quando ninguém responde no prazo | Sistema | Evento sensor solto | Essencial (MVP) |
 | RF25 | Registrar toda sugestão, decisão e escalonamento em trilha de auditoria | Sistema | Linha do tempo | Essencial (MVP) |
 | RF26 | Ajustar o comportamento ao perfil de missão (atraso, link, autonomia) | Sistema | Perfil de missão | Importante |
+| RF27 | Avisar no relógio cólica, inchaço ou humor quando a ficha tem calendário, e seguir a linha de base pessoal quando não tem; o método só entra na explicação; o médico só vê o aviso com consentimento | Astronauta | Eventos padrão hormonal e painel do Kenji | Importante |
 
 ## Atributos de qualidade
 

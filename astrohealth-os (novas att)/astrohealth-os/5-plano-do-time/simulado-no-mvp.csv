@@ -1,0 +1,5 @@
+ID,Titulo,Descricao,Frente,Responsavel,Prazo,Horario,Estimativa (h),Depende de,Requisitos,Marco,Labels
+S-01,[S-01] Copiloto de Houston: resumo do que houve desde o último contato,"Pronto quando: O resumo aparece na demo a partir de eventos simulados, com os horários.
+Simulado no MVP: sem back-end nem dado real; só mostra o fluxo na demo.",simulado,,,,,,RF20,Simulado no MVP (sem dado real),simulado;astrohealth
+S-02,[S-02] Buffer offline do relógio: guarda sem rede e reenvia em ordem,"Pronto quando: A demo simula a perda e a volta do sinal do relógio; as leituras reaparecem em ordem.
+Simulado no MVP: sem back-end nem dado real; só mostra o fluxo na demo.",simulado,,,,,,RF23,Simulado no MVP (sem dado real),simulado;astrohealth

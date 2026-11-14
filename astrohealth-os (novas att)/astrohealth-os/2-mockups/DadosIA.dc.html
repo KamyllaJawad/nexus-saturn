@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Dados e IA · do sensor ao modelo</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="demo.css">
+<link rel="stylesheet" href="demo-extra.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#04060c}
+a{color:#00e5ff}a:hover{color:#7df3ff}
+</style>
+</helmet>
+<div style="width: 1360px; height: 1146px; box-sizing: border-box; padding: 40px; background: #04060c; display: flex; align-items: flex-start; justify-content: center; font-family: Inter, system-ui, sans-serif; color: #eef2f8;">
+<div style="width: 1280px;">
+<section class="pipe" id="pipe" aria-labelledby="pipe-h"><div class="pipe-head"><h3 id="pipe-h">Dados e IA · do sensor ao modelo</h3><p>O caminho de cada leitura, ao vivo. Dados simulados com a mesma forma dos dados reais; os contadores e os JSON mudam com os cenários e eventos.</p></div>
+  <ol class="flow">
+    <li><h4>Captura</h4><p>Relógio: ECG de 1 derivação em trechos de 30 s, PPG, oxímetro, temperatura da pele e acelerômetro. Patch: respiração. Manguito: PA. Ambiente: dosímetro e CO₂. Registros da astronauta: água, sintomas e ciclo, com consentimento.</p><span class="tech">BLE → rede local da nave</span><div class="live"><b>81</b> leituras recebidas</div></li>
+    <li><h4>Ingestão</h4><p>Valida o JSON Schema, carimba hora e fonte, e o M2 confere a qualidade do sinal antes de qualquer alerta. Sem rede com a Terra, tudo fica na fila local.</p><span class="tech">FastAPI · JSON Schema</span><div class="live"><b>0</b> barradas pelo M2 · <b>0</b> na fila para a Terra</div></li>
+    <li><h4>Armazenamento</h4><p>Série temporal por tripulante e trilha de auditoria só de inclusão, com hash encadeado.</p><span class="tech">SQLite</span><div class="live"><b>14</b> dias de linha de base por pessoa</div></li>
+    <li><h4>Atributos</h4><p>ECG → picos R → intervalos RR → SDNN, RMSSD, pNN50, CV do RR, SD1/SD2 e entropia. Vitais em janelas de 1 min. À noite: temperatura da pele, FC de repouso e HRV.</p><span class="tech">NeuroKit2 · pandas</span><div class="live">janelas de <b>30 s</b> · <b>1 min</b> · <b>1 noite</b></div></li>
+    <li><h4>Modelos</h4><p>Quatro modelos clássicos, pequenos e explicáveis, que rodam a bordo sem depender da Terra, mais a Cosmo para explicar.</p><span class="tech">scikit-learn · hmmlearn · ChromaDB</span><div class="live"><b>M1 a M4</b> + Cosmo</div></li>
+    <li><h4>Decisão</h4><p>O motor de regras decide quem confirma cada passo. A IA recomenda; medicação e procedimentos sempre passam por um humano.</p><span class="tech">máquina de estados</span><div class="live"><b>1</b> eventos no registro</div></li>
+  </ol>
+  <div class="models-w"><table class="models"><thead><tr><th>Modelo</th><th>Algoritmo</th><th>Treinado com</th><th>Meta de aceite</th><th>Saída agora</th></tr></thead><tbody>
+    <tr><td>M1 · Fibrilação atrial</td><td>Random Forest sobre atributos RR, com peso por classe</td><td>PhysioNet CinC 2017: 8.528 ECGs de 1 derivação (ODC-By)</td><td>F1 da FA ≥ 0,75 no teste</td><td class="out">normal · 0,04</td></tr>
+    <tr><td>M2 · Qualidade do sinal</td><td>Regressão logística</td><td>CinC 2017 + ruído sintético (movimento, linha de base, sinal achatado)</td><td>Recall de "suspeito" ≥ 0,9</td><td class="out">bom · 0,94</td></tr>
+    <tr><td>M3 · Linha de base</td><td>Escore z robusto (mediana e MAD) + Isolation Forest para combinações estranhas</td><td>14 dias de vitais sintéticos por tripulante</td><td>≥ 90% das anomalias, ≤ 1 falso alarme por dia</td><td class="out">z FC -0,0 · IF 0,12</td></tr>
+    <tr><td>M4 · Ciclo hormonal</td><td>Deslocamento térmico (3 noites acima das 6 anteriores) + HMM de 2 estados</td><td>Sintéticos calibrados pela literatura; mcPHASES (PhysioNet) na próxima fase</td><td>Fase certa em ≥ 80% dos dias com dados</td><td class="out cy">lútea · dia 21 · 0,81 · privado</td></tr>
+    <tr><td>Cosmo</td><td>RAG: ChromaDB + LLM local (Ollama), sem permissão de ação</td><td>Protocolos médicos de fontes públicas</td><td>Toda resposta cita a fonte</td><td class="out">explica e conversa</td></tr>
+  </tbody></table></div>
+  <p class="pipe-note">O M4 alimenta o M3: na fase lútea, a temperatura da pele sobe cerca de 0,3 °C e a FC de repouso também sobe. Sem esse ajuste, a linha de base daria falso alarme de febre. Com ou sem método de supressão, a fase entra só para quem consentiu.</p>
+  <div class="jsons"><div class="json"><b>Última leitura · relógio da Sarah</b><pre>{
+  "tripulante": "sarah",
+  "fonte": "relogio",
+  "hora": "09:41:03",
+  "fc_bpm": 71,
+  "spo2_pct": 98,
+  "hrv_ms": 64,
+  "temp_c": 36.8,
+  "qualidade_m2": 0.94
+}</pre></div><div class="json"><b>Última análise · ia.analisar()</b><pre>{
+  "m1_fa": 0.04,
+  "m2_sinal": "bom",
+  "m3_z_fc": -0.04,
+  "m3_isolation_forest": 0.12,
+  "m4_fase": "lutea",
+  "m4_dia": 21,
+  "m4_compartilhado": false,
+  "nivel": "ótimo",
+  "versoes": {
+    "m1": "0.3",
+    "m2": "0.2",
+    "m3": "0.1",
+    "m4": "0.1"
+  }
+}</pre></div></div></section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1360,"height":1146}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

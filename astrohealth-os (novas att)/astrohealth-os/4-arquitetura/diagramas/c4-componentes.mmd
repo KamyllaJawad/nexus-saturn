@@ -1,0 +1,10 @@
+flowchart LR
+  ing[Ingestão de sinais] --> det[Detectores]
+  det --> mot[Motor de decisões]
+  mot <-->|consulta| prot[(Base de protocolos)]
+  mot <-->|consulta| cons[(Consentimentos)]
+  mot -->|estado, só leitura| llm[Cosmo nave<br/>LLM + RAG]
+  llm --> prot
+  mot --> aud[(Auditoria)]
+  mot --> gw[Gateway DTN]
+  cons --> gw

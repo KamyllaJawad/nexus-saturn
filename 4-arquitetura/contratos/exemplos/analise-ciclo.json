@@ -1,0 +1,36 @@
+{
+  "tripulante_id": "sarah",
+  "ficha": {
+    "sexo": "feminino",
+    "calendario": true,
+    "metodo": "pilula_combinada_continua",
+    "ultima_menstruacao": "2026-06-02",
+    "duracao_tipica_dias": 28,
+    "trecho_intenso": "segunda_quinzena",
+    "versao_ficha": "pre-voo-0.1"
+  },
+  "m2": {
+    "qualidade": "bom",
+    "confianca": 0.94,
+    "versao_modelo": "qualidade-0.2"
+  },
+  "m3": {
+    "estado": "otimo",
+    "versao_z": "m3-z-0.1",
+    "metricas": {
+      "fc": {"z": 0.6, "faixa": "padrao"},
+      "temperatura": {"z": 0.4, "faixa": "padrao"},
+      "hrv": {"z": -0.7, "faixa": "padrao"},
+      "sono": {"z": -0.9, "faixa": "padrao"}
+    }
+  },
+  "ciclo": {
+    "na_janela": true,
+    "aviso_dias": 2,
+    "sinais_leves": ["fc", "temperatura", "sono"],
+    "perguntar": true,
+    "sugestoes": ["respirar", "treino_leve"],
+    "compartilhado": false,
+    "versao": "ciclo-calendario-0.1"
+  }
+}

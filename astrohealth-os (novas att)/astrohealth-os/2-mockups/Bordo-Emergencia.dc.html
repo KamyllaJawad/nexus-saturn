@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Painel de bordo · protocolo da Cosmo</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="demo.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#04060c}
+a{color:#00e5ff}a:hover{color:#7df3ff}
+</style>
+</helmet>
+<div style="width: 720px; height: 1107px; box-sizing: border-box; padding: 40px; background: #04060c; display: flex; align-items: flex-start; justify-content: center; font-family: Inter, system-ui, sans-serif; color: #eef2f8;">
+<div class="dev" data-dev="tablet">
+<div class="bezel-tab frame"><div data-render="tablet"><div class="ts-head"><div><b>Enfermaria · Dr. Marcus</b><small>Oficial médico da tripulação</small></div><div class="chips"><span class="chip"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18v-2M10 18v-5M15 18v-8M20 18V7"></path></svg>Houston · &lt; 1 s</span><span class="chip ok"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="2.5"></circle><circle cx="18" cy="6" r="2.5"></circle><circle cx="18" cy="18" r="2.5"></circle><path d="M8.3 10.8l7.4-3.6M8.3 13.2l7.4 3.6"></path></svg>Rede local · 4 tripulantes</span><span class="chip "><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h11a3 3 0 1 0-3-3M3 15h14a3 3 0 1 1-3 3"></path></svg>CO₂ 2,4 mmHg</span></div></div>
+  <div class="ts-body"><div class="crew" role="group" aria-label="Tripulação"><button class="crew-i sel" data-arg="sarah" aria-pressed="true"><i class="l2"></i><span>Sarah</span><small>Comandante · FC 167 bpm</small></button><button class="crew-i " data-arg="marcus" aria-pressed="false"><i class="l0"></i><span>Dr. Marcus</span><small>Oficial médico</small></button><button class="crew-i " data-arg="elena" aria-pressed="false"><i class="l1"></i><span>Elena</span><small>Engenheira de voo · Água 52%</small></button><button class="crew-i " data-arg="kenji" aria-pressed="false"><i class="l0"></i><span>Kenji</span><small>Especialista de missão</small></button></div>
+  <div class="ts-main">
+    <div class="pt-head"><b>Sarah · Comandante</b><span class="state-pill l2">Crítico · homeostase 19%</span></div>
+    <div class="ecg-wrap"><svg class="ecg" viewBox="0 0 800 80" preserveAspectRatio="none" style="height:70px;padding:6px 0;box-sizing:border-box" role="img" aria-label="Traçado de ECG"><path d="M0 45h30l5-32 6 56 5-24h12l3-3 3 3h20l5-30 6 52 5-22h8l5-34 6 58 5-24h44l3-3 3 3h10l5-31 6 54 5-23h12l3-3 3 3h40l5-33 6 56 5-23h18l5-32 6 55 5-23h56l3-3 3 3h14l5-34 6 58 5-24h24l5-31 6 54 5-23h44l3-3 3 3h18l5-31 6 54 5-23h40" fill="none" stroke="#f87171" stroke-width="1.6" stroke-linejoin="round"></path></svg></div>
+    <div class="tiles"><div class="tile b2"><div class="l"><svg class="ic c-crit" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg>Frequência cardíaca</div><div class="v"><span data-v="hr" data-who="sarah">167</span><small>bpm</small></div><div class="src">Relógio · PPG + ECG</div></div><div class="tile b2"><div class="l"><svg class="ic c-acc" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="12" r="5"></circle><path d="M16 15.5c0-1 2.5-1.6 2.5-3a1.3 1.3 0 0 0-2.5-.3M16 19h3"></path></svg>Saturação de O₂</div><div class="v"><span data-v="spo2" data-who="sarah">88</span><small>%</small></div><div class="src">Relógio · oxímetro</div></div><div class="tile b2"><div class="l"><svg class="ic c-acc" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17a8 8 0 1 1 16 0M12 17l4-5"></path></svg>Pressão arterial</div><div class="v"><span data-v="bp" data-who="sarah">166/104</span><small>mmHg</small></div><div class="src">Manguito do kit médico</div></div><div class="tile b1"><div class="l"><svg class="ic c-acc" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h11a3 3 0 1 0-3-3M3 15h14a3 3 0 1 1-3 3"></path></svg>Respiração</div><div class="v"><span data-v="rr" data-who="sarah">26</span><small>irpm</small></div><div class="src">Patch torácico</div></div><div class="tile b2"><div class="l"><svg class="ic c-acc" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2-5 4 10 2-5h6"></path></svg>Variabilidade cardíaca</div><div class="v"><span data-v="hrv" data-who="sarah">16</span><small>ms</small></div><div class="src">Relógio · PPG</div></div><div class="tile b1"><div class="l"><svg class="ic c-water" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"></path></svg>Hidratação</div><div class="v"><span data-v="water" data-who="sarah">1.450</span><small>ml</small></div><div class="src">Registro + estimativa</div></div></div>
+    <div class="strip"><span><svg class="ic c-water" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"></path></svg>Rins: risco <b class="c-warn">moderado</b> · água 60% + perda óssea</span><span><svg class="ic c-warn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1.8"></circle><path d="M12 9.5V3a9 9 0 0 1 7.8 4.5l-5.6 3.2M9.8 10.7L4.2 7.5A9 9 0 0 1 12 3M14.2 13.3l5.6 3.2a9 9 0 0 1-15.6 0l5.6-3.2"></path></svg>Radiação: <b data-dose="sarah">0,42</b> mSv hoje · missão 38 de 600 mSv</span></div>
+    <div class="dec crit"><h5><svg class="ic c-crit" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9.5 16.5h-19z"></path><path d="M12 10v4M12 17h.01"></path></svg> Cosmo propõe um protocolo · confiança 87%</h5><p>Suspeita: fibrilação atrial com resposta ventricular rápida e hipoxemia leve.</p>
+    <ol><li>Interromper o exercício; Sarah sentada em repouso.</li><li>O₂ por máscara a 2 L/min.</li><li>ECG de 12 derivações com o kit médico.</li><li>Desfibrilador de prontidão; reavaliar em 10 min.</li><li>Antiarrítmico do kit: só com sua liberação, em passo separado (2 tratamentos em estoque, dentro da validade).</li></ol>
+    <p style="margin-top:8px">Nada é aplicado sem a sua confirmação.</p>
+    <button class="linkbtn">Ocultar explicação</button>
+    <div class="explain"><b class="c-acc">Evidências usadas pela Cosmo</b><br>Intervalos RR irregulares em 30 s de ECG do relógio (variação acima de 20%), sem onda P visível; FC acima de 150 bpm; SpO₂ abaixo de 90% por mais de 40 s; início durante esforço na esteira. Protocolo de referência: manejo inicial de FA aguda, adaptado ao kit médico da nave. Confiança 87%; a principal alternativa é taquicardia sinusal por esforço.<br><br><b class="c-acc">Modelos</b><br>M1 · fibrilação atrial 0,87 (v0.3, treinado no PhysioNet CinC 2017) · M2 · sinal bom 0,94 (v0.2) · M3 · FC acima da linha de base da Sarah (v0.1, z robusto).</div>
+    <div class="dec-actions"><button class="btn crit pulse">Confirmar protocolo</button><button class="btn ghost">Assumir manualmente</button></div></div>
+  </div></div></div></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":720,"height":1107}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

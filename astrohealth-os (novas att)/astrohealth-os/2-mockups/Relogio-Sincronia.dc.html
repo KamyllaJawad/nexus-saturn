@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Relógio · sincronia com a Terra</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="demo.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#04060c}
+a{color:#00e5ff}a:hover{color:#7df3ff}
+</style>
+</helmet>
+<div style="width: 400px; height: 400px; box-sizing: border-box; padding: 40px; background: #04060c; display: flex; align-items: flex-start; justify-content: center; font-family: Inter, system-ui, sans-serif; color: #eef2f8;">
+<div class="dev" data-dev="watch-round">
+<div class="bezel-round frame"><button class="crown" aria-label="Coroa: próxima tela do relógio"></button><div data-render="watch-round"><div class="ws round lv0  " style="--beat:0.82s"><div class="ws-in"><div class="w-tag ">Sincronia · TDRS</div>
+      <div class="w-delay">&lt; 1 s</div>
+      <div class="w-sub">de atraso até a Terra · 0 na fila</div>
+      <div class="w-qbar" aria-hidden="true"><i class="p4" style="flex:1;opacity:.4"></i></div>
+      <div class="w-pks"><div class="w-pk ok"><svg class="ic c-ok" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span class="tx">Tudo sincronizado</span><small>—</small></div></div><button class="w-btn sm2">Sincronizar agora</button><div class="w-dots"><button class="dot" data-arg="home" aria-label="Início" aria-current="false"><i></i></button><button class="dot" data-arg="insight" aria-label="Insight da Cosmo" aria-current="false"><i></i></button><button class="dot" data-arg="chat" aria-label="Chat com a Cosmo" aria-current="false"><i></i></button><button class="dot" data-arg="game" aria-label="Missões da estufa" aria-current="false"><i></i></button><button class="dot" data-arg="elo" aria-label="Elo com a família" aria-current="false"><i></i></button><button class="dot" data-arg="sync" aria-label="Sincronia com a Terra" aria-current="true"><i></i></button><button class="dot" data-arg="vitals" aria-label="Sinais" aria-current="false"><i></i></button></div></div></div></div></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":400,"height":400}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

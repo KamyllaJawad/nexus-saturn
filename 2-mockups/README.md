@@ -1,9 +1,9 @@
 # Mockups · fonte
 
-As 14 pranchetas do canvas de mockups, tiradas da demo original:
+As 17 pranchetas do canvas de mockups, tiradas da demo original:
 
-- Relógio (8): início, insight, chat, estufa, Elo, sincronia, relógio folgado e alerta.
-- Painel de bordo (2): rotina e protocolo da Cosmo.
+- Relógio (10): início, insight, chat, estufa, Elo, sincronia, relógio folgado, alerta, padrão hormonal e o aviso contado ao Dr. Marcus.
+- Painel de bordo (3): rotina, calendário compartilhado e protocolo da Cosmo.
 - Celular da família (2): rotina e durante o alerta.
 - Houston (2): rotina e alerta recebido.
 

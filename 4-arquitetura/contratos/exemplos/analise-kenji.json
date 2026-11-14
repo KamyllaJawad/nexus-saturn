@@ -1,0 +1,28 @@
+{
+  "tripulante_id": "kenji",
+  "ficha": {
+    "sexo": "masculino",
+    "calendario": false,
+    "versao_ficha": "pre-voo-0.1"
+  },
+  "m2": {
+    "qualidade": "bom",
+    "confianca": 0.91,
+    "versao_modelo": "qualidade-0.2"
+  },
+  "m3": {
+    "estado": "otimo",
+    "versao_z": "m3-z-0.1",
+    "metricas": {
+      "fc": {"z": 0.2, "faixa": "padrao"},
+      "sono": {"z": 0.1, "faixa": "padrao"},
+      "hrv": {"z": 0.4, "faixa": "padrao"}
+    }
+  },
+  "ciclo": null,
+  "sugestao": {
+    "nivel": 2,
+    "texto": "Manter o treino resistivo. A ficha não tem calendário de ciclo.",
+    "versao": "linha-de-base-0.1"
+  }
+}

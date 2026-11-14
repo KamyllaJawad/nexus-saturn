@@ -1,3 +1,7 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
 <title>AstroHealth OS</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -432,6 +436,8 @@ button.crew-i:hover{background:var(--surface)}
   .astro,.astro .beat,.w-breath span,.pulse,.w-notice{animation:none!important}
 }
 </style>
+</head>
+<body>
 
 <header class="bar" role="banner">
   <div class="brand">
@@ -817,7 +823,9 @@ function answer(q){
     case 'cansada':{
       const falta=Math.max(0,Math.round(v.waterGoal-v.water));
       const acts=[]; if(falta>0) acts.push({label:'+250 ml',act:'w-drink',cls:'water'}); acts.push({label:'Respirar 1 min',act:'w-breath'});
-      return {t:`Cruzei seus dados: hidratação em ${FMT.waterPct(v)}%${falta?` (faltam ${falta.toLocaleString('pt-BR')} ml)`:''}, HRV ${FMT.hrv(v)} ms, REM de 1h15 e ciclo no dia 14, com temperatura basal mais alta. O mais provável é desidratação leve somada ao treino. Sugiro água agora e 1 min de respiração lenta.`,acts};
+      const base=`Cruzei seus dados: hidratação em ${FMT.waterPct(v)}%${falta?` (faltam ${falta.toLocaleString('pt-BR')} ml)`:''}, HRV ${FMT.hrv(v)} ms e REM de 1h15.`;
+      const ciclo=S.evt.cycle?` Este é o trecho em que cólica, inchaço ou humor mais baixo costumam aparecer.${cycleGround()}`:'';
+      return {t:base+ciclo+' O mais provável é desidratação leve somada ao treino. Sugiro água agora e 1 min de respiração lenta.',acts};
     }
     case 'houston':
       send('up','Mensagem de voz da Sarah para Houston (0:08)',{prio:3,size:'0,4 MB',aud:['houston']});
@@ -927,12 +935,18 @@ function resetDemo(){
 }
 
 /* ================= Eventos injetáveis: IA local + humano no controle ================= */
-const EVENTS=[['solar','Tempestade solar'],['loose','Sensor solto'],['mood','Queda de humor'],['eva','Prontidão EVA'],['headache','Dor de cabeça'],['sleep','Hora de dormir']];
+const EVENTS=[['solar','Tempestade solar'],['loose','Sensor solto'],['mood','Queda de humor'],['cycle','Padrão hormonal · supressão'],['cycle-none','Padrão hormonal · sem método'],['eva','Prontidão EVA'],['headache','Dor de cabeça'],['sleep','Hora de dormir']];
 const MISSION_DOSE={leo:38,gateway:96,mars:212,marsSurf:340};
 const DOSE_TICK={leo:.0002,gateway:.0005,mars:.0008,marsSurf:.0003};
 const READY={sarah:88,marcus:90,elena:64,kenji:91};
 function later(ms,fn){const r=S.rid;setTimeout(()=>{if(S.rid!==r)return;fn();lastKey='';tick();},ms);}
 function evtOn(k){const e=S.evt[k];return !!e&&e.phase!=='done';}
+function cycleGround(){
+  const e=S.evt.cycle;
+  if(!e) return '';
+  if(e.method==='nenhum') return ' Sua ficha não tem método hormonal: a janela segue a última menstruação e a duração típica. Eu não medi ovulação no pulso.';
+  return ' Sua ficha tem supressão (pílula, DIU ou implante): uso o calendário de sintomas e não trato isso como ovulação.';
+}
 const fmtDose=x=>x.toFixed(2).replace('.',',');
 
 function injectEvent(k){
@@ -954,6 +968,15 @@ function injectEvent(k){
     S.evt.mood={phase:'offered',clock:t};
     log('Cosmo','relógio · privado','Padrão de humor em queda detectado. Apoio oferecido só à Sarah; nada foi compartilhado.',0);
     S.watch.screen='evt'; break;
+  case 'cycle':
+  case 'cycle-none': {
+    const method=k==='cycle-none'?'nenhum':'supressao';
+    S.evt.cycle={phase:'asking',clock:t,method};
+    const ficha=method==='nenhum'
+      ? 'Ficha sem método hormonal. Aviso privado: cólica, inchaço ou humor mais baixo em dois dias, pela última menstruação.'
+      : 'Ficha com supressão (pílula, DIU ou implante). Aviso privado: cólica, inchaço ou humor mais baixo em dois dias. O método não aparece na tela.';
+    log('Cosmo','relógio da Sarah · privado',ficha+' Marcus e Kenji não recebem essa pergunta. O calendário da Elena fica no relógio dela.',0);
+    S.watch.screen='evt'; break; }
   case 'eva':
     S.evt.eva={phase:'asking',clock:t};
     log('Cosmo','check de prontidão','EVA das 15:00: Elena com 64% de prontidão (sono curto, reação 18% mais lenta). Decisão levada à comandante.',1);
@@ -1021,6 +1044,23 @@ function evtAction(a){
   case 'mood-meet':{const e=E.mood;if(!e||e.phase!=='shared')return;e.phase='done';
     log('Bordo','oficial médico → relógio da Sarah','Dr. Marcus marcou uma conversa individual com a Sarah às 19:00.',0);
     notify('Conversa com o Dr. Marcus às 19:00');cosmoSay('O Dr. Marcus marcou uma conversa com você às 19:00, só vocês dois.');break;}
+  case 'cycle-yes':{const e=E.cycle;if(!e||e.phase!=='asking')return;e.phase='care';
+    log('Relógio','Sarah','Sarah confirmou cólica, inchaço ou humor mais baixo. A Cosmo ofereceu cuidado leve, sem alarme.',0);
+    break;}
+  case 'cycle-ok':{const e=E.cycle;if(!e||e.phase!=='asking')return;e.phase='done';
+    log('Relógio','Sarah','Sarah disse que está bem. O estado segue ótimo e nada foi compartilhado.',0);
+    cosmoSay('Combinado. Sigo de olho, sem alarme.');
+    S.watch.screen='home';break;}
+  case 'cycle-share':{const e=E.cycle;if(!e||e.phase!=='care')return;e.phase='told';
+    log('Relógio','Sarah → painel de bordo · rede local','Sarah autorizou. O Dr. Marcus vê só isto: cólica, inchaço ou humor mais baixo, e o pedido de cuidado leve. Sem alarme. A família não recebe.',0);
+    cosmoSay('Contei ao Dr. Marcus só isto: você pode ter cólica, inchaço ou humor mais baixo, e pediu cuidado leve. Sem alarme. A família não vê.');
+    S.watch.screen='evt';break;}
+  case 'cycle-close':{const e=E.cycle;if(!e||e.phase!=='told')return;e.phase='shared';
+    S.watch.screen='home';break;}
+  case 'cycle-private':{const e=E.cycle;if(!e||e.phase!=='care')return;e.phase='done';
+    log('Relógio','Sarah','Sarah manteve o aviso só no relógio. Nada foi compartilhado.',0);
+    cosmoSay('Fica entre nós. Se cólica, inchaço ou humor apertar, o analgésico do kit continua com o Dr. Marcus.');
+    S.watch.screen='home';break;}
   case 'eva-swap':{const e=E.eva;if(!e||e.phase!=='asking')return;e.phase='done';e.result='swap';
     log('Relógio','comandante → escala','Sarah trocou a Elena pelo Kenji na EVA das 15:00.',0);
     send('up','Escala da EVA alterada: Kenji no lugar da Elena (decisão da comandante)',{prio:3,aud:['houston']});
@@ -1069,6 +1109,7 @@ function watchEvt(){
   if(E.loose&&E.loose.phase==='asking') return 'loose';
   if(E.eva&&E.eva.phase==='asking') return 'eva';
   if(E.mood&&E.mood.phase==='offered') return 'mood';
+  if(E.cycle&&['asking','care','told'].includes(E.cycle.phase)) return 'cycle';
   if(E.sleep&&['scheduled','applied'].includes(E.sleep.phase)) return 'sleep';
   if(E.loose&&E.loose.phase==='escalated') return 'loose';
   return null;
@@ -1086,6 +1127,12 @@ function evtWatch(round){
   }
   if(k==='eva') return `<div class="w-tag">Escala · EVA 15:00</div><p class="w-text">Prontidão da Elena: <b class="c-warn">64%</b>${round?'':' (sono curto, reação mais lenta)'}. Kenji: <b class="c-ok">91%</b>.</p><button class="w-btn sm2" data-act="eva-swap">Trocar pelo Kenji</button><button class="w-btn ghost sm" data-act="eva-keep">Manter a Elena</button>`;
   if(k==='mood') return `<div class="w-tag" style="color:#c4b5fd">${ic('shield')} Só você vê isto</div><p class="w-text">Seu sono encurtou e sua voz ficou mais baixa nesta semana. Quer conversar?</p><button class="w-btn sm2" data-act="mood-talk">Conversar</button><div class="w-chips"><button data-act="mood-share">Contar ao Dr. Marcus</button><button data-act="mood-private">Só comigo</button></div>`;
+  if(k==='cycle'){const e=E.cycle;
+    const priv=`<div class="w-tag" style="color:#c4b5fd">${ic('shield')} Só você vê isto</div>`;
+    if(e.phase==='asking') return `${priv}<p class="w-text">Em dois dias: cólica, inchaço ou humor mais baixo. Você está sentindo?</p><button class="w-btn sm2" data-act="cycle-yes">Estou sentindo</button><button class="w-btn ghost sm" data-act="cycle-ok">Estou bem</button>`;
+    if(e.phase==='care') return `${priv}<p class="w-text">Se contar ao Dr. Marcus, ele vê só isto: esses sintomas e o pedido de cuidado leve. Sem alarme. A família não vê.</p><button class="w-btn sm2" data-act="w-breath">Respirar 1 min</button><div class="w-chips"><button data-act="cycle-share">Contar ao Dr. Marcus</button><button data-act="cycle-private">Só comigo</button></div>`;
+    return `${priv}<p class="w-text">O Dr. Marcus recebeu: cólica, inchaço ou humor mais baixo, e o seu pedido de cuidado leve. Sem alarme. A família não vê.</p><button class="w-btn sm2" data-act="cycle-close">Entendi</button>`;
+  }
   if(k==='sleep'){const e=E.sleep;
     if(e.phase==='scheduled') return `<div class="w-tag" style="color:#c4b5fd">${ic('moon')} Modo noite</div><p class="w-text">Às 21:00 deixo a luz mais quente e silencio avisos. ${round?'':'Sua média de sono na semana foi 6h50.'}</p><div class="w-sub">Aplico em <b data-until="sleep">15</b> s</div><button class="w-btn ghost sm2" data-act="sleep-veto">Vetar</button>`;
     return `<div class="w-tag ok">${ic('moon')} Modo noite ativo</div><p class="w-text">Luz em 2700 K e avisos silenciados até 06:30. Emergências continuam passando.</p><button class="w-btn ghost sm2" data-act="sleep-undo">Desfazer</button>`;
@@ -1099,6 +1146,7 @@ function evtTablet(){
     h+=`<div class="dec dark"><h5>${ic('radiation','c-warn')} Tempestade solar · ${st}</h5><div class="kv">${CREW_IDS.map(id=>`<div><span>${CREW[id].name}</span><b><span data-dose="${id}">${fmtDose(S.dose[id])}</span> mSv</b></div>`).join('')}</div><p>Dose de hoje por tripulante. A decisão de abrigo é da comandante; você acompanha a exposição.</p></div>`;}
   if(E.loose&&E.loose.phase==='escalated') h+=`<div class="dec"><h5>${ic('o2','c-warn')} Leitura suspeita · Sarah</h5><p>SpO₂ de 84% no relógio com sinal de baixa qualidade (M2: sinal suspeito, 0,31). ${E.loose.timedOut?'A Sarah não respondeu em 20 s.':'A Sarah diz que o relógio está firme.'} Sugestão da Cosmo: medir com o oxímetro de dedo do kit.</p><div class="dec-actions"><button class="btn" data-act="loose-kit">Registrar medição do kit: 97%</button></div></div>`;
   if(E.mood&&E.mood.phase==='shared') h+=`<div class="dec" style="border-color:rgba(139,92,246,.5)"><h5>${ic('shield')} Bem-estar · compartilhado pela Sarah</h5><p>Sono 1h10 mais curto em 5 dias, voz mais baixa nas conversas e HRV 15% abaixo do padrão dela. A Sarah autorizou só você a ver este resumo, sem gravações.</p><div class="dec-actions"><button class="btn ghost" data-act="mood-meet">Marcar conversa hoje às 19:00</button></div></div>`;
+  if(E.cycle&&['told','shared'].includes(E.cycle.phase)) h+=`<div class="dec"><h5>${ic('shield')} Sarah compartilhou um aviso</h5><p>Ela pode ter cólica, inchaço ou humor mais baixo nos próximos dois dias, e pediu cuidado leve. O estado segue ótimo. Não é diagnóstico. Analgésico do kit só se ela pedir.</p></div>`;
   if(E.eva){const e=E.eva;
     h+=`<div class="dec"><h5>${ic('user','c-acc')} Prontidão para a EVA das 15:00</h5><div class="kv">${CREW_IDS.map(id=>`<div><span>${CREW[id].name}</span><b class="${READY[id]<70?'c-warn':''}">${READY[id]}%</b></div>`).join('')}</div><p>${e.phase==='asking'?'Sono, HRV e tempo de reação. A decisão da escala é da comandante.':e.result==='swap'?'A comandante trocou a Elena pelo Kenji.':'A comandante manteve a Elena; monitoramento de fadiga reforçado.'}</p></div>`;}
   if(E.headache){const e=E.headache, co2=S.co2.toFixed(1).replace('.',',');
@@ -1286,7 +1334,7 @@ const CREW={
 };
 const CREW_IDS=Object.keys(CREW);
 const CREW_NOTES={
-  marcus:{title:'Autoavaliação do oficial médico',items:['Sinais estáveis: você está apto para atender.','Sono de 7h05 e treino de 30 min concluído.','Próxima autoavaliação no domingo.'],remind:null},
+  marcus:{title:'Autoavaliação do oficial médico',items:['Sinais estáveis: você está apto para atender.','Sono de 7h05 e treino de 30 min concluído.','A ficha não tem calendário de ciclo. A Cosmo usa a sua linha de base pessoal.'],remind:null},
   elena:{title:'Acompanhamento · Elena',items:['Hidratação em cerca de metade da meta; o lembrete das 08:30 ficou sem resposta.','Duas noites seguidas com cerca de 6h10 de sono.','Estresse moderado com a agenda de manutenção da cúpula cheia.'],remind:'Enviar lembrete de água ao relógio da Elena'},
   kenji:{title:'Acompanhamento · Kenji',items:['DXA (densidade óssea) marcada para sexta.','Densidade óssea −1,2% em 3 meses, dentro do esperado para a missão.','Todos os sinais na faixa ótima.'],remind:'Lembrar o Kenji do treino resistivo'}
 };
@@ -1327,7 +1375,7 @@ function tabletHTML(){
   let dec='';
   if(!isS){
     const n=CREW_NOTES[sel], rem=S.remind[sel];
-    if(sel==='kenji') dec+=`<div class="dec"><h5>${ic('bolt','c-acc')} Treino resistivo · Kenji</h5><p>Carga atual em 85% do previsto. A Cosmo sugere +5% nesta semana para frear a perda óssea e muscular.</p><button class="btn ${S.boneOk?'ghost':''}" data-act="bone-ok"${S.boneOk?' disabled':''}>${S.boneOk?'Carga aprovada às '+S.boneOk.slice(0,5):'Aprovar carga da semana'}</button></div>`;
+    if(sel==='kenji') dec+=`<div class="dec"><h5>${ic('bolt','c-acc')} Treino resistivo · Kenji</h5><p>Carga atual em 85% do previsto. A ficha dele não tem calendário de ciclo. A Cosmo sugere +5% nesta semana, na linha de base pessoal, para frear a perda óssea e muscular.</p><button class="btn ${S.boneOk?'ghost':''}" data-act="bone-ok"${S.boneOk?' disabled':''}>${S.boneOk?'Carga aprovada às '+S.boneOk.slice(0,5):'Aprovar carga da semana'}</button></div>`;
     if(e&&(e.phase==='detected'||e.phase==='proposed')) dec+=`<div class="dec crit"><h5>${ic('alert','c-crit')} A Sarah precisa de você</h5><p>${e.phase==='proposed'?'Há um protocolo da Cosmo aguardando sua confirmação.':'A Cosmo está analisando um evento cardíaco.'}</p><div class="dec-actions"><button class="btn crit pulse" data-act="t-sel" data-arg="sarah">Abrir o painel da Sarah</button></div></div>`;
     dec+=`<div class="dec"><h5>${n.title}</h5><ul>${n.items.map(i=>`<li>${i}</li>`).join('')}</ul>${n.remind?`<button class="btn ghost" data-act="t-remind" data-arg="${sel}"${rem?' disabled':''}>${rem?'Lembrete enviado às '+rem.slice(0,5):n.remind}</button>`:''}</div>`;
   } else if(e&&e.phase==='detected'){
@@ -1358,7 +1406,7 @@ function tabletHTML(){
   const tAns={
     crew:'Elena: hidratação baixa e duas noites curtas; vale conversar hoje. Sarah: estresse moderado e hidratação abaixo da meta. Kenji e você: estáveis.',
     resumo: isS
-      ? `Sarah está ${LV[a.level].toLowerCase()}: FC ${FMT.hr(v)} bpm, SpO₂ ${FMT.spo2(v)}%, PA ${FMT.bp(v)}, homeostase ${a.homeo}%. ${e?'Evento cardíaco às '+e.clock.slice(0,5)+'; acompanhar ECG de 12 derivações.':'Sem eventos cardíacos nos últimos 7 dias.'} Ciclo no dia 14 (janela fértil).`
+      ? `Sarah está ${LV[a.level].toLowerCase()}: FC ${FMT.hr(v)} bpm, SpO₂ ${FMT.spo2(v)}%, PA ${FMT.bp(v)}, homeostase ${a.homeo}%. ${e?'Evento cardíaco às '+e.clock.slice(0,5)+'; acompanhar ECG de 12 derivações.':'Sem eventos cardíacos nos últimos 7 dias.'}${S.evt.cycle&&['told','shared'].includes(S.evt.cycle.phase)?' Ela compartilhou: pode ter cólica, inchaço ou humor mais baixo, e pediu cuidado leve.'+cycleGround()+' Isso não é diagnóstico.':''}`
       : `${CREW[sel].name}: ${LV[a.level].toLowerCase()}, FC ${FMT.hr(v)} bpm, SpO₂ ${FMT.spo2(v)}%, homeostase ${a.homeo}%. ${COP_SUM[sel]}`,
     kit:'O₂ portátil em 92%, 18 eletrodos de ECG, 6 bolsas de soro, desfibrilador testado ontem. Antiarrítmicos: estoque para 2 tratamentos completos.'
   };
@@ -1636,3 +1684,5 @@ setInterval(tick,500);
 requestAnimationFrame(frame);
 })();
 </script>
+</body>
+</html>

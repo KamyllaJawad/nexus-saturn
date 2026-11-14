@@ -1,6 +1,6 @@
 # 6. Fluxos principais
 
-Nos cinco fluxos, a decisão acontece a bordo, e a Terra fica sabendo depois. Setas `--)` cruzam o link com a Terra e levam de menos de 1 s a 22 min, conforme o perfil de missão.
+Nos seis fluxos, a decisão acontece a bordo, e a Terra fica sabendo depois. Setas `--)` cruzam o link com a Terra e levam de menos de 1 s a 22 min, conforme o perfil de missão.
 
 ## Emergência cardíaca
 
@@ -95,6 +95,35 @@ sequenceDiagram
     A->>C: só comigo
     Note over C: nada sai do relógio
   end
+```
+
+## Calendário do ciclo
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant C as Cosmo (relógio)
+  participant A as Astronauta
+  participant T as Tablet (médico)
+  participant F as Família
+  C->>C: ficha de solo marca o trecho intenso em 2 dias
+  C->>A: aviso privado no relógio
+  C->>A: sinais leves no trecho. Cólica, inchaço ou humor?
+  alt estou bem
+    A->>C: estou bem
+    Note over C: o estado segue ótimo
+  else estou
+    A->>C: confirmar sintoma
+    C->>A: respirar, treino leve ou modo noite
+    alt contar ao médico
+      A->>C: contar ao Dr. Marcus
+      C->>T: sintomas e cuidado leve, sem alarme
+    else só comigo
+      A->>C: só comigo
+      Note over C: nada sai do relógio
+    end
+  end
+  Note over F: a família não recebe fase nem sintoma
 ```
 
 ## Blackout e volta do sinal

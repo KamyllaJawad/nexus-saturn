@@ -66,6 +66,20 @@
       "h": 400,
       "title": "Relógio · alerta de FA (M1)"
     },
+    "Relogio-Ciclo.dc.html": {
+      "x": 3840,
+      "y": 300,
+      "w": 400,
+      "h": 400,
+      "title": "Relógio · padrão hormonal"
+    },
+    "Relogio-Ciclo-Cuidado.dc.html": {
+      "x": 4320,
+      "y": 300,
+      "w": 400,
+      "h": 400,
+      "title": "Relógio · contado ao Dr. Marcus"
+    },
     "Bordo.dc.html": {
       "x": 0,
       "y": 1120,
@@ -73,8 +87,15 @@
       "h": 781,
       "title": "Painel de bordo · rotina"
     },
-    "Bordo-Emergencia.dc.html": {
+    "Bordo-Ciclo.dc.html": {
       "x": 800,
+      "y": 1120,
+      "w": 720,
+      "h": 900,
+      "title": "Painel de bordo · aviso compartilhado"
+    },
+    "Bordo-Emergencia.dc.html": {
+      "x": 1600,
       "y": 1120,
       "w": 720,
       "h": 1107,
@@ -118,7 +139,10 @@
     "Relogio-Sincronia.dc.html",
     "Relogio-Folgado.dc.html",
     "Relogio-Alerta.dc.html",
+    "Relogio-Ciclo.dc.html",
+    "Relogio-Ciclo-Cuidado.dc.html",
     "Bordo.dc.html",
+    "Bordo-Ciclo.dc.html",
     "Bordo-Emergencia.dc.html",
     "Familia.dc.html",
     "Familia-Emergencia.dc.html",
@@ -131,14 +155,14 @@
       "y": 0,
       "text": "Relógio · no pulso da Sarah",
       "kind": "title1",
-      "maxW": 3800
+      "maxW": 4800
     },
     "t-bordo": {
       "x": 0,
       "y": 820,
       "text": "Painel de bordo · oficial médico",
       "kind": "title1",
-      "maxW": 1520
+      "maxW": 2400
     },
     "t-familia": {
       "x": 0,
@@ -155,7 +179,7 @@
       "maxW": 2800
     },
     "n-fluxo": {
-      "x": 3880,
+      "x": 4840,
       "y": 300,
       "w": 320,
       "text": "Telas tiradas da demo original do AstroHealth OS, que é o MVP. Fluxo-herói: o M2 confere o sinal, o M1 detecta FA no relógio da Sarah, o painel de bordo mostra o protocolo da Cosmo e o Dr. Marcus confirma; Houston e a família recebem depois, com atraso. Valores são de dados simulados.",

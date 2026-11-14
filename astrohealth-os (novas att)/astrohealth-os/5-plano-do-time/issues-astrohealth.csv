@@ -1,0 +1,207 @@
+ID,Titulo,Descricao,Frente,Responsavel,Prazo,Horario,Estimativa (h),Depende de,Requisitos,Marco,Labels
+B-01,"[B-01] Criar o repositório e o projeto FastAPI, com README de como rodar","Pronto quando: `uvicorn app.main:app --reload` sobe a API e `/docs` abre no navegador; o README explica os 3 comandos para rodar.
+Por onde começar: Siga o tutorial ""First Steps"" do FastAPI; uma pasta `app/`, um `requirements.txt` e mais nada.
+
+Responsável: Pessoa 3
+Estimativa: 2 h
+Prazo: sáb 10h",back-end,Pessoa 3,2026-11-14,10h,2,,,G1 · Contratos e mock (sáb 11h),back-end;astrohealth
+D-01,"[D-01] Definir o JSON da leitura, do evento e da análise dos modelos, com um exemplo de cada","Pronto quando: `contratos/leitura.json`, `evento.json` e `analise.json` com exemplos reais; o time usa esses arquivos no mock.
+Por onde começar: Parta do exemplo `contratos/exemplos/evento-arritmia.json` da arquitetura e corte o que o MVP não usa.
+
+Requisitos: RF11
+Responsável: Kamylla
+Estimativa: 1 h
+Prazo: sáb 10h",dados-e-ia,Kamylla,2026-11-14,10h,1,,RF11,G1 · Contratos e mock (sáb 11h),dados-e-ia;astrohealth
+B-02,[B-02] Mock da API: endpoints que devolvem os JSON de exemplo do D-01,"Pronto quando: `GET /tripulacao`, `GET /eventos`, `GET /familia/feed` e `GET /houston/casos` respondem com os exemplos; o front já consegue ler.
+Por onde começar: Cada endpoint só lê o arquivo JSON e devolve. Nada de banco ainda.
+
+Depende de: B-01, D-01
+Responsável: Pessoa 3
+Estimativa: 1 h
+Prazo: sáb 11h",back-end,Pessoa 3,2026-11-14,11h,1,"B-01, D-01",,G1 · Contratos e mock (sáb 11h),back-end;astrohealth
+F-01,[F-01] Montar a pasta web/ com o estilo da demo e uma função que busca os dados,"Pronto quando: Uma página de teste mostra os dados do mock; trocar o endereço do mock pelo da API muda uma linha só.
+Por onde começar: Copie as cores e fontes do topo da demo original (`:root`). Use `fetch()` e repita a busca a cada 1 s com `setInterval`.
+
+Depende de: D-01
+Requisitos: RF01
+Responsável: Pessoa 2
+Estimativa: 2 h
+Prazo: sáb 11h",telas,Pessoa 2,2026-11-14,11h,2,D-01,RF01,G1 · Contratos e mock (sáb 11h),telas;astrohealth
+D-02,[D-02] Gerar os vitais sintéticos dos 4 tripulantes (14 dias) e os cenários de FA e relógio folgado em CSV,"Pronto quando: `dados/vitais.csv` com 1 leitura por minuto por tripulante e `dados/cenarios/*.csv` prontos para o simulador.
+
+Depende de: D-01
+Requisitos: RF01
+Responsável: Kamylla
+Estimativa: 2 h
+Prazo: sáb 12h",dados-e-ia,Kamylla,2026-11-14,12h,2,D-01,RF01,G2 · Telas no mock e M1 treinado (sáb 19h),dados-e-ia;astrohealth
+D-03,[D-03] Preparar o PhysioNet CinC 2017: intervalos RR por gravação e separação 70/15/15,"Pronto quando: Tabela de atributos RR das 8.528 gravações com a classe e o split salvo; fonte e licença (ODC-By 1.0) no README.
+Por onde começar: Baixe o zip de treino (94,6 MB) na sexta à noite.
+
+Requisitos: RF01
+Responsável: Kamylla
+Estimativa: 3 h
+Prazo: sáb 14h",dados-e-ia,Kamylla,2026-11-14,14h,3,,RF01,G2 · Telas no mock e M1 treinado (sáb 19h),dados-e-ia;astrohealth
+B-03,"[B-03] Banco SQLite com as tabelas de leituras, eventos, decisões e mensagens","Pronto quando: As tabelas existem, um script cria o banco do zero e nenhuma rota apaga ou altera um registro (só inclusão).
+Por onde começar: Use `sqlite3` da biblioteca padrão do Python; um arquivo `app/banco.py` com as funções `salvar_*` e `listar_*`.
+
+Depende de: B-01
+Requisitos: RF25
+Responsável: Pessoa 3
+Estimativa: 2 h
+Prazo: sáb 14h",back-end,Pessoa 3,2026-11-14,14h,2,B-01,RF25,G2 · Telas no mock e M1 treinado (sáb 19h),back-end;astrohealth
+F-02,"[F-02] Relógio: início com avatar, insight, chat com a Cosmo, missões da estufa, Elo com a família, ciclo, sincronia, ""relógio folgado?"" e alerta","Pronto quando: As telas do relógio dos mockups funcionam com os dados do mock; os botões chamam a API (ou um console.log enquanto ela não existe).
+Por onde começar: Copie a função `watchHTML` da demo original e troque os valores fixos pelos do mock.
+
+Depende de: F-01
+Requisitos: RF01 a RF04
+Responsável: Pessoa 2
+Estimativa: 5 h
+Prazo: sáb 16h",telas,Pessoa 2,2026-11-14,16h,5,F-01,RF01 a RF04,G2 · Telas no mock e M1 treinado (sáb 19h),telas;astrohealth
+B-04,"[B-04] Simulador: toca os cenários do CSV como leituras, uma por segundo","Pronto quando: `POST /simulador/cenario` com `rotina`, `folgado` ou `fa` troca o cenário; as leituras entram no banco.
+Por onde começar: Um laço com `asyncio.sleep(1)` que lê a próxima linha do CSV e chama `salvar_leitura()`.
+
+Depende de: D-02, B-03
+Requisitos: RF01, RF04
+Responsável: Pessoa 3
+Estimativa: 3 h
+Prazo: sáb 17h",back-end,Pessoa 3,2026-11-14,17h,3,"D-02, B-03","RF01, RF04",G2 · Telas no mock e M1 treinado (sáb 19h),back-end;astrohealth
+D-04,[D-04] M1 · treinar o detector de fibrilação atrial no CinC 2017 (atributos RR + Random Forest),"Pronto quando: F1 da classe FA ≥ 0,75 no teste; modelo salvo em `modelos/m1.joblib` com probabilidade e os 3 atributos que mais pesaram.
+
+Depende de: D-03
+Requisitos: RF01, RF12
+Responsável: Kamylla
+Estimativa: 4 h
+Prazo: sáb 19h",dados-e-ia,Kamylla,2026-11-14,19h,4,D-03,"RF01, RF12",G2 · Telas no mock e M1 treinado (sáb 19h),dados-e-ia;astrohealth
+B-05,[B-05] Motor de regras: estados do evento e quem decide cada passo,"Pronto quando: Um evento passa por detectado → proposto → confirmado ou recusado; medicação só muda de estado com o oficial médico; dado do ciclo só sai do relógio com o consentimento dela; os testes cobrem cada passo.
+Por onde começar: Um dicionário Python com as transições permitidas. A Kamylla revisa no portão das 19h.
+
+Depende de: B-03
+Requisitos: RF12, RF24
+Responsável: Pessoa 3
+Estimativa: 3 h
+Prazo: sáb 20h",back-end,Pessoa 3,2026-11-14,20h,3,B-03,"RF12, RF24",G3 · Fluxo da FA de ponta a ponta (sáb 23h),back-end;astrohealth
+D-05,"[D-05] Módulo ia.py: analisar(leitura) devolve M1 e a linha de base (M3, z robusto)","Pronto quando: Uma função só, sem servidor: o back-end importa e chama; devolve o JSON de análise do D-01.
+
+Depende de: D-04, D-02
+Requisitos: RF01, RF12
+Responsável: Kamylla
+Estimativa: 2 h
+Prazo: sáb 21h",dados-e-ia,Kamylla,2026-11-14,21h,2,"D-04, D-02","RF01, RF12",G3 · Fluxo da FA de ponta a ponta (sáb 23h),dados-e-ia;astrohealth
+F-03,"[F-03] Painel de bordo: tripulação, sinais, protocolo da Cosmo com explicação, confirmar e liberar medicação","Pronto quando: Confirmar o protocolo, assumir manualmente e liberar medicação chamam a API; o botão de medicação só aparece depois de confirmar.
+Por onde começar: Copie a função `tabletHTML` da demo original (o antigo tablet).
+
+Depende de: F-01
+Requisitos: RF11 a RF13
+Responsável: Pessoa 2
+Estimativa: 4 h
+Prazo: sáb 21h",telas,Pessoa 2,2026-11-14,21h,4,F-01,RF11 a RF13,G3 · Fluxo da FA de ponta a ponta (sáb 23h),telas;astrohealth
+B-06,[B-06] Ligar a IA: cada leitura passa por ia.analisar() e pode virar evento,"Pronto quando: Com o cenário `fa` ligado, um evento de FA aparece em `GET /eventos` em até 2 s.
+Por onde começar: Chame `ia.analisar()` dentro do laço do simulador, logo depois de salvar a leitura.
+
+Depende de: D-05, B-04, B-05
+Requisitos: RF01
+Responsável: Pessoa 3
+Estimativa: 1 h
+Prazo: sáb 22h",back-end,Pessoa 3,2026-11-14,22h,1,"D-05, B-04, B-05",RF01,G3 · Fluxo da FA de ponta a ponta (sáb 23h),back-end;astrohealth
+D-06,"[D-06] Base de protocolos de fontes públicas, indexada no ChromaDB","Pronto quando: Pelo menos 10 protocolos com fonte; a busca devolve o protocolo de fibrilação atrial.
+
+Requisitos: RF17
+Responsável: Kamylla
+Estimativa: 2 h
+Prazo: sáb 23h",dados-e-ia,Kamylla,2026-11-14,23h,2,,RF17,G3 · Fluxo da FA de ponta a ponta (sáb 23h),dados-e-ia;astrohealth
+F-04,"[F-04] Celular da família: status da Sarah, Elo Terra (corrida e brinde) e mensagens, com o atraso visível","Pronto quando: A tela mostra só frases do feed (nunca números ou diagnóstico) e quanto tempo a notícia levou para chegar.
+Por onde começar: Copie a função `phoneHTML` da demo original.
+
+Depende de: F-01
+Requisitos: RF21
+Responsável: Pessoa 2
+Estimativa: 3 h
+Prazo: sáb 23h",telas,Pessoa 2,2026-11-14,23h,3,F-01,RF21,G3 · Fluxo da FA de ponta a ponta (sáb 23h),telas;astrohealth
+B-07,[B-07] Mensagens entre nave e Terra com atraso por missão,"Pronto quando: Cada mensagem guarda a hora de chegada (órbita baixa: menos de 1 s; Marte: 12 min 30 s, comprimido para 12,5 s); a API só entrega depois dessa hora.
+Por onde começar: Não precisa de fila real: salve `chega_em = agora + atraso` e filtre por `chega_em <= agora`.
+
+Depende de: B-05
+Requisitos: RF07, RF23
+Responsável: Pessoa 3
+Estimativa: 2 h
+Prazo: sáb 23h",back-end,Pessoa 3,2026-11-14,23h,2,B-05,"RF07, RF23",G3 · Fluxo da FA de ponta a ponta (sáb 23h),back-end;astrohealth
+B-10,[B-10] Gerar os ciclos hormonais sintéticos com a receita da Kamylla,"Pronto quando: `dados/ciclos.csv` com 2 tripulantes × 6 ciclos, um com ciclo natural e um com pílula contínua, cada noite com a fase verdadeira para avaliar o M4.
+Por onde começar: Por noite: temperatura da pele = base + 0,3 °C nas noites da fase lútea (os ~14 dias antes da menstruação) + ruído de 0,1 °C; FC de repouso +2 bpm na fase lútea. Com pílula contínua, sem salto. Use pandas e salve em CSV.
+
+Depende de: D-02
+Requisitos: RF01
+Responsável: Pessoa 3
+Estimativa: 1 h
+Prazo: dom 9h",back-end,Pessoa 3,2026-11-15,9h,1,D-02,RF01,G4 · Entrega (dom 15h; código congelado às 13h),back-end;astrohealth
+B-08,"[B-08] Feed da família: frases prontas a partir dos eventos, nunca números","Pronto quando: `GET /familia/feed` devolve frases como ""A Sarah está sendo acompanhada pelo oficial médico""; um teste garante que nenhum número nem dado do ciclo sai.
+Por onde começar: Um dicionário de estado → frase. Passa pelo mesmo atraso do B-07.
+
+Depende de: B-07
+Requisitos: RF21
+Responsável: Pessoa 3
+Estimativa: 1 h
+Prazo: dom 10h",back-end,Pessoa 3,2026-11-15,10h,1,B-07,RF21,G4 · Entrega (dom 15h; código congelado às 13h),back-end;astrohealth
+D-07,[D-07] M2 · treinar o detector de qualidade de sinal (CinC 2017 + ruído sintético) e incluir em ia.py,"Pronto quando: Recall de ""suspeito"" ≥ 0,9; com o cenário `folgado`, a análise marca o sinal como suspeito e o M1 não dispara.
+
+Depende de: D-03, D-05
+Requisitos: RF04
+Responsável: Kamylla
+Estimativa: 2 h
+Prazo: dom 10h",dados-e-ia,Kamylla,2026-11-15,10h,2,"D-03, D-05",RF04,G4 · Entrega (dom 15h; código congelado às 13h),dados-e-ia;astrohealth
+F-05,"[F-05] Console de Houston: dados com atraso, recebido da nave, copiloto e envio de parecer","Pronto quando: Os dados mostram a hora em que saíram da nave; o parecer enviado chega ao painel de bordo com o atraso da missão.
+Por onde começar: Copie a função `desktopHTML` da demo original.
+
+Depende de: F-01, B-07
+Requisitos: RF18, RF19
+Responsável: Pessoa 2
+Estimativa: 3 h
+Prazo: dom 10h",telas,Pessoa 2,2026-11-15,10h,3,"F-01, B-07","RF18, RF19",G4 · Entrega (dom 15h; código congelado às 13h),telas;astrohealth
+D-09,[D-09] M4 · ciclo hormonal no ia.py: deslocamento térmico (3 noites acima das 6 anteriores) + HMM de 2 estados,"Pronto quando: Fase certa em pelo menos 80% das noites dos ciclos sintéticos; com pílula contínua, devolve ""suprimido""; a saída ajusta a linha de base do M3.
+
+Depende de: D-05, B-10
+Requisitos: RF01
+Responsável: Kamylla
+Estimativa: 1 h
+Prazo: dom 11h",dados-e-ia,Kamylla,2026-11-15,11h,1,"D-05, B-10",RF01,G4 · Entrega (dom 15h; código congelado às 13h),dados-e-ia;astrohealth
+F-07,"[F-07] Visão Dados e IA: o caminho do sensor ao modelo, com contadores e o JSON da última leitura","Pronto quando: A visão mostra as 6 etapas, a tabela dos modelos M1 a M4 e os contadores lidos da API.
+Por onde começar: Copie a função `pipeHTML` da demo original.
+
+Depende de: F-01
+Requisitos: RF11
+Responsável: Pessoa 2
+Estimativa: 1 h
+Prazo: dom 11h",telas,Pessoa 2,2026-11-15,11h,1,F-01,RF11,G4 · Entrega (dom 15h; código congelado às 13h),telas;astrohealth
+B-09,[B-09] Testes pytest dos fluxos de FA e de relógio folgado,"Pronto quando: `pytest` passa e cobre: FA vira evento, o oficial confirma, Houston recebe com atraso; relógio folgado não vira alarme.
+Por onde começar: Use o `TestClient` do FastAPI; um teste por fluxo.
+
+Depende de: B-06, B-08
+Requisitos: RF04, RF12
+Responsável: Pessoa 3
+Estimativa: 2 h
+Prazo: dom 12h",back-end,Pessoa 3,2026-11-15,12h,2,"B-06, B-08","RF04, RF12",G4 · Entrega (dom 15h; código congelado às 13h),back-end;astrohealth
+D-08,"[D-08] Cosmo: chat e explicação das sugestões com o protocolo citado (Ollama + ChromaDB), sem permissão de ação","Pronto quando: `POST /cosmo/chat` responde e cita a fonte; a Cosmo não chama nenhuma rota que muda estado.
+
+Depende de: D-06
+Requisitos: RF03, RF12
+Responsável: Kamylla
+Estimativa: 2 h
+Prazo: dom 13h",dados-e-ia,Kamylla,2026-11-15,13h,2,D-06,"RF03, RF12",G4 · Entrega (dom 15h; código congelado às 13h),dados-e-ia;astrohealth
+F-06,[F-06] Trocar o mock pela API real nas quatro telas e criar o botão de cenário,"Pronto quando: As 4 telas leem a API; um botão troca o cenário do simulador; se a API cair, uma chave volta para o mock.
+Por onde começar: Se o F-01 ficou bem feito, aqui é trocar o endereço e testar.
+
+Depende de: F-02, F-03, F-04, F-05, F-07, B-06
+Responsável: Pessoa 2
+Estimativa: 2 h
+Prazo: dom 13h",telas,Pessoa 2,2026-11-15,13h,2,"F-02, F-03, F-04, F-05, F-07, B-06",,G4 · Entrega (dom 15h; código congelado às 13h),telas;astrohealth
+Q-01,[Q-01] Ensaio da demo com o roteiro de 90 segundos,"Pronto quando: O time roda o roteiro da demo original duas vezes seguidas sem travar, com a API e com o mock.
+
+Depende de: Todas
+Responsável: Todas
+Estimativa: 1 h
+Prazo: dom 13h",entrega,Todas,2026-11-15,13h,1,Todas,,G4 · Entrega (dom 15h; código congelado às 13h),entrega;astrohealth
+Q-02,"[Q-02] Vídeo do pitch e entrega do projeto até domingo, 15h","Pronto quando: Vídeo gravado e projeto entregue antes de domingo, 15h.
+
+Depende de: Q-01
+Responsável: Todas
+Estimativa: 2 h
+Prazo: dom 15h",entrega,Todas,2026-11-15,15h,2,Q-01,,G4 · Entrega (dom 15h; código congelado às 13h),entrega;astrohealth

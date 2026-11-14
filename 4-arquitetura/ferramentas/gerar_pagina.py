@@ -54,6 +54,10 @@ def ajustar_links(h):
             return f'href="#adr-{nome[:4]}"'
         if nome in ANCORA_DOC:
             return f'href="#{ANCORA_DOC[nome]}"'
+        if "analise-kenji" in alvo:
+            return 'href="#analise-kenji"'
+        if "analise-ciclo" in alvo:
+            return 'href="#analise-ciclo"'
         if "analise-fa" in alvo:
             return 'href="#analise-fa"'
         if "contratos" in alvo:
@@ -112,6 +116,8 @@ def main():
         if ancora == "dados":
             contrato = (RAIZ / "contratos/exemplos/evento-arritmia.json").read_text(encoding="utf-8")
             analise = (RAIZ / "contratos/exemplos/analise-fa.json").read_text(encoding="utf-8")
+            ciclo = (RAIZ / "contratos/exemplos/analise-ciclo.json").read_text(encoding="utf-8")
+            kenji = (RAIZ / "contratos/exemplos/analise-kenji.json").read_text(encoding="utf-8")
             corpo += (
                 '<h3 id="contrato">Exemplo de mensagem <code>evento.atualizado</code></h3>'
                 '<div class="codigo"><button class="copiar" type="button" data-alvo="json-contrato">Copiar</button>'
@@ -119,6 +125,12 @@ def main():
                 '<h3 id="analise-fa">Exemplo de análise com z robusto e Isolation Forest</h3>'
                 '<div class="codigo"><button class="copiar" type="button" data-alvo="json-analise">Copiar</button>'
                 f'<pre id="json-analise"><code>{html.escape(analise)}</code></pre></div>'
+                '<h3 id="analise-ciclo">Exemplo de análise do calendário do ciclo</h3>'
+                '<div class="codigo"><button class="copiar" type="button" data-alvo="json-ciclo">Copiar</button>'
+                f'<pre id="json-ciclo"><code>{html.escape(ciclo)}</code></pre></div>'
+                '<h3 id="analise-kenji">Exemplo sem calendário de ciclo</h3>'
+                '<div class="codigo"><button class="copiar" type="button" data-alvo="json-kenji">Copiar</button>'
+                f'<pre id="json-kenji"><code>{html.escape(kenji)}</code></pre></div>'
             )
         secoes.append(
             f'<section id="{ancora}" class="secao"><p class="sec-n">{i:02d}</p><h2>{nome}</h2>{corpo}</section>'

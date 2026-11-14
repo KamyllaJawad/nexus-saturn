@@ -9,9 +9,9 @@ O hackathon é no sábado 14/11 e no domingo 15/11, com entrega às 15h de domin
 | Pasta | Conteúdo |
 | --- | --- |
 | `1-demo-mvp/` | `astrohealth-demo.html`, a demo navegável e base do MVP. Abra no navegador, sem instalar nada. |
-| `2-mockups/` | Fonte das 14 telas do canvas de mockups, tiradas da demo. Só abrem dentro do canvas (link abaixo). |
-| `3-documentos/` | PDFs do plano do time, do MVP (dados, modelos e telas) e da arquitetura de software, exportados em 11/11. O Isolation Forest entrou no M3 depois disso: vale a ADR-012. |
-| `4-arquitetura/` | Arquitetura em formato de repositório: docs, 12 ADRs, contratos JSON, diagramas Mermaid e SVG, e a página interativa. |
+| `2-mockups/` | Fonte das 17 telas do canvas de mockups, tiradas da demo. Só abrem dentro do canvas (link abaixo). |
+| `3-documentos/` | PDFs do plano do time, do MVP (dados, modelos e telas) e da arquitetura de software, exportados em 11/11, e a gamificação cooperativa de 14/11 (`4-Gamificação.pdf`): sem ranking, sem punição, com a família. O Isolation Forest entrou no M3 depois dos PDFs de 11/11: vale a ADR-012. |
+| `4-arquitetura/` | Arquitetura em formato de repositório: docs, 13 ADRs, contratos JSON, diagramas Mermaid e SVG, e a página interativa. |
 | `5-plano-do-time/` | CSV com as 25 tarefas para 3 pessoas, as partes só simuladas e o script que cria as issues no GitHub. |
 | `6-origem/` | As telas do Stitch que deram origem ao projeto. |
 | `7-pitch/` | Guia, mapa de uso e parcerias em potencial para quem monta o pitch. |
@@ -24,6 +24,7 @@ O hackathon é no sábado 14/11 e no domingo 15/11, com entrega às 15h de domin
 - MVP · dados, modelos e telas: https://claude.ai/artifact/7cs25yVBYhkGgKk1ywLaRT
 - Arquitetura (doc): https://claude.ai/artifact/VAc7XDqgnsWmbqsZRo5kvB
 - Arquitetura (página interativa): https://claude.ai/artifact/Lego72b78ToDUQFZ46EGYe
+- Gamificação: https://claude.ai/artifact/F8cWbKnNstNTQRTeEUW6qM
 
 Os links são privados até serem compartilhados pelo menu Share de cada um.
 

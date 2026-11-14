@@ -1,0 +1,36 @@
+[hidden]{display:none!important}
+/* ---------- Ciclo hormonal (M4) ---------- */
+.w-tag.cyc{color:#f9a8d4}
+.w-btn.cyc{background:var(--cycle);color:#fff}
+.ws.scr-ciclo{background:radial-gradient(circle at 50% 40%,rgba(236,72,153,.18),#000 72%)}
+.dec.cyc{border-color:rgba(236,72,153,.45);background:linear-gradient(140deg,rgba(236,72,153,.1),var(--surface) 70%)}
+.dec.cyc.priv{border-style:dashed;background:var(--surface)}
+
+/* ---------- Dados e IA ---------- */
+.pipe{max-width:1280px;margin:26px auto 0;border-top:1px solid var(--line);padding-top:18px;display:flex;flex-direction:column;gap:14px}
+.pipe-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 16px}
+.pipe-head h3{font:600 16px var(--fd)}
+.pipe-head p{font-size:12.5px;color:var(--ink3);max-width:78ch}
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;list-style:none;margin:0;padding:0;counter-reset:etapa}
+.flow li{counter-increment:etapa;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 13px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.flow li h4{display:flex;align-items:center;gap:8px;font:600 13.5px var(--fd)}
+.flow li h4::before{content:counter(etapa);display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:rgba(0,229,255,.14);color:var(--accent);font:600 11px var(--fm);flex:none}
+.flow li p{font-size:12px;color:var(--ink2);line-height:1.45}
+.flow .tech{font:500 10.5px var(--fm);color:var(--ink3);letter-spacing:.02em}
+.flow .live{margin-top:auto;font-size:11.5px;color:var(--ink2);padding-top:6px;border-top:1px solid var(--line)}
+.flow .live b{font:600 14px var(--fd);color:var(--ink);font-variant-numeric:tabular-nums}
+.models-w{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.models{width:100%;min-width:760px;border-collapse:collapse;font-size:12.5px}
+.models th{text-align:left;font:500 10.5px var(--fm);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);padding:10px 12px;border-bottom:1px solid var(--line)}
+.models td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink2)}
+.models tr:last-child td{border-bottom:0}
+.models td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+.models td.out{font:500 12px var(--fm);color:var(--ink);white-space:nowrap}
+.models td.out.hot{color:#fca5a5}.models td.out.cy{color:#f9a8d4}
+.pipe-note{font-size:12px;color:var(--ink2);padding:10px 12px;border-radius:12px;background:rgba(236,72,153,.07);border:1px solid rgba(236,72,153,.3)}
+.jsons{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+.json{background:#020409;border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+.json b{display:block;font:500 10.5px var(--fm);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.json pre{margin:0;font:400 11.5px/1.5 var(--fm);color:#a5f3fc;white-space:pre-wrap;overflow-wrap:anywhere}
+/* Prancheta da visão Dados e IA: a seção aparece sem a página em volta */
+.pipe{margin:0 auto;border-top:0;padding-top:0}
