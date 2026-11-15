@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import PainelHeader from '../components/PainelHeader.vue'
 import ListaTripulacao from '../components/ListaTripulacao.vue'
 import PacienteHeader from '../components/PacienteHeader.vue'
@@ -14,7 +15,8 @@ import { buscarEcg, paraCard } from '@/servicos/api'
 import type { TrechoEcg } from '@/ecg/tocador'
 
 const { tripulantes, status, bordo, erro, conexao, decidir } = usarBordo()
-const selecionado = ref('sarah')
+// /v2/#/bordo?quem=kenji abre o painel já nessa pessoa.
+const selecionado = ref(String(useRoute().query.quem ?? 'sarah'))
 const acoesFeitas = ref<Record<string, string>>({})
 
 const tripulante = computed(
@@ -114,6 +116,41 @@ main {
   grid-template-columns: minmax(0, 1fr) 300px;
   align-items: start;
   gap: 12px;
+}
+
+/* Telas mais estreitas, como o iframe da sala de simulação (~620 px):
+   o chat desce e, abaixo de 820 px, tudo vira uma coluna. */
+@media (max-width: 1180px) {
+  .layout {
+    grid-template-columns: 200px minmax(0, 1fr);
+  }
+  .chat {
+    grid-column: 1 / -1;
+    height: 420px;
+    border-left: 0;
+    border-top: 1px solid var(--linha);
+  }
+}
+@media (max-width: 820px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lista {
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-right: 0;
+    border-bottom: 1px solid var(--linha);
+  }
+  .lista :deep(.item) {
+    width: auto;
+    flex: 1 1 140px;
+  }
+  main {
+    padding: 14px 16px;
+  }
+  .sinais-e-corpo {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .aviso {

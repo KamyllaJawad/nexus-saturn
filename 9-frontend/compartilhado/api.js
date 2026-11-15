@@ -1,6 +1,6 @@
-// Uma função só para falar com a API. Servido pelo FastAPI (porta 8000) o caminho
-// é relativo; aberto de outro servidor, aponta para a API local.
-export const API = location.port === "8000" ? "" : "http://127.0.0.1:8000";
+// Uma função só para falar com a API. Servido pelo FastAPI (em qualquer porta) o caminho
+// é relativo; aberto como arquivo ou pelo Live Server (5500), aponta para a API local.
+export const API = location.protocol === "file:" || location.port === "5500" ? "http://127.0.0.1:8000" : "";
 
 export const TRIPULACAO = [
   { id: "sarah", nome: "Sarah", papel: "Comandante" },

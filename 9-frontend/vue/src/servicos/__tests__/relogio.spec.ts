@@ -106,7 +106,7 @@ describe('usarRelogio', () => {
   afterEach(() => vi.unstubAllGlobals())
 
   it('a decisão no pulso é assinada pela dona do relógio', async () => {
-    const fetch = vi.fn(async (url: string) => new Response(JSON.stringify(url.includes('/relogio') ? base : { ok: true })))
+    const fetch = vi.fn(async (url: string, _init?: RequestInit) => new Response(JSON.stringify(url.includes('/relogio') ? base : { ok: true })))
     vi.stubGlobal('fetch', fetch)
     let api!: ReturnType<typeof usarRelogio>
     const C = defineComponent({
@@ -119,7 +119,7 @@ describe('usarRelogio', () => {
     await flushPromises()
     await api.decidir('ev-9', 'compartilhar')
     const post = fetch.mock.calls.find(([u]) => String(u).endsWith('/api/decisoes'))!
-    expect(JSON.parse((post[1] as RequestInit).body as string)).toEqual({ evento_id: 'ev-9', humano_id: 'elena', acao: 'compartilhar' })
+    expect(JSON.parse(post[1]!.body as string)).toEqual({ evento_id: 'ev-9', humano_id: 'elena', acao: 'compartilhar' })
     w.unmount()
   })
 })
