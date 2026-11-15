@@ -1,3 +1,5 @@
+# Só vale se o contexto for esta pasta. O deploy do Render usa a raiz
+# do repositório e o .dockerignore de lá (veja 8-backend/Dockerfile).
 astrohealth.db
 **/__pycache__
 .pytest_cache
