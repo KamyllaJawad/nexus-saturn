@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+# banco da sessão e dado grande: o zip do CinC (94 MB) se baixa de novo.
+# Prata e ouro (~9 MB) ficam no git: o retreino (human-in-the-loop) e o painel de
+# dados precisam deles no servidor, e sem o zip do CinC o pipeline não os refaz iguais.
+8-backend/astrohealth.db
+8-backend/dados/bronze/cinc2017/
+8-backend/modelos/candidatos/
+# build das telas Vue (npm run build em 9-frontend/vue); a API serve em /v2/
+9-frontend/v2/

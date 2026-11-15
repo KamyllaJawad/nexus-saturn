@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AstroHealth · Painel de bordo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../compartilhado/tema.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand" id="brand"><b>Enfermaria · Dr. Marcus</b><small>Painel de bordo · oficial médico</small></div>
+  <div class="chips" id="chips"></div>
+  <div class="onde" id="onde">A bordo · rede local</div>
+</header>
+<main class="palco">
+  <div class="layout">
+    <section class="col">
+      <span class="eyebrow">Tripulação</span>
+      <div class="crew" id="quem"></div>
+      <div class="card" id="sombra" hidden></div>
+    </section>
+    <section class="col">
+      <div id="topo"></div>
+      <div class="ecg-wrap"><canvas class="ecg" id="ecg" width="900" height="192" aria-label="Trecho de ECG do relógio"></canvas><small id="ecg-origem"></small></div>
+      <div id="ficha"></div>
+    </section>
+    <section class="col">
+      <div class="card"><h3>Decisões</h3><div id="eventos"></div></div>
+      <div class="card"><h3>Compartilhado pela tripulação</h3><div id="avisos"></div></div>
+      <div class="card"><h3 id="titulo-cosmo">Cosmo · chat do copiloto médico</h3><div id="cosmo"></div></div>
+      <div class="card"><h3>Trilha da Cosmo · auditoria</h3><div id="trilha"></div></div>
+    </section>
+  </div>
+</main>
+<p class="rodape">Protótipo experimental com dados simulados. Não é dispositivo médico. A Cosmo explica; quem decide é um humano.</p>
+<p id="erro" class="erro" hidden></p>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

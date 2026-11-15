@@ -1,0 +1,6 @@
+id,tripulante_id,cenario,inicio_utc,fim_utc,excluir_treino_if,o_que_o_mvp_deve_fazer
+ep01,sarah,ciclo,2026-11-14T10:00:00Z,2026-11-14T12:00:00Z,false,Avisar só a Sarah: sintomas em dois dias ou já no trecho; estado ótimo; não compartilhar.
+ep02,elena,hidratacao,2026-11-13T05:50:00Z,2026-11-14T12:00:00Z,false,Lembrete de água para a Elena.
+ep03,sarah,sensor_solto,2026-11-13T16:10:00Z,2026-11-13T16:11:00Z,true,Perguntar à Sarah antes de alarmar; o kit confirma 97%.
+ep04,sarah,fa,2026-11-13T09:42:00Z,2026-11-13T09:44:00Z,true,Abrir evento de arritmia; não usar esses minutos no Isolation Forest.
+ep05,kenji,osso,2026-11-14T00:00:00Z,2026-11-14T12:00:00Z,false,Manter treino resistivo do Kenji; sem pergunta de ciclo.

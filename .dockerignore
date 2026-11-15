@@ -1,0 +1,15 @@
+.git
+.venv
+**/.venv
+**/node_modules
+**/__pycache__
+**/.pytest_cache
+**/*.pyc
+**/.vite
+9-frontend/v2
+9-frontend/vue/dist
+8-backend/astrohealth.db
+8-backend/dados/bronze/cinc2017
+8-backend/modelos/candidatos
+astrohealth-os (novas att)
+*.zip

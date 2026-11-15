@@ -900,7 +900,7 @@ Quem não tem calendário sai no formato de [contratos/exemplos/analise-kenji.js
 
 A NASA não publica o prontuário da tripulação. O treino não espera esse arquivo. O lakehouse fica na Terra. A nave guarda o operacional e manda, em P2, o agregado de 1 minuto, a janela crua de ECG quando um evento abre, o resumo da noite e a ficha. O relógio, o patch, o kit, o registro de água e a cabine publicam o mesmo contrato, com `dispositivo_id` e `canal`. CO₂ não tem tripulante. Estresse é canal derivado, na zona prata. A ficha não é série temporal.
 
-O bronze guarda o cru. A prata alinha o relógio, unifica a unidade e marca a qualidade do M2. O ouro é uma tabela por modelo: CinC 2017 para M1 e M2, vitais sintéticos para o M3, ficha sem treino para o calendário. O job grava o `.joblib`. Esse artefato sobe para a nave. O lakehouse não sobe. O texto completo está em `4-arquitetura/docs/11-dados-lakehouse.md`.
+As pastas do protótipo ficam em `8-backend/dados/`. O bronze guarda o cru. A prata alinha o relógio, unifica a unidade e marca a qualidade do M2. O ouro é uma tabela por modelo: CinC 2017 para M1 e M2, vitais sintéticos para o M3, ficha sem treino para o calendário. O job grava o `.joblib`. Esse artefato sobe para a nave. O lakehouse não sobe. O texto completo está em `4-arquitetura/docs/11-dados-lakehouse.md`.
 
 <a id="stack"></a>
 
@@ -1013,27 +1013,24 @@ flowchart TB
 | Auditoria | Hash do registro anterior, só inclusão | Transição, sugestão, decisão e escalonamento | Trilha no SQLite, copiada para a Terra em P2 |
 | Link | Fila por prioridade. `chega_em = agora + atraso` do perfil de missão | `evento.atualizado` | P1 a P4. O feed da família sai de um dicionário de estado para frase |
 
-<a id="stack-estrutura-sugerida-do-codigo-do-prototipo"></a>
+<a id="stack-codigo-do-prototipo"></a>
 
-### Estrutura sugerida do código do protótipo
+### Código do protótipo
+
+O serviço da nave mora em [`8-backend/`](../../8-backend/). Demo, mockups e documentos não entram nessa pasta.
 
 ```text
-astrohealth/
-├── nave/
-│   ├── ingestao/          # leituras + qualidade de sinal
-│   ├── detectores/        # arritmia, artefato, linha de base (z e Isolation Forest), calendário do ciclo, prontidão, humor
-│   ├── motor/             # máquina de estados + regras + prazos
-│   ├── cosmo/             # LangChain/CrewAI + ChromaDB + Ollama
-│   ├── auditoria/         # log com hash encadeado (SQLite)
-│   └── gateway_dtn/       # fila por prioridade + simulador de atraso
-├── terra/
-│   ├── servidor/          # recepção, confirmação, filtro de privacidade
-│   └── cosmo_terra/       # copiloto de Houston
-├── apps/                  # relógio, tablet, console, família (web)
-├── contratos/             # JSON Schemas compartilhados
+8-backend/
+├── app/
+│   ├── ia.py              # M1, M2 e M3
+│   ├── nave/              # ingestão e motor
+│   └── terra/             # frase da família
+├── dados/
+│   ├── bronze/
+│   ├── prata/
+│   ├── ouro/
+│   └── treino/
 └── testes/
-    ├── aceitacao/         # Robot Framework, um .robot por fluxo
-    └── unidade/           # pytest
 ```
 
 <a id="seguranca"></a>

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AstroHealth · Família</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../compartilhado/tema.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand"><b>Terra-Órbita</b><small>App da família da Sarah</small></div>
+  <div class="onde terra" id="onde">Terra · só frases</div>
+</header>
+<main class="palco">
+  <div class="fone" id="fone"></div>
+  <p class="nota" style="text-align:center;margin-top:16px">A família recebe frases prontas, com o atraso da missão. Nunca sinais vitais, diagnóstico, humor ou ciclo.</p>
+</main>
+<p class="rodape">Protótipo experimental com dados simulados. Não é dispositivo médico.</p>
+<p id="erro" class="erro" hidden></p>
+<script type="module">
+import { api, erro, esc, hora, ligarAcoes, nome, pintar, repetir } from "../compartilhado/api.js";
+
+let d = null;
+ligarAcoes({ acao: (tipo) => api("/familia/acao", { tipo }).then(carregar) }, erro);
+
+async function carregar() {
+  d = await api("/familia/feed");
+  const medico = d.frase.includes("equipe médica");
+  const outros = Object.entries(d.tripulacao).filter(([k]) => k !== "sarah")
+    .map(([k, v]) => `<span class="chip">${esc(nome(k))}: ${esc(v === "bem" ? "bem" : "acompanhada")}</span>`).join("");
+  const brinde = { enviado: "Convite a caminho da nave.", chegou: "A Sarah recebeu seu convite. Quando ela beber, a confirmação viaja de volta.", feito: "Brinde concluído: vocês beberam juntas, cada uma no seu planeta." }[d.elo.brinde];
+  document.querySelector("#onde").innerHTML = `Terra${d.dado_de ? ` · notícia de ${hora(d.dado_de)}` : ""}<br>atraso ${esc(d.atraso)}`;
+  pintar(document.querySelector("#fone"), `
+    <div class="heroi ${d.sem_sinal ? "semsinal" : medico ? "med" : ""}">
+      <span class="eyebrow">Sarah · Comandante</span><h4>${esc(d.frase)}</h4>
+      <p class="nota">${d.sem_sinal ? "" : `As notícias da nave chegam com ${esc(d.atraso)} de atraso, o tempo que o sinal leva para viajar.`}</p>
+    </div>
+    <div class="chips" style="margin:10px 0">${outros}</div>
+    <div class="card"><h3>Últimas da nave</h3>${d.ultimas.length ? `<ul class="lista">${d.ultimas.map((i) => `<li class="p3"><time>saiu da nave ${hora(i.gerado_em, true)} · chegou ${hora(i.recebido_em, true)}</time>${esc(i.frase)}</li>`).join("")}</ul>` : '<p class="nota">Nada novo por enquanto.</p>'}</div>
+    <div class="card"><h3>Elo Terra · estufa da tripulação</h3>
+      <div class="barra"><i style="width:${d.elo.estufa_pct}%"></i></div>
+      <p class="nota" style="margin-top:6px">Hábitos saudáveis da tripulação e da família fazem a estufa crescer. Ninguém joga sozinho e ninguém perde. ${esc(d.elo.corrida)}</p>
+      ${brinde ? `<p class="nota c-acc">${brinde}</p>` : ""}
+      <div class="acoes"><button class="btn water sm" data-acao="acao" data-arg="brinde">Brindar com a Sarah</button>
+        <button class="btn ghost sm" data-acao="acao" data-arg="corrida">Registrar corrida do Lucas</button>
+        <button class="btn ghost sm" data-acao="acao" data-arg="mensagem">Enviar áudio do Lucas</button></div></div>
+    <div class="card"><h3>Enviado para a nave</h3>${d.enviadas.length ? `<ul class="lista">${d.enviadas.map((p) => `<li class="p4"><time>${p.estado === "entregue" ? `entregue ${hora(p.entregue_em, true)}` : p.estado === "fila" ? "guardado: sem sinal, segue quando o contato voltar" : `a caminho · chega em ${p.falta_s} s`}</time>${esc(p.rotulo)}</li>`).join("")}</ul>` : `<p class="nota">Cada mensagem leva ${esc(d.atraso)} para chegar.</p>`}</div>`);
+}
+repetir(carregar, 1000);
+</script>
+</body>
+</html>
