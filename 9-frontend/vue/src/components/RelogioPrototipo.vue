@@ -34,7 +34,9 @@ const subtitulo = computed(() => {
 const chipCiclo = computed(() => {
   const c = props.ciclo
   if (!c) return null
-  return 'dia' in c ? { valor: `D${c.dia}`, rotulo: 'ciclo' } : { valor: c.metodo, rotulo: '' }
+  if ('dia' in c) return { valor: `D${c.dia}`, rotulo: 'ciclo' }
+  if ('aviso' in c) return { valor: c.aviso, rotulo: 'calendário' }
+  return { valor: c.metodo, rotulo: '' }
 })
 
 

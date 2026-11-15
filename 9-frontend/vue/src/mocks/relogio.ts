@@ -15,7 +15,8 @@ export const PREVIA_ESTADO: Record<NivelSaude, EstadoRelogio> = {
   2: { fc: 123, spo2: 89, homeostase: 19, motivo: 'FC alta e SpO₂ baixa' },
 }
 
-export type CicloNoRelogio = { dia: number; fase: string } | { metodo: string }
+// `aviso`: só o trecho do calendário de solo (ADR-013), sem método nem fase. É o que a API manda.
+export type CicloNoRelogio = { dia: number; fase: string } | { metodo: string } | { aviso: string }
 
 export const CICLO_NO_RELOGIO: Record<string, CicloNoRelogio> = {
   sarah: { dia: 16, fase: 'lútea' }
