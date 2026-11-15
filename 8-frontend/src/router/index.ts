@@ -14,6 +14,11 @@ const router = createRouter({
       name: 'relogio',
       component: () => import('../views/RelogioView.vue'),
     },
+    {
+      path: '/celular',
+      name: 'celular',
+      component: () => import('../views/CelularView.vue'),
+    },
   ],
 })
 
