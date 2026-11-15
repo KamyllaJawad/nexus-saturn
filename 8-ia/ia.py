@@ -303,12 +303,43 @@ def chat_cosmo(
             "motor": "Google Gemini (Nuvem)",
         }
 
-    # 3. Fallback informativo demonstrando o RAG mesmo sem LLM online
-    msg_demo = (
-        "🔍 **Modo Protocolo RAG:** Os trechos oficiais da NASA foram recuperados com sucesso para esta consulta. "
-        "Para síntese textual pela IA na nuvem, adicione uma chave `GEMINI_API_KEY` na barra lateral ou nas configurações do Streamlit."
+    # 3. Fallback RAG Extrativo Mínimo (100% offline, sem custo e sem chave de API)
+    # Primeiro verifica salvaguarda médica (ADR-003)
+    if _FARMACO.search(mensagem):
+        return {
+            "resposta": _SEGURO,
+            "fontes": trechos,
+            "aviso": AVISO,
+            "motor": "Salvaguarda Médica (ADR-003)",
+        }
+
+    if not trechos or trechos[0].get("similaridade", 0) <= 0.0:
+        return {
+            "resposta": "Não encontrei essa informação nos protocolos médicos da missão.",
+            "fontes": [],
+            "aviso": AVISO,
+            "motor": "RAG Extrativo (Zero Chave)",
+        }
+
+    top = trechos[0]
+    # Extrai o parágrafo mais relevante do trecho recuperado
+    linhas = [p.strip() for p in top["trecho"].split("\n") if len(p.strip()) > 35]
+    texto_base = linhas[0] if linhas else top["trecho"][:350]
+    frases = re.split(r"(?<=[.!?])\s+", texto_base)
+    extrato = " ".join(frases[:3])
+
+    resposta_extrativa = (
+        f"Conforme o protocolo oficial da missão (`{top['fonte']}`):\n\n"
+        f"\"{extrato}\" [1]\n\n"
+        f"*(Resposta extraída diretamente da base de conhecimento da NASA, sem alucinações e sem dependência de chaves de nuvem).* "
+        f"Lembre-se: decisões de conduta final são sempre de responsabilidade humana."
     )
-    return {"resposta": msg_demo, "fontes": trechos, "aviso": AVISO, "motor": "Protocolo RAG direto"}
+    return {
+        "resposta": resposta_extrativa,
+        "fontes": trechos,
+        "aviso": AVISO,
+        "motor": "RAG Extrativo Direto (100% Gratuito / Sem Chave)",
+    }
 
 
 # --------------------------------------------------------------------------- regras

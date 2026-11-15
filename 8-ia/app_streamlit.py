@@ -77,10 +77,11 @@ except Exception:
 if not ollama_online and not chave_secreta:
     st.sidebar.markdown("---")
     st.sidebar.caption("🌐 **Modo Nuvem (Streamlit Cloud):**")
+    st.sidebar.success("✅ RAG Extrativo Mínimo Ativo: Funciona 100% sem chave externa!")
     chave_input = st.sidebar.text_input(
         "Chave Gemini API (Opcional):",
         type="password",
-        help="Permite respostas sintetizadas em linguagem natural quando executado fora do notebook com Ollama.",
+        help="Opcional. Sem chave, o sistema usa RAG Extrativo direto dos protocolos oficiais da NASA sem custo.",
     )
     chave_ativa = chave_input or chave_secreta
 else:
