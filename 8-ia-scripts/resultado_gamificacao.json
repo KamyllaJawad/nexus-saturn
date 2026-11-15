@@ -1,0 +1,23 @@
+﻿{
+    "timestamp":  "2026-11-15 16:43:26",
+    "bioma_cooperativo":  {
+                              "vitalidade_pct":  93.7,
+                              "fase_estufa":  "Florescendo (Ecossistema Vibrante)",
+                              "adesao_medias":  {
+                                                    "agua":  91.7,
+                                                    "exercicio":  94.4,
+                                                    "sono":  95.2
+                                                },
+                              "narrativa_cosmo":  "Olá, tripulação!\n\nEstamos no auge da nossa jornada espacial e estamos todos muito orgulhosos do nosso ecossistema em funcionamento. Continue cuidando de cada detalhe e sabendo que estamos todos juntos nessa aventura incrível!"
+                          },
+    "elo_terra_espaco":  {
+                             "desafio":  "Corrida Terra-Orbita",
+                             "astronauta":  "Alex",
+                             "familiar":  "Lucas (filho)",
+                             "km_total":  43.6,
+                             "km_meta":  60,
+                             "progresso_pct":  72.7,
+                             "mensagem_cosmo":  "Olá, Lucas! Estou tão orgulhoso de você por estar tão perto da meta! Você está fazendo um ótimo trabalho e estou confiante de que você vai alcançar o objetivo!",
+                             "privacidade":  "ADR-007 cumprida: dados de saude mental restritos"
+                         }
+}
