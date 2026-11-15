@@ -18,13 +18,28 @@ const props = withDefaults(
     telaAtual?: string
     // Fundo da tela em evento: alerta vermelho, aviso amarelo, privado roxo.
     fundo?: '' | 'crit' | 'warn' | 'roxo'
+    // Circular (45 mm) ou quadrado (41 mm), como os dois relógios da demo.
+    formato?: 'redondo' | 'quadrado'
+    // Quantos sinais estão ótimos, em atenção e críticos (a face quadrada mostra).
+    contagem?: { otimos: number; atencao: number; criticos: number }
   }>(),
-  { missao: 'LEO', telas: undefined, telaAtual: undefined, fundo: '' },
+  {
+    missao: 'LEO',
+    telas: undefined,
+    telaAtual: undefined,
+    fundo: '',
+    formato: 'redondo',
+    contagem: undefined,
+  },
 )
+// Anel do relógio quadrado: retângulo com pathLength 100, então o traço é a própria %.
+const tracoQuadrado = computed(() => `${Math.max(0, Math.min(100, props.estado.homeostase))} 100`)
 const emit = defineEmits<{ proxima: []; tela: [id: string] }>()
 
 // A face (hora, avatar, estado e sinais) é a tela "início".
-const mostrarFace = computed(() => !props.telas?.length || !props.telaAtual || props.telaAtual === 'inicio')
+const mostrarFace = computed(
+  () => !props.telas?.length || !props.telaAtual || props.telaAtual === 'inicio',
+)
 
 const NOMES = ['Ótimo', 'Atenção', 'Crítico']
 const CIRCUNFERENCIA = 2 * Math.PI * 47
@@ -32,7 +47,6 @@ const traco = computed(() => {
   const cheio = (Math.max(0, Math.min(100, props.estado.homeostase)) / 100) * CIRCUNFERENCIA
   return `${cheio} ${CIRCUNFERENCIA}`
 })
-
 
 const subtitulo = computed(() => {
   const c = props.ciclo
@@ -48,7 +62,6 @@ const chipCiclo = computed(() => {
   return { valor: c.metodo, rotulo: '' }
 })
 
-
 const hora = ref('')
 let relogio = 0
 function atualizarHora() {
@@ -62,19 +75,62 @@ onUnmounted(() => window.clearInterval(relogio))
 </script>
 
 <template>
-  <div class="aro" :class="`n${nivel}`">
+  <div class="aro" :class="[`n${nivel}`, formato]">
     <!-- A coroa passa para a próxima tela, como no relógio da demo -->
-    <button v-if="telas?.length" type="button" class="botao" aria-label="Coroa: próxima tela do relógio" @click="emit('proxima')"></button>
+    <button
+      v-if="telas?.length"
+      type="button"
+      class="botao"
+      aria-label="Coroa: próxima tela do relógio"
+      @click="emit('proxima')"
+    ></button>
     <div v-else class="botao" aria-hidden="true"></div>
     <div
       class="tela"
-      :class="fundo ? `fundo-${fundo}` : ''"
+      :class="[formato, fundo ? `fundo-${fundo}` : '']"
       :role="mostrarFace ? 'img' : undefined"
-      :aria-label="mostrarFace ? `Relógio: ${NOMES[nivel]}, ${subtitulo}, FC ${estado.fc} bpm, SpO₂ ${estado.spo2}%` : undefined"
+      :aria-label="
+        mostrarFace
+          ? `Relógio: ${NOMES[nivel]}, ${subtitulo}, FC ${estado.fc} bpm, SpO₂ ${estado.spo2}%`
+          : undefined
+      "
     >
-      <svg v-if="mostrarFace" class="anel" viewBox="0 0 100 100" aria-hidden="true">
+      <svg
+        v-if="mostrarFace && formato === 'quadrado'"
+        class="anel"
+        viewBox="0 0 236 292"
+        aria-hidden="true"
+      >
+        <rect
+          class="trilho quadrado"
+          x="3"
+          y="3"
+          width="230"
+          height="286"
+          rx="55"
+          pathLength="100"
+        />
+        <rect
+          class="progresso quadrado"
+          x="3"
+          y="3"
+          width="230"
+          height="286"
+          rx="55"
+          pathLength="100"
+          :stroke-dasharray="tracoQuadrado"
+        />
+      </svg>
+      <svg v-else-if="mostrarFace" class="anel" viewBox="0 0 100 100" aria-hidden="true">
         <circle class="trilho" cx="50" cy="50" r="47" />
-        <circle class="progresso" cx="50" cy="50" r="47" :stroke-dasharray="traco" transform="rotate(-90 50 50)" />
+        <circle
+          class="progresso"
+          cx="50"
+          cy="50"
+          r="47"
+          :stroke-dasharray="traco"
+          transform="rotate(-90 50 50)"
+        />
       </svg>
 
       <div v-if="mostrarFace" class="conteudo">
@@ -86,9 +142,29 @@ onUnmounted(() => window.clearInterval(relogio))
         <div class="estado">{{ NOMES[nivel] }}</div>
         <div class="subtitulo">{{ subtitulo }}</div>
         <div class="chips">
-          <span class="chip"><Heart :size="11" class="coracao" aria-hidden="true" /><b>{{ estado.fc }}</b> bpm</span>
-          <span class="chip"><span class="o2">O₂</span><b>{{ estado.spo2 }}</b> %</span>
-          <span v-if="chipCiclo" class="chip ciclo">♀ <b>{{ chipCiclo.valor }}</b> {{ chipCiclo.rotulo }}</span>
+          <span class="chip"
+            ><Heart :size="11" class="coracao" aria-hidden="true" /><b>{{ estado.fc }}</b> bpm</span
+          >
+          <span class="chip"
+            ><span class="o2">O₂</span><b>{{ estado.spo2 }}</b> %</span
+          >
+          <span v-if="chipCiclo" class="chip ciclo"
+            >♀ <b>{{ chipCiclo.valor }}</b> {{ chipCiclo.rotulo }}</span
+          >
+        </div>
+        <div v-if="formato === 'quadrado' && contagem" class="contagem">
+          <span class="c0" :class="{ on: contagem.otimos }"
+            ><b>{{ contagem.otimos }}</b
+            >ótimos</span
+          >
+          <span class="c1" :class="{ on: contagem.atencao }"
+            ><b>{{ contagem.atencao }}</b
+            >atenção</span
+          >
+          <span class="c2" :class="{ on: contagem.criticos }"
+            ><b>{{ contagem.criticos }}</b
+            >críticos</span
+          >
         </div>
       </div>
       <!-- As outras telas (sinais, Cosmo, estufa...) vêm de quem usa o relógio -->
@@ -96,7 +172,12 @@ onUnmounted(() => window.clearInterval(relogio))
 
       <slot name="aviso" />
 
-      <div v-if="telas && telas.length > 1" class="pontos" role="group" aria-label="Telas do relógio">
+      <div
+        v-if="telas && telas.length > 1"
+        class="pontos"
+        role="group"
+        aria-label="Telas do relógio"
+      >
         <button
           v-for="t in telas"
           :key="t.id"
@@ -116,6 +197,71 @@ onUnmounted(() => window.clearInterval(relogio))
 </template>
 
 <style scoped>
+/* ---------- Relógio quadrado (41 mm), como o da demo ---------- */
+.aro.quadrado {
+  width: 264px;
+  height: 320px;
+  padding: 14px;
+  border-radius: 72px;
+  background: linear-gradient(160deg, #2b3448, #0e131d 70%);
+}
+.aro.quadrado .botao {
+  top: 34%;
+}
+.tela.quadrado {
+  border-radius: 58px;
+}
+.trilho.quadrado,
+.progresso.quadrado {
+  stroke-width: 4;
+}
+.progresso.quadrado {
+  filter: drop-shadow(0 0 4px var(--cor));
+}
+.tela.quadrado .conteudo-tela {
+  padding: 22px 18px 34px;
+}
+.tela.quadrado .conteudo {
+  padding: 0 16px 28px;
+}
+.contagem {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  width: 100%;
+  margin-top: 4px;
+}
+.contagem span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 2px;
+  border-radius: 12px;
+  border: 1px solid var(--linha);
+  background: #101a30;
+  font-size: 9px;
+  color: var(--texto-fraco);
+}
+.contagem b {
+  font-size: 15px;
+}
+.contagem .c0 b {
+  color: var(--ok);
+}
+.contagem .c1 b {
+  color: var(--warn);
+}
+.contagem .c2 b {
+  color: var(--crit);
+}
+.contagem .on.c1 {
+  border-color: rgba(245, 158, 11, 0.5);
+}
+.contagem .on.c2 {
+  border-color: rgba(239, 68, 68, 0.6);
+  background: rgba(239, 68, 68, 0.12);
+}
+
 .conteudo-tela {
   position: absolute;
   inset: 0;
@@ -189,7 +335,9 @@ button.botao {
   padding: 16px;
   border-radius: 50%;
   background: radial-gradient(circle at 30% 22%, #2b3448, #0e131d 62%);
-  box-shadow: inset 0 0 0 1px #2e3850, 0 24px 50px rgba(0, 0, 0, 0.65);
+  box-shadow:
+    inset 0 0 0 1px #2e3850,
+    0 24px 50px rgba(0, 0, 0, 0.65);
 }
 .n1 {
   --cor: var(--warn);
