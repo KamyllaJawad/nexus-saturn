@@ -6,6 +6,7 @@ import { RouterLink } from 'vue-router'
 import { pedir } from '@/servicos/api'
 import { usarConsulta } from '@/servicos/consulta'
 import { ajustarEquipe, hora, nome, TIPO } from '@/servicos/formato'
+import { EVENTOS_BORDO as EVENTOS, SINAIS_RELOGIO as SINAIS } from '@/servicos/cenarios'
 
 interface Estado {
   hora_nave: string
@@ -37,22 +38,6 @@ function reiniciar() {
   return estado.executar(() => pedir('/simulador/reiniciar', {})).then(() => missao.carregar())
 }
 
-const SINAIS: [string, string, string | null][] = [
-  ['Fibrilação atrial · Sarah', 'fa', 'sarah'],
-  ['Relógio folgado · Sarah', 'sensor_solto', 'sarah'],
-  ['Combinação fora do padrão · Kenji', 'combinacao', 'kenji'],
-  ['Ciclo · Sarah (supressão)', 'ciclo', 'sarah'],
-  ['Ciclo · Elena (sem método)', 'ciclo', 'elena'],
-  ['Mesmo desvio · Kenji (sem calendário)', 'ciclo', 'kenji'],
-  ['Voltar à rotina', 'rotina', null],
-]
-const EVENTOS: [string, string, string | null][] = [
-  ['Tempestade solar', 'tempestade_solar', null],
-  ['Queda de humor', 'humor', 'sarah'],
-  ['Prontidão EVA', 'eva', null],
-  ['Dor de cabeça + CO₂', 'dor_de_cabeca', 'sarah'],
-  ['Hora de dormir', 'modo_noite', 'sarah'],
-]
 const FASE: Record<string, string> = {
   rotina: 'rotina',
   fa: 'fibrilação atrial',

@@ -118,9 +118,13 @@ const SINAL_CURTO: Record<string, string> = { fc: 'FC', hrv: 'HRV', spo2: 'SpO�
 // Mesma lógica de `pendencia()` e `evento()` em 9-frontend/relogio/app.js.
 export function notificacao(r: ApiRelogio): Notificacao | null {
   const marcus = r.equipe.marcus.nome
-  const e = r.pendencias[0]
+  // O alerta médico da própria pessoa vem antes de qualquer outra pendência
+  // (uma pergunta do ciclo em aberto não pode esconder a FA).
+  const pendArritmia = r.pendencias.find((x) => x.tipo === 'arritmia')
+  const minhaArritmia = r.acompanhando.find((x) => x.tipo === 'arritmia')
+  const e = pendArritmia ?? (minhaArritmia ? undefined : r.pendencias[0])
   if (!e) {
-    const a = r.acompanhando.find((x) => x.tipo === 'arritmia')
+    const a = minhaArritmia
     if (!a) return null
     const terra = a.medico_local === 'terra'
     const seguras = a.dados.seguras as { por?: string } | undefined

@@ -95,6 +95,17 @@ describe('notificações do pulso', () => {
     expect(n.botoes.map((b) => b.rotulo)).toContain('Contar só à Dra. Rivera')
   })
 
+  it('o alerta de FA vem antes de uma pergunta do ciclo ainda aberta', () => {
+    const n = notificacao({
+      ...base,
+      emergencia: true,
+      pendencias: [ev({ dados: { aviso_dias: 2 } })],
+      acompanhando: [ev({ id: 'ev-fa', tipo: 'arritmia', classe: 'evento', responsavel_id: 'marcus' })],
+    })!
+    expect(n.id).toBe('ev-fa')
+    expect(n.etiqueta).toBe('Alerta médico')
+  })
+
   it('arritmia acompanhada: alerta sem botão de cancelar', () => {
     const n = notificacao({ ...base, emergencia: true, acompanhando: [ev({ tipo: 'arritmia', classe: 'evento', responsavel_id: 'marcus' })] })!
     expect(n.variante).toBe('crit')

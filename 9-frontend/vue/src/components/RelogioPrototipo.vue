@@ -13,9 +13,18 @@ const props = withDefaults(
     estado: EstadoRelogio
     ciclo?: CicloNoRelogio
     missao?: string
+    // Telas do relógio (com a API). Sem `telas`, o relógio mostra só a face, como na prévia.
+    telas?: { id: string; rotulo: string }[]
+    telaAtual?: string
+    // Fundo da tela em evento: alerta vermelho, aviso amarelo, privado roxo.
+    fundo?: '' | 'crit' | 'warn' | 'roxo'
   }>(),
-  { missao: 'LEO' },
+  { missao: 'LEO', telas: undefined, telaAtual: undefined, fundo: '' },
 )
+const emit = defineEmits<{ proxima: []; tela: [id: string] }>()
+
+// A face (hora, avatar, estado e sinais) é a tela "início".
+const mostrarFace = computed(() => !props.telas?.length || !props.telaAtual || props.telaAtual === 'inicio')
 
 const NOMES = ['Ótimo', 'Atenção', 'Crítico']
 const CIRCUNFERENCIA = 2 * Math.PI * 47
@@ -54,14 +63,21 @@ onUnmounted(() => window.clearInterval(relogio))
 
 <template>
   <div class="aro" :class="`n${nivel}`">
-    <div class="botao" aria-hidden="true"></div>
-    <div class="tela" role="img" :aria-label="`Relógio: ${NOMES[nivel]}, ${subtitulo}, FC ${estado.fc} bpm, SpO₂ ${estado.spo2}%`">
-      <svg class="anel" viewBox="0 0 100 100" aria-hidden="true">
+    <!-- A coroa passa para a próxima tela, como no relógio da demo -->
+    <button v-if="telas?.length" type="button" class="botao" aria-label="Coroa: próxima tela do relógio" @click="emit('proxima')"></button>
+    <div v-else class="botao" aria-hidden="true"></div>
+    <div
+      class="tela"
+      :class="fundo ? `fundo-${fundo}` : ''"
+      :role="mostrarFace ? 'img' : undefined"
+      :aria-label="mostrarFace ? `Relógio: ${NOMES[nivel]}, ${subtitulo}, FC ${estado.fc} bpm, SpO₂ ${estado.spo2}%` : undefined"
+    >
+      <svg v-if="mostrarFace" class="anel" viewBox="0 0 100 100" aria-hidden="true">
         <circle class="trilho" cx="50" cy="50" r="47" />
         <circle class="progresso" cx="50" cy="50" r="47" :stroke-dasharray="traco" transform="rotate(-90 50 50)" />
       </svg>
 
-      <div class="conteudo">
+      <div v-if="mostrarFace" class="conteudo">
         <div class="topo">
           <span class="hora">{{ hora }}</span>
           <span class="missao">{{ missao }}</span>
@@ -75,11 +91,96 @@ onUnmounted(() => window.clearInterval(relogio))
           <span v-if="chipCiclo" class="chip ciclo">♀ <b>{{ chipCiclo.valor }}</b> {{ chipCiclo.rotulo }}</span>
         </div>
       </div>
+      <!-- As outras telas (sinais, Cosmo, estufa...) vêm de quem usa o relógio -->
+      <div v-else class="conteudo-tela"><slot name="tela" /></div>
+
+      <slot name="aviso" />
+
+      <div v-if="telas && telas.length > 1" class="pontos" role="group" aria-label="Telas do relógio">
+        <button
+          v-for="t in telas"
+          :key="t.id"
+          type="button"
+          class="ponto"
+          :class="{ alerta: t.id === 'evento' }"
+          :aria-label="t.rotulo"
+          :title="t.rotulo"
+          :aria-current="t.id === (telaAtual ?? 'inicio')"
+          @click="emit('tela', t.id)"
+        >
+          <i></i>
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+.conteudo-tela {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 30px 36px 40px;
+  text-align: center;
+}
+.tela.fundo-crit {
+  background: radial-gradient(circle at 50% 42%, rgba(239, 68, 68, 0.34), #000 72%);
+}
+.tela.fundo-warn {
+  background: radial-gradient(circle at 50% 42%, rgba(245, 158, 11, 0.24), #000 72%);
+}
+.tela.fundo-roxo {
+  background: radial-gradient(circle at 50% 42%, rgba(139, 92, 246, 0.24), #000 72%);
+}
+.pontos {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  display: flex;
+  justify-content: center;
+  gap: 0;
+}
+.ponto {
+  display: grid;
+  place-items: center;
+  width: 15px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.ponto i {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: #3a475e;
+  transition: width 0.15s;
+}
+.ponto.alerta i {
+  background: var(--warn);
+}
+.ponto[aria-current='true'] i {
+  width: 14px;
+  background: var(--texto);
+}
+.ponto:focus-visible,
+button.botao:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 2px;
+}
+button.botao {
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+}
+
 .aro {
   --cor: var(--ok);
   position: relative;
