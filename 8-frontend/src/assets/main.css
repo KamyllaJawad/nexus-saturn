@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+:root {
+  --bg-inicio: #252e42;
+  --bg-fim: #0d121c;
+
+  /* Cores do mockup */
+  --superficie: #162038; /* fundo de cards e item selecionado */
+  --linha: rgba(148, 163, 184, 0.13); /* divisórias finas */
+  --linha-forte: rgba(148, 163, 184, 0.26);
+  --texto: #eef2f8;
+  --texto-fraco: #6f7d96;
+  --ok: #10b981; /* ótimo */
+  --warn: #f59e0b; /* atenção */
+  --crit: #ef4444; /* crítico */
+  --acento: #00e5ff; /* ciano da marca, ícones */
+  --agua: #3b82f6; /* hidratação */
+  --ciclo: #ec4899; /* saúde hormonal */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(160deg, var(--bg-inicio), var(--bg-fim) 70%);
+  background-color: var(--bg-fim);
+  background-attachment: fixed;
+  color: var(--texto);
+  font-family: 'DM Sans', sans-serif;
+}
