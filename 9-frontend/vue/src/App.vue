@@ -11,6 +11,8 @@ const TELAS = [
   { para: '/familia', nome: 'Família' },
   { para: '/dados-ia', nome: 'Dados e IA' },
 ]
+
+const RAG_COSMO = 'https://nexus-saturn-sg9y3bs4xtruk7h9we6gww.streamlit.app/'
 </script>
 
 <template>
@@ -18,6 +20,16 @@ const TELAS = [
   <nav v-if="!embutida" class="nav" aria-label="Telas do AstroHealth OS">
     <span class="marca">AstroHealth OS</span>
     <RouterLink v-for="t in TELAS" :key="t.para" :to="t.para" class="link">{{ t.nome }}</RouterLink>
+    <a
+      :href="RAG_COSMO"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="rag"
+      title="Abre em outra aba o RAG da Cosmo no Streamlit Cloud"
+    >
+      <span aria-hidden="true">✦</span> Teste o RAG da Cosmo
+      <span aria-hidden="true" class="seta">↗</span>
+    </a>
     <span class="conexao" :class="conexao" :title="conexao === 'api' ? 'Dados da API' : 'Sem API: dados de exemplo'">
       {{ conexao === 'api' ? 'API no ar' : conexao === 'offline' ? 'Modo offline' : 'Conectando…' }}
     </span>
@@ -63,6 +75,47 @@ const TELAS = [
 .link:focus-visible {
   outline: 2px solid var(--acento);
   outline-offset: 2px;
+}
+.rag {
+  margin-left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0b1220;
+  text-decoration: none;
+  background: linear-gradient(135deg, #7dd3fc, #c4b5fd);
+  box-shadow: 0 0 0 0 rgba(125, 211, 252, 0.55);
+  animation: pulso 2.4s ease-out infinite;
+}
+.rag:hover {
+  filter: brightness(1.08);
+}
+.rag:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 2px;
+}
+.rag .seta {
+  font-size: 12px;
+}
+@keyframes pulso {
+  0% {
+    box-shadow: 0 0 0 0 rgba(125, 211, 252, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(125, 211, 252, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(125, 211, 252, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rag {
+    animation: none;
+  }
 }
 .conexao {
   margin-left: auto;
