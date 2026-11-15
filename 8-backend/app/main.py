@@ -11,6 +11,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -641,6 +642,18 @@ def ia_modelo(peca: str, acao: str, t: Treino):
                                       estado="a caminho", chegou_em=None, motivo=None))
         registro.auditar("modelo_terra", versao, None, "a caminho", m, dict(acao=acao, peca=peca, pacote=pac["id"]), agora)
         return dict(peca=peca, versao=versao, estado="a caminho", pacote=s.link.publico(pac))
+
+
+# A página inicial é o site em Vue (9-frontend/v2, gerado por `npm run build:api`).
+# Sem o build do v2, a raiz mostra a sala de simulação antiga. As telas em JS puro
+# continuam nos caminhos delas (/index.html, /bordo/, /relogio/...).
+@app.get("/", include_in_schema=False)
+def raiz():
+    if (FRONT / "v2" / "index.html").exists():
+        return RedirectResponse("/v2/")
+    if (FRONT / "index.html").exists():
+        return FileResponse(FRONT / "index.html")
+    raise HTTPException(404, "telas não encontradas")
 
 
 if FRONT.exists():

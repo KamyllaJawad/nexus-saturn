@@ -32,7 +32,7 @@ A API e as telas sobem juntas. O `Dockerfile` do `8-backend` usa a raiz do repos
 
 1. Envie o branch para o GitHub.
 2. Em <https://render.com>: New > Blueprint, escolha este repositório. O `render.yaml` da raiz cria o serviço `astrohealth-api` (Docker, plano gratuito, checagem de saúde em `/api/missao`).
-3. Abra a URL do serviço. A sala de simulação é `/`. O Vue é `/v2/` (rotas com `#`, por exemplo `/v2/#/bordo`).
+3. Abra a URL do serviço: a raiz leva ao site em Vue (`/v2/`, com rotas `#`, por exemplo `/v2/#/bordo`), que abre na sala de simulação. As telas antigas em JS puro seguem em `/index.html`, `/bordo/`, `/relogio/`...
 
 Pontos de atenção:
 
