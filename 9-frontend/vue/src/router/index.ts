@@ -1,7 +1,9 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 
+// Rotas com # (/v2/#/bordo): funcionam servidas pelo FastAPI e dentro do iframe da
+// sala de simulação sem precisar de fallback de SPA no servidor.
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/', redirect: '/bordo' },
     {

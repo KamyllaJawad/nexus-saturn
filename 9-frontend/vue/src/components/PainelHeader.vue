@@ -15,8 +15,8 @@ const co2Alto = computed(() => props.status.co2 > LIMITE_CO2)
 <template>
     <header class="painel-header">
         <div  class="painel-header-content">
-            <h1 class="titulo">Enfermaria · Dr. Marcus</h1>
-            <p class="subtitulo">Oficial médico da tripulação</p>
+            <h1 class="titulo">{{ status.titulo ?? 'Enfermaria · Dr. Marcus' }}</h1>
+            <p class="subtitulo">{{ status.subtitulo ?? 'Oficial médico da tripulação' }}</p>
         </div>
         <div class="chips">
             <StatusChip v-if="status.houstonOnline" :icone="Signal">

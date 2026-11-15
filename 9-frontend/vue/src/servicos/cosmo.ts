@@ -1,6 +1,8 @@
-// Sem VITE_COSMO_URL no .env, responde com mock.
+// Com a API no ar, a pergunta vai para POST /api/cosmo/chat (Cosmo do 8-backend, com a
+// visão da superfície e a trilha de auditoria). Offline, responde com o mock abaixo.
 
 import { tripulacaoMock, type Tripulante } from '@/mocks/tripulacao'
+import { conexao, perguntarApi } from './api'
 import { statusNaveMock } from '@/mocks/nave'
 import { DECISOES, KIT_MEDICO } from '@/mocks/decisoes'
 
@@ -21,21 +23,18 @@ export interface RespostaCosmo {
   gerada_em: string
 }
 
-const URL_COSMO: string | undefined = import.meta.env.VITE_COSMO_URL
-
 export async function perguntarCosmo(
   pergunta: PerguntaCosmo,
   opcoes: { signal?: AbortSignal; atrasoMs?: number } = {},
 ): Promise<RespostaCosmo> {
-  if (URL_COSMO) {
-    const r = await fetch(`${URL_COSMO}/cosmo/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(pergunta),
-      signal: opcoes.signal,
-    })
-    if (!r.ok) throw new Error(`A Cosmo respondeu com erro ${r.status}`)
-    return (await r.json()) as RespostaCosmo
+  if (conexao.value === 'api') {
+    const superficie = pergunta.origem === 'painel' ? 'bordo' : 'relogio'
+    const r = await perguntarApi(pergunta.mensagem, superficie, pergunta.tripulante_id, opcoes.signal)
+    return {
+      resposta: r.resposta,
+      fontes: r.fonte ? [{ titulo: r.fonte.titulo, trecho: r.fonte.referencia }] : [],
+      gerada_em: new Date().toISOString(),
+    }
   }
 
   await esperar(opcoes.atrasoMs ?? 900, opcoes.signal)
@@ -68,14 +67,15 @@ function hormonal(t: Tripulante): Omit<RespostaCosmo, 'gerada_em'> {
   if (!h.compartilhado)
     return {
       resposta:
-        `${t.nome} não compartilhou o contexto hormonal com você. Eu uso essa informação só a bordo, ` +
-        'para não gerar alarme falso, e não mostro nada sem consentimento. Ela pode compartilhar pelo relógio.',
-      fontes: [{ titulo: 'ADR-013 · consentimento de saúde reprodutiva' }],
+        `${t.nome} não compartilhou nada sobre o ciclo com você. O calendário fica no relógio dela; ` +
+        'método e fase não aparecem no painel, e nada sai sem o consentimento dela.',
+      fontes: [{ titulo: 'ADR-013 · calendário do ciclo no relógio' }],
     }
-  const fase = h.dia ? `dia ${h.dia} de ${h.duracao}, fase ${h.fase.toLowerCase()}` : h.fase.toLowerCase()
   return {
-    resposta: `${t.nome}: ${h.metodo.toLowerCase()}, ${fase}. ${h.efeito}. Pela linha de base desta fase, está no padrão dela, sem alerta.`,
-    fontes: [{ titulo: 'Linha de base por fase do ciclo (m3-fase-0.1)' }],
+    resposta:
+      `${t.nome} compartilhou: ${h.resumo}. O estado segue como está e isso não é diagnóstico. ` +
+      'Método e fase não aparecem no painel. Analgésico do kit só se ela pedir.',
+    fontes: [{ titulo: 'ADR-014 · ciclo hormonal, privado por padrão' }],
   }
 }
 

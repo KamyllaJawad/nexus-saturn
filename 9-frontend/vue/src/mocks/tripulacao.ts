@@ -29,16 +29,14 @@ export interface Tripulante {
 
 export type Orgao = 'cerebro' | 'coracao' | 'pulmoes' | 'rins'
 
-// Sem consentimento, o back nem envia os detalhes: o front recebe só { compartilhado: false }.
+// ADR-013 e ADR-014: o calendário do ciclo fica no relógio e é privado por padrão.
+// O painel recebe só o que a pessoa compartilhou pelo relógio (sintomas e pedido de
+// cuidado leve), nunca o método nem a fase. Sem consentimento: { compartilhado: false }.
 export type ContextoHormonal =
   | { compartilhado: false }
   | {
       compartilhado: true
-      metodo: string // "Ciclo natural", "DIU hormonal", "Pílula"...
-      fase: string // "Lútea", "Supressão menstrual"...
-      dia?: number // dia do ciclo, só para ciclo natural
-      duracao?: number // duração do ciclo, em dias
-      efeito: string // o que a fase muda nos sinais, explicado
+      resumo: string // o que ela autorizou o oficial médico a ver
     }
 
 export interface Vitais {
@@ -65,14 +63,7 @@ export const tripulacaoMock: Tripulante[] = [
     sexo: 'f',
     corpo: { cerebro: 1, coracao: 0, pulmoes: 0, rins: 1 },
     radiacao: { hojeMsv: 0.42, missaoMsv: 38 },
-    hormonal: {
-      compartilhado: true,
-      metodo: 'Ciclo natural',
-      fase: 'Lútea',
-      dia: 16,
-      duracao: 28,
-      efeito: 'FC de repouso +3 bpm e pele +0,3 °C, o esperado depois da ovulação',
-    },
+    hormonal: { compartilhado: false },
   },
   {
     id: 'marcus',
@@ -100,12 +91,7 @@ export const tripulacaoMock: Tripulante[] = [
     sexo: 'f',
     corpo: { cerebro: 1, coracao: 0, pulmoes: 0, rins: 1 },
     radiacao: { hojeMsv: 0.45, missaoMsv: 38 },
-    hormonal: {
-      compartilhado: true,
-      metodo: 'DIU hormonal',
-      fase: 'Supressão menstrual',
-      efeito: 'Sem estrogênio, então não pesa no osso. A Cosmo usa a linha de base pelo método e acompanha sangramento de escape',
-    },
+    hormonal: { compartilhado: false },
   },
   {
     id: 'kenji',

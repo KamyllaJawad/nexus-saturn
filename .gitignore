@@ -8,3 +8,5 @@ __pycache__/
 8-backend/dados/prata/
 8-backend/dados/ouro/
 8-backend/modelos/candidatos/
+# build das telas Vue (npm run build em 9-frontend/vue); a API serve em /v2/
+9-frontend/v2/

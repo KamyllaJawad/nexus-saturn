@@ -14,3 +14,7 @@ Suba a API em `8-backend` (ela serve esta pasta) e abra <http://127.0.0.1:8000/>
 | `dados-ia/` | Banca e time | Lakehouse, métricas medidas, human-in-the-loop dos modelos e auditoria. |
 
 O relógio aceita `?quem=kenji` na URL, para abrir um pulso por aba.
+
+## Telas novas em Vue (`vue/`)
+
+O painel de bordo novo, em Vue, lê a mesma API. Depois de `npm ci && npm run build` em `vue/`, ele fica em <http://127.0.0.1:8000/v2/#/bordo>. Os cenários da sala de simulação valem para as duas versões. Detalhes em [vue/README.md](vue/README.md).

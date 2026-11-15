@@ -12,10 +12,19 @@ const emit = defineEmits<{ acao: [acao: Acao] }>()
 
 <template>
   <div class="cards">
-    <section v-if="card.decisao" class="card decisao">
+    <section v-if="card.decisao" class="card decisao" :class="{ urgente: card.decisao.urgente }">
       <h3>{{ card.decisao.titulo }}</h3>
       <p>{{ card.decisao.texto }}</p>
+      <a
+        v-if="card.decisao.painelCompleto"
+        class="botao principal"
+        href="/bordo/"
+        target="_top"
+      >
+        Decidir no painel completo
+      </a>
       <button
+        v-else-if="card.decisao.acao"
         type="button"
         class="botao principal"
         :disabled="!!feitas[card.decisao.acao.chave]"
@@ -65,6 +74,13 @@ const emit = defineEmits<{ acao: [acao: Acao] }>()
 }
 .decisao {
   border-color: rgba(0, 229, 255, 0.35);
+}
+.decisao.urgente {
+  border-color: rgba(239, 68, 68, 0.55);
+  background: linear-gradient(140deg, rgba(239, 68, 68, 0.1), var(--superficie) 70%);
+}
+a.botao {
+  text-decoration: none;
 }
 h3 {
   margin: 0;

@@ -1,48 +1,34 @@
-# .
+# 9-frontend/vue · telas novas em Vue
 
-This template should help get you started developing with Vue 3 in Vite.
+Painel de bordo e relógio em Vue 3 + TypeScript (Vite, Vitest). Convivem com as telas em JS puro de `9-frontend/` até a migração terminar.
 
-## Recommended IDE Setup
+Protótipo experimental com dados simulados. Não é dispositivo médico.
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Rodar
 
-## Recommended Browser Setup
-
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+Requer Node `^22.18` ou `>=24.12`.
 
 ```sh
-npm install
+npm ci
+npm run dev          # http://localhost:5173/v2/  (/api vai para a API em 127.0.0.1:8000)
+npm run build        # gera ../v2, que a API serve em http://127.0.0.1:8000/v2/
+npm run test:unit    # Vitest
 ```
 
-### Compile and Hot-Reload for Development
+As rotas usam `#`: `/v2/#/bordo` e `/v2/#/relogio`.
 
-```sh
-npm run dev
-```
+## De onde vêm os dados
 
-### Type-Check, Compile and Minify for Production
+| Peça | Situação |
+| --- | --- |
+| Painel de bordo | Lê `GET /api/bordo` a cada 1 s. `src/servicos/api.ts` traduz a resposta para os tipos de `src/mocks/` e os componentes não mudam. |
+| Decisões | Os eventos abertos viram o card de decisão; o botão chama `POST /api/decisoes`. Medicação com PIN, médico na Terra e ordem permanente ainda mandam para o painel completo em `bordo/`. |
+| Chat da Cosmo | `POST /api/cosmo/chat` com `superficie: "bordo"`. |
+| ECG | Desenho sintético a partir da FC e do ritmo do M1. O trecho real do CinC (`/api/tripulantes/{id}/ecg`) é o próximo passo. |
+| Silhueta (`corpo`) e `sexo` | Calculados no adaptador por enquanto; vão para o back (`s.clinico()`). |
+| Ciclo | Só aparece o que a pessoa compartilhou pelo relógio, sem método nem fase (ADR-013 e ADR-014). |
+| Relógio | Ainda nos mocks. |
 
-```sh
-npm run build
-```
+Sem a API no ar, o painel mostra os mocks com o aviso "Modo offline" e volta sozinho quando ela responde.
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-npm run test:unit
-```
+`VITE_API_URL` aponta para outra API (ex.: `http://127.0.0.1:8000`); sem ele, o caminho é relativo.

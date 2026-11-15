@@ -2,12 +2,20 @@ export interface Acao {
   chave: string
   rotulo: string
   feito: string
+  // Com a API no ar: a decisão vira POST /api/decisoes { evento_id, acao, detalhe }.
+  evento_id?: string
+  acao_api?: string
+  detalhe?: Record<string, unknown>
 }
 
 export interface Decisao {
   titulo: string
   texto: string
-  acao: Acao
+  acao?: Acao
+  // Fluxo que o painel novo ainda não cobre (medicação com PIN, médico na Terra, ordem
+  // permanente): o card manda para o painel completo em vez de decidir aqui.
+  painelCompleto?: boolean
+  urgente?: boolean
 }
 
 export interface Acompanhamento {

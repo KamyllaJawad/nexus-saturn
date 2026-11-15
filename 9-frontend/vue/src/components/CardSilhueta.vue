@@ -10,14 +10,6 @@ const NIVEL = ['ótimo', 'atenção', 'crítico']
 const INTENSIDADE = ['baixo', 'moderado', 'alto']
 const LIMITE_RADIACAO_MSV = 600 // limite de carreira da NASA, igual para todos desde 2022
 
-
-const FASES: [string, number, number][] = [
-  ['Menstrual', 1, 5],
-  ['Folicular', 6, 13],
-  ['Ovulação', 14, 15],
-  ['Lútea', 16, 28],
-]
-
 const linhas = computed(() => {
   const t = props.tripulante
   const c = t.corpo
@@ -42,25 +34,7 @@ const textoHormonal = computed(() => {
   const h = hormonal.value
   if (!h) return ''
   if (!h.compartilhado) return `Privado · ${props.tripulante.nome} decide no relógio`
-  return h.dia ? `${h.fase} · dia ${h.dia} · sem alerta` : `${h.metodo} · ${h.fase.toLowerCase()}`
-})
-
-const ciclo = computed(() => {
-  const h = hormonal.value
-  if (!h?.compartilhado || !h.dia || !h.duracao) return null
-  return {
-    dia: h.dia,
-    duracao: h.duracao,
-    fase: h.fase,
-    efeito: h.efeito,
-    marcador: `${(((h.dia - 0.5) / h.duracao) * 100).toFixed(1)}%`,
-    fases: FASES.map(([nome, ini, fim]) => ({
-      nome,
-      ini,
-      fim,
-      atual: h.dia! >= ini && h.dia! <= fim,
-    })),
-  }
+  return 'Compartilhado: cuidado leve, sem alerta'
 })
 
 const rotulo = computed(
@@ -107,24 +81,6 @@ const doseHoje = computed(() => props.tripulante.radiacao.hojeMsv.toFixed(2).rep
       </li>
     </ul>
 
-    <div v-if="ciclo" class="barra-ciclo">
-      <div
-        class="trilho"
-        role="img"
-        :aria-label="`Ciclo de ${ciclo.duracao} dias: dia ${ciclo.dia}, fase ${ciclo.fase.toLowerCase()}`"
-      >
-        <span
-          v-for="f in ciclo.fases"
-          :key="f.nome"
-          :class="{ atual: f.atual }"
-          :style="{ flex: f.fim - f.ini + 1 }"
-          :title="`${f.nome} · dias ${f.ini} a ${f.fim}`"
-        ></span>
-        <i :style="{ left: ciclo.marcador }"></i>
-      </div>
-      <b>Dia {{ ciclo.dia }} de {{ ciclo.duracao }} · fase {{ ciclo.fase.toLowerCase() }}</b>
-      <small>{{ ciclo.efeito }}. Linha de base por fase: no padrão dela.</small>
-    </div>
   </section>
 </template>
 
@@ -196,47 +152,4 @@ const doseHoje = computed(() => props.tripulante.radiacao.hojeMsv.toFixed(2).rep
   box-shadow: inset 0 0 0 1.5px var(--acento);
 }
 
-.barra-ciclo {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-top: 10px;
-  border-top: 1px solid var(--linha);
-}
-.trilho {
-  position: relative;
-  display: flex;
-  gap: 2px;
-  height: 7px;
-  margin-bottom: 3px;
-}
-.trilho span {
-  border-radius: 3px;
-  background: var(--ciclo);
-  opacity: 0.28;
-}
-.trilho span.atual {
-  opacity: 1;
-}
-.trilho i {
-  position: absolute;
-  top: -3px;
-  width: 3px;
-  height: 13px;
-  margin-left: -1.5px;
-  border-radius: 2px;
-  background: #fff;
-  box-shadow: 0 0 0 2px #05070e;
-}
-.barra-ciclo b {
-  font-size: 12px;
-  font-weight: 600;
-  color: #f9a8d4;
-}
-.barra-ciclo small {
-  font-size: 11px;
-  line-height: 1.35;
-  color: var(--texto-fraco);
-}
 </style>
