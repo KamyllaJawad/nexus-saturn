@@ -20,3 +20,10 @@ export const EVENTOS_BORDO: Gatilho[] = [
   ['Dor de cabeça + CO₂', 'dor_de_cabeca', 'sarah'],
   ['Hora de dormir', 'modo_noite', 'sarah'],
 ]
+
+// A família na Terra (app Terra-Órbita): cada ação viaja pelo link até o relógio.
+export const ACOES_FAMILIA: [rotulo: string, tipo: 'brinde' | 'corrida' | 'mensagem'][] = [
+  ['Brinde hídrico da Ana', 'brinde'],
+  ['Corrida do Lucas · 5 km', 'corrida'],
+  ['Áudio do Lucas', 'mensagem'],
+]

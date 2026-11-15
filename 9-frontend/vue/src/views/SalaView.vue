@@ -6,7 +6,11 @@ import { RouterLink } from 'vue-router'
 import { pedir } from '@/servicos/api'
 import { usarConsulta } from '@/servicos/consulta'
 import { ajustarEquipe, hora, nome, TIPO } from '@/servicos/formato'
-import { EVENTOS_BORDO as EVENTOS, SINAIS_RELOGIO as SINAIS } from '@/servicos/cenarios'
+import {
+  ACOES_FAMILIA,
+  EVENTOS_BORDO as EVENTOS,
+  SINAIS_RELOGIO as SINAIS,
+} from '@/servicos/cenarios'
 
 interface Estado {
   hora_nave: string
@@ -21,7 +25,12 @@ interface Missao {
   atraso_txt: string
   comprimido: boolean
   perfis: Record<string, string>
-  equipe: { local: 'bordo' | 'terra'; resumo: string; medico_nome: string; marcus: { nome: string; papel: string } }
+  equipe: {
+    local: 'bordo' | 'terra'
+    resumo: string
+    medico_nome: string
+    marcus: { nome: string; papel: string }
+  }
 }
 
 const estado = usarConsulta<Estado>(() => '/simulador/estado')
@@ -29,10 +38,20 @@ const missao = usarConsulta<Missao>(() => '/missao')
 const erro = computed(() => estado.erro.value)
 
 const terra = computed(() => missao.dados.value?.equipe.local === 'terra')
-watch(() => missao.dados.value?.equipe, (eq) => ajustarEquipe(eq), { immediate: true })
+watch(
+  () => missao.dados.value?.equipe,
+  (eq) => ajustarEquipe(eq),
+  { immediate: true },
+)
 
 function cenario(c: string, tripulante_id: string | null = null) {
-  return estado.executar(() => pedir('/simulador/cenario', { cenario: c, tripulante_id })).then(() => missao.carregar())
+  return estado
+    .executar(() => pedir('/simulador/cenario', { cenario: c, tripulante_id }))
+    .then(() => missao.carregar())
+}
+// A família na Terra: a ação sai do app Terra-Órbita e atravessa o link até a nave.
+function familia(tipo: string) {
+  return estado.executar(() => pedir('/familia/acao', { tipo }))
 }
 function reiniciar() {
   return estado.executar(() => pedir('/simulador/reiniciar', {})).then(() => missao.carregar())
@@ -55,17 +74,27 @@ const fases = computed(() => {
 const abertos = computed(
   () =>
     (estado.dados.value?.abertos ?? [])
-      .map((e) => `${TIPO[e.tipo] ?? e.tipo} (${nome(e.tripulante_id)}) → decide ${nome(e.responsavel_id)}`)
+      .map(
+        (e) =>
+          `${TIPO[e.tipo] ?? e.tipo} (${nome(e.tripulante_id)}) → decide ${nome(e.responsavel_id)}`,
+      )
       .join(' · ') || 'nenhum',
 )
 
 const base = import.meta.env.BASE_URL
 const TELAS = computed(() => [
   { titulo: 'A bordo · Relógio', rota: '#/relogio?quem=sarah' },
-  { titulo: terra.value ? 'A bordo · Painel do CMO (sem médico a bordo)' : 'A bordo · Painel do oficial médico', rota: '#/bordo' },
+  {
+    titulo: terra.value
+      ? 'A bordo · Painel do CMO (sem médico a bordo)'
+      : 'A bordo · Painel do oficial médico',
+    rota: '#/bordo',
+  },
   { titulo: 'Na Terra · Celular da família', rota: '#/familia' },
   {
-    titulo: terra.value ? `Na Terra · Console da ${missao.dados.value?.equipe.medico_nome} (médica responsável)` : 'Na Terra · Console de Houston',
+    titulo: terra.value
+      ? `Na Terra · Console da ${missao.dados.value?.equipe.medico_nome} (médica responsável)`
+      : 'Na Terra · Console de Houston',
     rota: '#/houston',
   },
 ])
@@ -76,7 +105,9 @@ const TELAS = computed(() => [
     <header class="cabeca">
       <div>
         <h1>Sala de simulação</h1>
-        <p class="nota">O relógio é simulado; os modelos, as decisões e o link com atraso são reais.</p>
+        <p class="nota">
+          O relógio é simulado; os modelos, as decisões e o link com atraso são reais.
+        </p>
       </div>
       <div class="onde" v-if="estado.dados.value && missao.dados.value">
         Hora da nave {{ hora(estado.dados.value.hora_nave, true) }}<br />
@@ -104,40 +135,97 @@ const TELAS = computed(() => [
       <div class="grupo">
         <span class="etiqueta">Médico da missão (hipótese)</span>
         <div class="selos">
-          <button type="button" class="selecao" :aria-pressed="!terra" @click="cenario('medico_bordo')">Dr. Marcus a bordo</button>
-          <button type="button" class="selecao" :aria-pressed="terra" @click="cenario('medico_terra')">Só na Terra · Dra. Rivera</button>
+          <button
+            type="button"
+            class="selecao"
+            :aria-pressed="!terra"
+            @click="cenario('medico_bordo')"
+          >
+            Dr. Marcus a bordo
+          </button>
+          <button
+            type="button"
+            class="selecao"
+            :aria-pressed="terra"
+            @click="cenario('medico_terra')"
+          >
+            Só na Terra · Dra. Rivera
+          </button>
         </div>
       </div>
       <div class="grupo">
         <span class="etiqueta">Link com a Terra</span>
         <div class="selos">
-          <button type="button" class="selecao" :aria-pressed="!!estado.dados.value?.blackout" @click="cenario('blackout')">Blackout</button>
-          <button type="button" class="selecao" @click="cenario('sinal_volta')">O sinal volta</button>
+          <button
+            type="button"
+            class="selecao"
+            :aria-pressed="!!estado.dados.value?.blackout"
+            @click="cenario('blackout')"
+          >
+            Blackout
+          </button>
+          <button type="button" class="selecao" @click="cenario('sinal_volta')">
+            O sinal volta
+          </button>
         </div>
       </div>
       <div class="grupo largo">
         <span class="etiqueta">Sinal do relógio (quem detecta são os modelos)</span>
         <div class="selos">
-          <button v-for="[r, c, t] in SINAIS" :key="r" type="button" class="selecao" @click="cenario(c, t)">{{ r }}</button>
+          <button
+            v-for="[r, c, t] in SINAIS"
+            :key="r"
+            type="button"
+            class="selecao"
+            @click="cenario(c, t)"
+          >
+            {{ r }}
+          </button>
         </div>
       </div>
       <div class="grupo largo">
         <span class="etiqueta">Eventos de bordo</span>
         <div class="selos">
-          <button v-for="[r, c, t] in EVENTOS" :key="r" type="button" class="selecao" @click="cenario(c, t)">{{ r }}</button>
+          <button
+            v-for="[r, c, t] in EVENTOS"
+            :key="r"
+            type="button"
+            class="selecao"
+            @click="cenario(c, t)"
+          >
+            {{ r }}
+          </button>
           <button type="button" class="btn sm" @click="reiniciar()">Reiniciar a simulação</button>
+        </div>
+      </div>
+      <div class="grupo">
+        <span class="etiqueta">Família na Terra (app Terra-Órbita)</span>
+        <div class="selos">
+          <button
+            v-for="[r, t] in ACOES_FAMILIA"
+            :key="r"
+            type="button"
+            class="selecao"
+            @click="familia(t)"
+          >
+            {{ r }}
+          </button>
         </div>
       </div>
       <p v-if="estado.dados.value && missao.dados.value" class="nota estado">
         <b>Médico:</b> {{ missao.dados.value.equipe.resumo }}<br />
         <b>Sinal injetado:</b> {{ fases }}. <b>Link:</b>
-        <span :class="{ 'c-warn': estado.dados.value.blackout }">{{ estado.dados.value.blackout ? 'sem sinal' : 'ativo' }}</span
-        >{{ missao.dados.value.comprimido ? ' (na demo, 1 min de atraso = 1 s)' : '' }}. <b>Aguardando humano:</b> {{ abertos }}.
-        <b>ECG:</b> {{ estado.dados.value.banco_ecg.em_uso.normal }} gravações normais e {{ estado.dados.value.banco_ecg.em_uso.fa }} de FA
-        do teste do CinC 2017.
+        <span :class="{ 'c-warn': estado.dados.value.blackout }">{{
+          estado.dados.value.blackout ? 'sem sinal' : 'ativo'
+        }}</span
+        >{{ missao.dados.value.comprimido ? ' (na demo, 1 min de atraso = 1 s)' : '' }}.
+        <b>Aguardando humano:</b> {{ abertos }}. <b>ECG:</b>
+        {{ estado.dados.value.banco_ecg.em_uso.normal }} gravações normais e
+        {{ estado.dados.value.banco_ecg.em_uso.fa }} de FA do teste do CinC 2017.
       </p>
       <p v-else class="aviso-faixa offline">
-        A API não respondeu. A sala precisa dela para injetar cenários (8-backend, ou VITE_API_URL apontando para a API publicada).
+        A API não respondeu. A sala precisa dela para injetar cenários (8-backend, ou VITE_API_URL
+        apontando para a API publicada).
       </p>
       <p v-if="erro" class="aviso-faixa erro" role="alert">{{ erro }}</p>
     </section>

@@ -533,10 +533,30 @@ def feed():
     with s.trava:
         f = familia.feed(s.link, s.retrato_terra(), s.link.resumo())
         j = s.jogo
-        f["elo"] = dict(estufa_nivel=j["nivel"], estufa_pct=j["pct"], brinde=j["brinde"],
+        brinde, brinde_falta = _brinde_na_terra(s)
+        f["elo"] = dict(estufa_nivel=j["nivel"], estufa_pct=j["pct"], brinde=brinde, brinde_falta_s=brinde_falta,
                         corrida="A corrida Terra–órbita está quase completa." if j["corrida_km"] < j["corrida_meta"] else "Corrida Terra–órbita concluída!")
         f["enviadas"] = [s.link.publico(p) for p in s.link.pacotes if p["direcao"] == "down" and p["de"] == "familia"][-5:][::-1]
         return f
+
+
+def _brinde_na_terra(s) -> tuple:
+    """O brinde como a família o vê, pelos pacotes do link (não pelo estado da nave):
+    'fila' (sem sinal), 'enviado' (convite a caminho), 'chegou' (o convite chegou e a
+    resposta da Sarah ainda não atravessou o link) ou 'feito' (a resposta chegou à Terra)."""
+    convites = [p for p in s.link.pacotes if p["direcao"] == "down" and p["de"] == "familia" and p["carga"].get("tipo") == "brinde"]
+    if not convites:
+        return None, None
+    c = convites[-1]
+    if c["estado"] == "fila":
+        return "fila", None
+    if c["estado"] != "entregue":
+        return "enviado", s.link.publico(c)["falta_s"]
+    respostas = [p for p in s.link.pacotes if p["direcao"] == "up" and p["carga"].get("tipo") == "brinde_feito"
+                 and p["gerado_em"] >= c["entregue_em"]]
+    if respostas and respostas[-1]["estado"] == "entregue":
+        return "feito", None
+    return "chegou", None
 
 
 class AcaoFamilia(BaseModel):

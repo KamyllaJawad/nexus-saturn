@@ -41,7 +41,14 @@ interface Feed {
   atraso: string
   sem_sinal: boolean
   dado_de: string | null
-  elo: { estufa_nivel: number; estufa_pct: number; brinde: string | null; corrida: string }
+  elo: {
+    estufa_nivel: number
+    estufa_pct: number
+    // Como a família vê o brinde, pelos pacotes do link: fila, enviado, chegou, feito.
+    brinde: 'fila' | 'enviado' | 'chegou' | 'feito' | null
+    brinde_falta_s?: number | null
+    corrida: string
+  }
   enviadas: Pacote[]
 }
 
@@ -109,9 +116,24 @@ const outros = computed(() =>
 const habitos = computed(() =>
   (d.value?.enviadas ?? []).filter((p) => /corrida|brinde/i.test(p.rotulo)),
 )
-const conviteBrinde = computed(() =>
-  (d.value?.enviadas ?? []).find((p) => /brinde/i.test(p.rotulo)),
-)
+const TITULO_BRINDE: Record<string, string> = {
+  novo: 'Beba junto com a Sarah',
+  fila: 'Convite guardado: sem sinal',
+  enviado: 'Convite a caminho da nave',
+  chegou: 'A Sarah recebeu seu convite',
+  feito: 'A Sarah brindou de volta!',
+}
+const ETAPAS = [
+  'Você convidou',
+  'Chegou ao relógio da Sarah',
+  'A Sarah brindou',
+  'A resposta chegou aqui',
+]
+// Em que etapa está o brinde (0 a 4). "A Sarah brindou" só aparece quando a resposta chega.
+const etapa = computed(() => {
+  const b = d.value?.elo.brinde
+  return b === 'feito' ? 4 : b === 'chegou' ? 2 : b === 'enviado' || b === 'fila' ? 1 : 0
+})
 const situacao = (p: Pacote) =>
   p.estado === 'entregue'
     ? `Entregue · ${hora(p.entregue_em)}`
@@ -217,6 +239,54 @@ const conversa = computed(() => {
 
           <!-- ================= Elo ================= -->
           <template v-else-if="aba === 'elo'">
+            <!-- Brinde hídrico Terra–órbita: a relação do celular com o relógio da Sarah -->
+            <section class="pc brinde" :class="{ celebra: d.elo.brinde === 'feito' }">
+              <p class="olho">Brinde hídrico Terra–órbita</p>
+              <h4 class="com-icone">
+                <Droplet :size="16" class="c-agua" aria-hidden="true" />
+                {{ TITULO_BRINDE[d.elo.brinde ?? 'novo'] }}
+              </h4>
+              <p v-if="!d.elo.brinde">
+                Beba 250 ml e convide a Sarah a beber junto. O convite chega ao relógio dela em
+                {{ d.atraso }}.
+              </p>
+              <p v-else-if="d.elo.brinde === 'fila'" class="c-warn">
+                Sem sinal agora. O convite fica guardado e sai quando o contato voltar.
+              </p>
+              <p v-else-if="d.elo.brinde === 'enviado'">
+                Chega ao relógio da Sarah em <b>{{ d.elo.brinde_falta_s ?? '…' }} s</b>.
+              </p>
+              <p v-else-if="d.elo.brinde === 'chegou'">
+                O convite já está no relógio dela. Quando ela beber, a resposta viaja de volta para
+                cá ({{ d.atraso }}).
+              </p>
+              <p v-else>
+                Você e a Sarah beberam juntas, cada uma no seu planeta. A estufa cresceu.
+              </p>
+
+              <ol class="etapas" aria-label="Etapas do brinde">
+                <li
+                  v-for="(e, n) in ETAPAS"
+                  :key="e"
+                  :class="{ feita: etapa > n, atual: etapa === n }"
+                >
+                  <i aria-hidden="true">{{ etapa > n ? '✓' : n + 1 }}</i
+                  >{{ e }}
+                </li>
+              </ol>
+
+              <button v-if="!d.elo.brinde" type="button" class="botao agua" @click="acao('brinde')">
+                Brindar com a Sarah
+              </button>
+              <button
+                v-else-if="d.elo.brinde === 'feito'"
+                type="button"
+                class="botao fantasma"
+                @click="acao('brinde')"
+              >
+                Brindar de novo
+              </button>
+            </section>
             <section class="pc">
               <p class="olho">Estufa da tripulação · nível {{ d.elo.estufa_nivel }}</p>
               <h4 class="com-icone">
@@ -256,41 +326,6 @@ const conversa = computed(() => {
               </div>
               <button type="button" class="botao fantasma" @click="acao('corrida')">
                 <Footprints :size="15" aria-hidden="true" /> Registrar corrida do Lucas · 5 km
-              </button>
-            </section>
-
-            <!-- Brinde hídrico: convite, chegada, a Sarah bebe, confirmação -->
-            <section v-if="!d.elo.brinde" class="pc">
-              <h4 class="com-icone">
-                <Droplet :size="16" class="c-agua" aria-hidden="true" /> Brinde hídrico Terra–órbita
-              </h4>
-              <p>
-                Beba 250 ml e convide a Sarah a beber junto. O convite chega à nave em
-                {{ d.atraso }}.
-              </p>
-              <button type="button" class="botao agua" @click="acao('brinde')">
-                Brindar com a Sarah
-              </button>
-            </section>
-            <section v-else-if="d.elo.brinde === 'enviado'" class="pc">
-              <h4>Convite a caminho da nave</h4>
-              <p v-if="conviteBrinde?.estado === 'fila'" class="c-warn">
-                Sem sinal agora. O convite sai quando o contato voltar.
-              </p>
-              <p v-else>
-                Chega em <b>{{ conviteBrinde?.falta_s ?? '…' }} s</b>.
-              </p>
-            </section>
-            <section v-else-if="d.elo.brinde === 'chegou'" class="pc">
-              <h4>A Sarah recebeu seu convite</h4>
-              <p>Quando ela beber, a confirmação viaja de volta para cá.</p>
-            </section>
-            <section v-else class="pc celebra">
-              <Leaf :size="30" class="c-ok" aria-hidden="true" />
-              <h4>Brinde concluído</h4>
-              <p>Você e a Sarah beberam juntas, cada uma no seu planeta. A estufa cresceu.</p>
-              <button type="button" class="botao fantasma" @click="acao('brinde')">
-                Brindar de novo
               </button>
             </section>
           </template>
@@ -681,5 +716,47 @@ const conversa = computed(() => {
 }
 .c-agua {
   color: var(--agua);
+}
+.etapas {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: var(--texto-fraco);
+}
+.etapas li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.etapas i {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--linha-forte);
+  font: 600 10px var(--mono);
+  font-style: normal;
+}
+.etapas li.feita {
+  color: var(--texto);
+}
+.etapas li.feita i {
+  border-color: transparent;
+  background: var(--ok);
+  color: #022c1f;
+}
+.etapas li.atual {
+  color: var(--acento);
+}
+.etapas li.atual i {
+  border-color: var(--acento);
+}
+.brinde.celebra .etapas {
+  align-items: center;
 }
 </style>

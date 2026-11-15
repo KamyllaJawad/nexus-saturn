@@ -10,7 +10,7 @@ import { tripulacaoMock, type NivelSaude } from '@/mocks/tripulacao'
 import { CICLO_NO_RELOGIO, PREVIA_ESTADO } from '@/mocks/relogio'
 import { notificacao, paraMostrador, usarRelogio, type BotaoRelogio } from '@/servicos/relogio'
 import { pedir, perguntarApi } from '@/servicos/api'
-import { EVENTOS_BORDO, SINAIS_RELOGIO, type Gatilho } from '@/servicos/cenarios'
+import { ACOES_FAMILIA, EVENTOS_BORDO, SINAIS_RELOGIO, type Gatilho } from '@/servicos/cenarios'
 import { ajustarEquipe, classeFaixa, embutida, nome, num } from '@/servicos/formato'
 
 const tripulacao = tripulacaoMock
@@ -115,6 +115,17 @@ function proxima() {
   const l = listaTelas.value
   tela.value = l[(l.indexOf(telaVisivel.value) + 1) % l.length] ?? 'inicio'
 }
+
+// O convite de brinde da família chegou: o relógio abre a dica com o brinde (como na demo),
+// a não ser que haja um evento ou alerta mais importante na tela.
+watch(
+  () => dados.value?.jogo?.brinde,
+  (b, antes) => {
+    if (b !== 'chegou' || antes === 'chegou' || aviso.value || emergencia.value) return
+    respirando.value = 0
+    tela.value = 'dica'
+  },
+)
 
 // Notificação curta no topo do relógio quando chega um aviso novo.
 const notificacaoTopo = ref<string | null>(null)
@@ -252,6 +263,15 @@ const fila = computed(() => dados.value?.link.fila ?? [])
 
 // Gatilhos de evento (fora do relógio): os mesmos da sala de simulação.
 const disparando = ref(false)
+async function familia(tipo: 'brinde' | 'corrida' | 'mensagem') {
+  disparando.value = true
+  try {
+    await pedir('/familia/acao', { tipo })
+    await carregar()
+  } finally {
+    disparando.value = false
+  }
+}
 async function disparar([, cenario, tid]: Gatilho) {
   disparando.value = true
   try {
@@ -620,6 +640,19 @@ const NIVEIS: { valor: NivelSaude; nome: string }[] = [
             @click="disparar(g)"
           >
             {{ g[0] }}
+          </button>
+        </div>
+        <p class="etiqueta">Família na Terra</p>
+        <div class="gatilhos">
+          <button
+            v-for="[r, t] in ACOES_FAMILIA"
+            :key="r"
+            type="button"
+            class="selecao"
+            :disabled="disparando"
+            @click="familia(t)"
+          >
+            {{ r }}
           </button>
         </div>
       </template>

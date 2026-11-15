@@ -332,6 +332,7 @@ class Simulador:
                 self.link.enviar("up", "Brinde hídrico: a Sarah respondeu a Ana", prioridade=4, destinos=["familia"],
                                  frase_familia="A Sarah brindou de volta com um copo de água.", gerado_em=self.agora_iso(),
                                  carga=dict(tipo="brinde_feito"))
+                self.avisar("sarah", "Você brindou com a Ana · a resposta vai para a Terra")
             if tid == "sarah" and not j["missoes"]["agua"] and p["agua"] >= TRIPULACAO[tid]["agua_meta"]:
                 self.missao_feita("agua", "Hidratação do dia")
             return p["agua"]
