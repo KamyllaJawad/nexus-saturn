@@ -1,0 +1,15 @@
+{
+  "consentimento_saude_mental": true,
+  "usar_rag": true,
+  "explicar": true,
+  "dias": [
+    {"data": "2026-11-08", "sono_h": 7.4, "agua_ml": 2400, "exercicio_min": 120, "humor": 4, "fc_repouso": 58, "tarefas_planejadas": 8, "tarefas_feitas": 8},
+    {"data": "2026-11-09", "sono_h": 7.1, "agua_ml": 2300, "exercicio_min": 110, "humor": 4, "fc_repouso": 59, "tarefas_planejadas": 8, "tarefas_feitas": 7},
+    {"data": "2026-11-10", "sono_h": 7.0, "agua_ml": 2200, "exercicio_min": 100, "humor": 3, "fc_repouso": 58, "tarefas_planejadas": 8, "tarefas_feitas": 8},
+    {"data": "2026-11-11", "sono_h": 5.6, "agua_ml": 1900, "exercicio_min": 50, "humor": 3, "fc_repouso": 66, "tarefas_planejadas": 8, "tarefas_feitas": 5},
+    {"data": "2026-11-12", "sono_h": 5.2, "agua_ml": 1700, "exercicio_min": 40, "humor": 2, "fc_repouso": 67, "tarefas_planejadas": 8, "tarefas_feitas": 4},
+    {"data": "2026-11-13", "sono_h": 5.4, "agua_ml": 1800, "exercicio_min": 30, "humor": 2, "fc_repouso": 68, "tarefas_planejadas": 8, "tarefas_feitas": 4, "pendentes": ["Medir pressão", "Exercício de resistência"]},
+    {"data": "2026-11-14", "sono_h": 5.0, "agua_ml": 1600, "exercicio_min": 20, "humor": 2, "fc_repouso": 69, "tarefas_planejadas": 8, "tarefas_feitas": 3}
+  ]
+}
+
