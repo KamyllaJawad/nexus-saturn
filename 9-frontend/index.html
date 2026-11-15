@@ -19,6 +19,8 @@
     <div class="controles">
       <div class="grupo"><span class="eyebrow">Perfil de missão (muda o atraso)</span><div class="chips" id="missoes"></div></div>
       <div class="grupo"><span class="eyebrow">Médico da missão (hipótese)</span><div class="chips" id="equipe"></div></div>
+      <div class="grupo"><span class="eyebrow">Visual do relógio e do painel de bordo</span><div class="chips" id="visual"></div>
+        <p class="nota" id="visual-nota" hidden></p></div>
       <div class="grupo"><span class="eyebrow">Link com a Terra</span><div class="chips">
         <button class="chip-btn" data-acao="cenario" data-arg="blackout">Blackout</button>
         <button class="chip-btn" data-acao="cenario" data-arg="sinal_volta">O sinal volta</button></div></div>
@@ -41,8 +43,8 @@
     <p class="nota" id="estado" style="margin-top:10px"></p>
   </div>
   <div class="grade">
-    <div class="moldura"><header><span>A bordo · Relógio</span><a href="relogio/" target="_blank">abrir em aba</a></header><iframe src="relogio/" title="Relógio"></iframe></div>
-    <div class="moldura"><header><span id="cap-bordo">A bordo · Painel do oficial médico</span><a href="bordo/" target="_blank">abrir em aba</a></header><iframe src="bordo/" title="Painel de bordo"></iframe></div>
+    <div class="moldura"><header><span>A bordo · Relógio</span><a id="ln-relogio" href="relogio/" target="_blank">abrir em aba</a></header><iframe id="if-relogio" src="relogio/" title="Relógio"></iframe></div>
+    <div class="moldura"><header><span id="cap-bordo">A bordo · Painel do oficial médico</span><a id="ln-bordo" href="bordo/" target="_blank">abrir em aba</a></header><iframe id="if-bordo" src="bordo/" title="Painel de bordo"></iframe></div>
     <div class="moldura"><header><span>Na Terra · Celular da família</span><a href="familia/" target="_blank">abrir em aba</a></header><iframe src="familia/" title="Família"></iframe></div>
     <div class="moldura"><header><span id="cap-houston">Na Terra · Console de Houston</span><a href="houston/" target="_blank">abrir em aba</a></header><iframe src="houston/" title="Houston"></iframe></div>
   </div>
@@ -52,7 +54,34 @@
 <script type="module">
 import { TIPO, ajustarEquipe, api, erro, esc, hora, ligarAcoes, nome, pintar, repetir } from "./compartilhado/api.js";
 
+// Visual das telas de bordo: as atuais (JS puro) ou as novas em Vue (vue/, build em v2/).
+// As duas leem a mesma API, então os cenários valem para as duas.
+const TELAS = { atual: { relogio: "relogio/", bordo: "bordo/" }, novo: { relogio: "v2/#/relogio", bordo: "v2/#/bordo" } };
+let visual = "atual", temV2 = null;
+try { visual = localStorage.getItem("astro.visual") === "novo" ? "novo" : "atual"; } catch { /* sem armazenamento: começa no atual */ }
+
+function aplicarVisual() {
+  const usar = visual === "novo" && temV2 !== false ? "novo" : "atual";
+  for (const k of ["relogio", "bordo"]) {
+    const alvo = TELAS[usar][k], fr = document.querySelector(`#if-${k}`);
+    if (fr.getAttribute("src") !== alvo) fr.setAttribute("src", alvo);
+    document.querySelector(`#ln-${k}`).setAttribute("href", alvo);
+  }
+  pintar(document.querySelector("#visual"), `<button class="chip-btn" data-acao="visual" data-arg="atual" aria-pressed="${visual === "atual"}">Atual</button>
+    <button class="chip-btn" data-acao="visual" data-arg="novo" aria-pressed="${visual === "novo"}">Novo (Vue)</button>`);
+  const nota = document.querySelector("#visual-nota");
+  nota.hidden = !(visual === "novo" && temV2 === false);
+  nota.textContent = "As telas novas ainda não foram geradas. Em 9-frontend/vue: npm ci && npm run build.";
+}
+fetch("v2/", { method: "HEAD" }).then((r) => { temV2 = r.ok; }).catch(() => { temV2 = false; }).then(aplicarVisual);
+aplicarVisual();
+
 ligarAcoes({
+  visual: (v) => {
+    visual = v === "novo" ? "novo" : "atual";
+    try { localStorage.setItem("astro.visual", visual); } catch { /* segue sem lembrar */ }
+    aplicarVisual();
+  },
   cenario: (arg) => { const [cenario, tripulante_id] = arg.split("|"); return api("/simulador/cenario", { cenario, tripulante_id: tripulante_id || null }).then(ver); },
   reiniciar: () => api("/simulador/reiniciar", {}).then(ver),
 }, erro);
