@@ -2,14 +2,14 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AstroHealth OS</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: barra de controle fixa + roteiro + palco com os 5 dispositivos + linha do tempo do sistema.
-   Tema único OLED escuro (escolha do design system AstroHealth OS). */
+
 :root{
   --void:#04060c; --panel:#0a0f1c; --surface:#0f172a; --surface2:#162038;
   --line:rgba(148,163,184,.13); --line2:rgba(148,163,184,.26);
@@ -76,6 +76,9 @@ h1,h2,h3,h4,p{margin:0}
 .pill.quiet{color:var(--ink3)}
 .linkline{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 14px;font:400 12px var(--fm);color:var(--ink3)}
 .linkline b{color:var(--ink2);font-weight:500}
+
+/* O seletor "Dispositivo" esconde aparelhos com o atributo hidden; sem esta regra o display:flex deles vencia. */
+[hidden]{display:none!important}
 
 /* ---------- Palco ---------- */
 .stage{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:30px 30px;padding:28px 0 8px;max-width:1440px;margin:0 auto}
@@ -350,6 +353,70 @@ button.crew-i:hover{background:var(--surface)}
   .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
+/* ---------- Painel de bordo · versão PC: silhueta + chat da Cosmo ----------
+   Só aparece quando o painel tem espaço (visão "Painel de bordo").
+   Na visão Ecossistema o tablet continua estreito e igual ao de antes. */
+.stage[data-view="tablet"] .dev[data-dev="tablet"]{width:min(1280px,100%)}
+/* O painel precisa ser um container para as regras @container abaixo (e a de 540px acima) funcionarem. */
+[data-render="tablet"]{container-type:inline-size}
+.vit-row{display:grid;gap:8px}
+.body-card,.t-chat{display:none}
+.body-card{grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
+/* Silhueta em estilo holograma: contorno anatômico, brilho ciano, malha e anéis de radar */
+.body-fig{display:block;height:230px;width:auto}
+.body-fig .radar{fill:none;stroke:#22d3ee;stroke-opacity:.14}
+.body-fig .sil-line{fill:none;stroke:#67e8f9;stroke-width:1.4;stroke-opacity:.9}
+.body-fig .org{stroke:#05070e;stroke-width:1.4;fill:var(--ok);opacity:.92}
+.body-fig .org.l1{fill:var(--warn)}.body-fig .org.l2{fill:var(--crit)}
+.body-fig .lung{opacity:.62}
+.body-fig .sens{fill:#05070e;stroke:var(--accent);stroke-width:2.2}
+.body-leg{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:11.5px;min-width:0}
+.body-leg li{display:grid;grid-template-columns:10px minmax(0,1fr);gap:0 7px;align-items:center}
+.body-leg li>i{width:8px;height:8px;border-radius:50%;background:var(--ok);justify-self:center}
+.body-leg li>i.l1{background:var(--warn)}.body-leg li>i.l2{background:var(--crit)}
+.body-leg li>.ic{width:11px;height:11px}
+.body-leg b{font-weight:600}
+.body-leg small{grid-column:2;font-size:10.5px;line-height:1.35;color:var(--ink3)}
+.body-leg .sens-k>i{background:#05070e;box-shadow:inset 0 0 0 1.3px var(--accent)}
+/* Saúde hormonal: rosa (--cycle) quando compartilhado; cinza com cadeado quando privado */
+.body-fig .horm.on>*{fill:var(--cycle)}
+.body-fig .horm.off>*{fill:#3a475e}
+.body-fig .sens.est{stroke:var(--cycle);stroke-dasharray:4 3}
+.body-leg li>i.cyc{background:var(--cycle)}
+.cyc-bar{grid-column:1/-1;display:flex;flex-direction:column;gap:4px;padding-top:9px;border-top:1px solid var(--line)}
+.cyc-track{position:relative;display:flex;gap:2px;height:7px;margin-bottom:3px}
+.cyc-track span{border-radius:3px;background:var(--cycle);opacity:.28}
+.cyc-track span.cur{opacity:1}
+.cyc-track i{position:absolute;top:-3px;width:3px;height:13px;margin-left:-1.5px;border-radius:2px;background:#fff;box-shadow:0 0 0 2px #05070e}
+.cyc-bar b{font:600 11.5px var(--fd);color:#f9a8d4}
+.cyc-bar small{font-size:10.5px;line-height:1.35;color:var(--ink3)}
+
+.t-chat{position:relative;border-left:1px solid var(--line);min-width:0}
+.tc-in{position:absolute;inset:0;display:flex;flex-direction:column}
+.tc-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.tc-head b{display:flex;align-items:center;gap:6px;font:600 13px var(--fd);white-space:nowrap}
+.tc-thread{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:12px}
+.tc-msg{max-width:90%;padding:8px 11px;border-radius:12px;font-size:12px;line-height:1.45;overflow-wrap:anywhere}
+.tc-msg.cosmo{align-self:flex-start;background:linear-gradient(140deg,rgba(0,229,255,.08),var(--surface) 70%);border:1px solid rgba(0,229,255,.25);border-bottom-left-radius:4px}
+.tc-msg.me{align-self:flex-end;background:var(--surface2);border:1px solid var(--line2);border-bottom-right-radius:4px}
+.tc-typing{align-self:flex-start;font:500 11px var(--fm);color:var(--ink3)}
+.tc-foot{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-top:1px solid var(--line)}
+.tc-foot .cop-chips button{font-size:11px;padding:5px 9px}
+.tc-form{display:flex;gap:6px}
+.tc-form input{flex:1;min-width:0;padding:9px 11px;border-radius:10px;background:var(--surface);border:1px solid var(--line2);color:var(--ink);font:400 12.5px var(--fb)}
+.tc-form input::placeholder{color:var(--ink3)}
+.tc-form input:focus-visible{outline:none;border-color:var(--accent)}
+.tc-send{display:grid;place-items:center;width:38px;flex:none;border-radius:10px;background:var(--accent);color:#03141a;font-size:15px}
+.tc-note{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--ink3)}
+
+@container (min-width:1040px){
+  .ts-body{grid-template-columns:190px minmax(0,1fr) 330px;min-height:560px}
+  .t-chat{display:block}
+  .ts-main .cop,.ts-main .strip{display:none}
+  .body-card{display:grid}
+  .vit-row{grid-template-columns:minmax(0,1fr) 280px;align-items:start}
+}
+
 /* ---------- Desktop Houston ---------- */
 .mon{border-radius:16px;border:1px solid var(--line2);background:#03050a;overflow:hidden;container-type:inline-size;box-shadow:0 30px 70px rgba(0,0,0,.55)}
 .mon-chrome{display:flex;align-items:center;gap:6px;padding:8px 12px;background:#0b1120;border-bottom:1px solid var(--line);font:400 11.5px var(--fm);color:var(--ink3);white-space:nowrap;overflow:hidden}
@@ -527,6 +594,8 @@ const STORY = [
    text:'A Cosmo cruza a queixa da Sarah com o CO₂ da cabine e com os sintomas dos outros tripulantes. No painel de bordo, o Dr. Marcus pede o ajuste do ar à Elena e aprova o ultrassom ocular guiado; as imagens seguem para laudo em Houston.'},
   {event:'mood', focus:['watch-round','watch-sq','tablet'], title:'Saúde mental com consentimento',
    text:'A Cosmo percebe sono mais curto e voz mais baixa. Ela fala só com a Sarah, que decide se conta ao Dr. Marcus. Sem consentimento, nada sai do relógio.'},
+  {event:'cycle', focus:['watch-round','watch-sq','tablet'], title:'Linha de base que entende o ciclo',
+   text:'A FC de repouso da Sarah subiu 3 bpm e a pele 0,3 °C, como acontece depois da ovulação. Uma linha de base única daria alarme todo mês. O M3 compara com o padrão dela nesta fase do ciclo, então a Cosmo só informa, e a Sarah decide se mostra ao Dr. Marcus.'},
   {event:'sleep', focus:['watch-round','watch-sq'], title:'Hora de dormir: a IA age e deixa vetar',
    text:'Ajustar a luz da cabine é reversível, então a Cosmo agenda o modo noite sozinha e dá 15 s para a Sarah vetar. Depois de aplicado, ainda dá para desfazer.'},
   {scenario:'blackout', focus:['tablet','phone'], title:'Sem sinal com a Terra',
@@ -625,6 +694,7 @@ function fresh(){
     chat:[{who:'cosmo',text:'Bom dia, Sarah. Você dormiu 7h40, com 1h55 de sono profundo. Treino de resistência às 14:00.'}],
     typing:false, xp:450, quests:{treino:true,agua:false,powerdown:false},
     tExplain:false, tAsk:null, hAsk:null,
+    tChat:[{who:'cosmo',text:'Bom dia, Dr. Marcus. Estou rodando no computador da nave, sem depender da Terra. A Elena é quem mais pede atenção hoje. Pergunte sobre qualquer tripulante, o kit médico ou Houston.'}], tTyping:false,
     family:{km:43.6,kmEarth:43.6,goal:60,lucasKm:5,cheers:0,done:false},
     evt:{}, dose:{sarah:.42,marcus:.40,elena:.45,kenji:.41}, co2:2.4, boneOk:null, rid:Math.random(),
     crew:{marcus:{...CREW_BASE.marcus},elena:{...CREW_BASE.elena},kenji:{...CREW_BASE.kenji}}, tSel:'sarah', hSel:'sarah', remind:{},
@@ -1327,10 +1397,10 @@ function phoneHTML(){
 
 /* ================= Tripulação ================= */
 const CREW={
-  sarah:{name:'Sarah',role:'Comandante'},
-  marcus:{name:'Dr. Marcus',role:'Oficial médico'},
-  elena:{name:'Elena',role:'Engenheira de voo'},
-  kenji:{name:'Kenji',role:'Especialista de missão'}
+  sarah:{name:'Sarah',role:'Comandante',sex:'f'},
+  marcus:{name:'Dr. Marcus',role:'Oficial médico',sex:'m'},
+  elena:{name:'Elena',role:'Engenheira de voo',sex:'f'},
+  kenji:{name:'Kenji',role:'Especialista de missão',sex:'m'}
 };
 const CREW_IDS=Object.keys(CREW);
 const CREW_NOTES={
@@ -1402,15 +1472,8 @@ function tabletHTML(){
   } else {
     dec=`<div class="dec"><h5>Nenhuma decisão pendente</h5><ul><li>ECG de rotina · Sarah · 14:00</li><li>Densidade óssea (DXA) · Kenji · sexta</li><li>Hidratação da Elena abaixo da meta · toque no nome dela para ver</li></ul></div>`;
   }
-  const TQ={crew:'Quem precisa de atenção hoje?',resumo:`Resumo: ${CREW[sel].name}`,kit:'Situação do kit médico'};
-  const tAns={
-    crew:'Elena: hidratação baixa e duas noites curtas; vale conversar hoje. Sarah: estresse moderado e hidratação abaixo da meta. Kenji e você: estáveis.',
-    resumo: isS
-      ? `Sarah está ${LV[a.level].toLowerCase()}: FC ${FMT.hr(v)} bpm, SpO₂ ${FMT.spo2(v)}%, PA ${FMT.bp(v)}, homeostase ${a.homeo}%. ${e?'Evento cardíaco às '+e.clock.slice(0,5)+'; acompanhar ECG de 12 derivações.':'Sem eventos cardíacos nos últimos 7 dias.'}${S.evt.cycle&&['told','shared'].includes(S.evt.cycle.phase)?' Ela compartilhou: pode ter cólica, inchaço ou humor mais baixo, e pediu cuidado leve.'+cycleGround()+' Isso não é diagnóstico.':''}`
-      : `${CREW[sel].name}: ${LV[a.level].toLowerCase()}, FC ${FMT.hr(v)} bpm, SpO₂ ${FMT.spo2(v)}%, homeostase ${a.homeo}%. ${COP_SUM[sel]}`,
-    kit:'O₂ portátil em 92%, 18 eletrodos de ECG, 6 bolsas de soro, desfibrilador testado ontem. Antiarrítmicos: estoque para 2 tratamentos completos.'
-  };
-  const cop=`<div class="cop"><div class="cop-chips">${Object.keys(TQ).map(k=>`<button data-act="t-ask" data-arg="${k}" aria-pressed="${S.tAsk===k}">${TQ[k]}</button>`).join('')}</div>${S.tAsk&&tAns[S.tAsk]?`<div class="cop-a"><b>${ic('orbit')}Cosmo · copiloto médico</b>${esc(tAns[S.tAsk])}</div>`:''}</div>`;
+  const TQ=tChips(sel), ansT=S.tAsk?tabletAnswer(S.tAsk,sel):null;
+  const cop=`<div class="cop"><div class="cop-chips">${Object.keys(TQ).map(k=>`<button data-act="t-ask" data-arg="${k}" aria-pressed="${S.tAsk===k}">${TQ[k]}</button>`).join('')}</div>${ansT?`<div class="cop-a"><b>${ic('orbit')}Cosmo · copiloto médico</b>${esc(ansT)}</div>`:''}</div>`;
   if(!(isS&&e&&e.phase==='proposed')) dec+=cop;
   dec=evtTablet()+dec;
   return `<div class="ts-head"><div><b>Enfermaria · Dr. Marcus</b><small>Oficial médico da tripulação</small></div><div class="chips">${linkC}<span class="chip ok">${ic('mesh')}Rede local · 4 tripulantes</span><span class="chip ${S.co2>3?'warn':''}">${ic('wind')}CO₂ ${S.co2.toFixed(1).replace('.',',')} mmHg</span></div></div>
@@ -1418,10 +1481,157 @@ function tabletHTML(){
   <div class="ts-main">
     <div class="pt-head"><b>${CREW[sel].name} · ${CREW[sel].role}</b><span class="state-pill l${a.level}">${LV[a.level]} · homeostase ${a.homeo}%</span></div>
     <div class="ecg-wrap"><canvas class="ecg" data-ecg="live" data-who="${sel}" aria-label="ECG ao vivo de ${CREW[sel].name}"></canvas></div>
-    <div class="tiles">${['hr','spo2','bp','rr','hrv','water'].map(k=>tile(k,v,a.bands,'',sel)).join('')}</div>
+    <div class="vit-row"><div class="tiles">${['hr','spo2','bp','rr','hrv','water'].map(k=>tile(k,v,a.bands,'',sel)).join('')}</div>${bodyHTML(sel,v,a)}</div>
     ${strip(sel)}
     ${dec}
-  </div></div>`;
+  </div>
+  ${tChatHTML(sel)}</div>`;
+}
+
+/* ---------- Painel de bordo · silhueta corporal ----------
+   Genérica de propósito: sem rosto e sem anatomia detalhada. Mostra só a do
+   tripulante selecionado. Cada órgão é pintado pelo nível do sinal ligado a ele,
+   e os anéis ciano marcam onde ficam os sensores que geram os números dos cards. */
+// Metade direita do contorno do corpo (x >= 100, viewBox 200x440), do topo da cabeça até a
+// virilha. A metade esquerda é espelhada e o contorno vira curvas suaves (Catmull-Rom).
+// A diferença entre as duas versões é só a proporção: ombros, cintura e quadril.
+const SIL_HALF={
+  m:[[100,12],[110,14],[117,24],[118,38],[115,51],[110,61],[106,67],[107,79],[119,85],[137,89],[152,94],[162,105],[166,124],[167,150],[169,176],[172,200],[175,222],[177,240],[180,254],[180,270],[176,284],[171,283],[168,268],[166,250],[162,226],[157,202],[153,180],[149,156],[145,132],[141,121],[141,146],[138,170],[136,190],[137,210],[138,230],[137,258],[134,286],[130,310],[132,332],[129,362],[123,394],[128,410],[125,420],[109,420],[108,404],[109,392],[106,362],[108,334],[105,312],[104,280],[102,250],[100,236]],
+  f:[[100,14],[109,16],[115,26],[116,39],[113,51],[109,60],[105,66],[105,79],[114,85],[127,89],[139,94],[148,105],[151,124],[153,150],[156,176],[160,200],[163,220],[166,236],[168,250],[168,264],[164,276],[160,275],[157,261],[155,246],[150,224],[145,202],[141,180],[138,156],[135,132],[132,121],[130,146],[126,170],[127,186],[134,204],[140,224],[139,254],[135,284],[129,310],[131,332],[127,362],[121,394],[126,410],[123,419],[109,419],[108,404],[109,392],[106,362],[108,334],[105,312],[103,282],[102,252],[100,238]]
+};
+function silPath(half){
+  const p=[...half,...half.slice(1,-1).reverse().map(([x,y])=>[200-x,y])], n=p.length;
+  let d=`M${p[0][0]} ${p[0][1]}`;
+  for(let i=0;i<n;i++){
+    const a=p[(i-1+n)%n],b=p[i],c=p[(i+1)%n],e=p[(i+2)%n];
+    d+=`C${(b[0]+(c[0]-a[0])/6).toFixed(1)} ${(b[1]+(c[1]-a[1])/6).toFixed(1)} ${(c[0]-(e[0]-b[0])/6).toFixed(1)} ${(c[1]-(e[1]-b[1])/6).toFixed(1)} ${c[0]} ${c[1]}`;
+  }
+  return d+'Z';
+}
+// Contorno pronto + onde ficam os sensores em cada versão.
+const SIL={
+  m:{d:silPath(SIL_HALF.m), watch:[29,244], cuff:[157,140], patch:[82,152], sweat:[118,196]},
+  f:{d:silPath(SIL_HALF.f), watch:[39,240], cuff:[145,140], patch:[84,152], sweat:[118,196]}
+};
+function bodyHTML(id,v,a){
+  const s=SIL[CREW[id].sex]||SIL.m, b=a.bands, W=['baixo','moderado','alto'];
+  const p=v.water/v.waterGoal, kid=p<.6?2:p<.8?1:0;
+  const afib=id==='sarah'&&afibActive(S.scenario,S.emerg&&S.emerg.phase);
+  const heart=afib?2:b.hr, lungs=Math.max(b.spo2,b.rr), brain=b.stress;
+  const rows=[
+    [brain,'Cérebro',`estresse ${W[brain]}`],
+    [heart,'Coração',afib?'ritmo irregular':`ritmo regular · ${LV[heart].toLowerCase()}`],
+    [lungs,'Pulmões',LV[lungs].toLowerCase()],
+    [kid,'Rins',`risco ${W[kid]} · água ${Math.round(p*100)}%`]
+  ];
+  const ring=([x,y],t,cls='')=>`<circle class="sens ${cls}" cx="${x}" cy="${y}" r="6"><title>${t}</title></circle>`;
+  // Saúde hormonal: só para quem tem contexto registrado, e o detalhe só com consentimento.
+  const H=HORM[id], hs=!!H&&H.shared();
+  const hTxt=!H?'':!hs?`Privado · ${CREW[id].name} decide no relógio`:'Compartilhado: cuidado leve, sem alerta';
+  const hLeg=!H?'':hs
+    ?`<li><i class="cyc"></i><b>Saúde hormonal</b><small>${hTxt}</small></li>`
+    :`<li>${ic('shield','c-cycle')}<b>Saúde hormonal</b><small>${hTxt}</small></li>`;
+  const hSvg=!H?'':`<g class="horm ${hs?'on':'off'}"><title>Saúde hormonal · ${hTxt}</title><path d="M92 204h16l-4 12h-8z"/><circle cx="86" cy="209" r="3.2"/><circle cx="114" cy="209" r="3.2"/></g>
+      ${ring(s.sweat,'Adesivo de suor · estradiol em tempo real (conceito, ainda não testado no espaço)','est')}`;
+  return `<div class="body-card">
+    <svg class="body-fig" viewBox="0 0 200 440" role="img" aria-label="Silhueta de ${esc(CREW[id].name)}: ${rows.map(r=>r[1]+' '+r[2]).join(', ')}${H?', Saúde hormonal '+hTxt:''}">
+      <defs>
+        <linearGradient id="bf-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee" stop-opacity=".42"/><stop offset="1" stop-color="#0ea5e9" stop-opacity=".16"/></linearGradient>
+        <pattern id="bf-grid" width="7" height="7" patternUnits="userSpaceOnUse"><path d="M7 0H0V7" fill="none" stroke="#67e8f9" stroke-opacity=".22" stroke-width=".6"/></pattern>
+        <clipPath id="bf-clip"><path d="${s.d}"/></clipPath>
+        <filter id="bf-glow" x="-20%" y="-10%" width="140%" height="120%"><feGaussianBlur stdDeviation="3"/></filter>
+      </defs>
+      <g class="radar"><circle cx="100" cy="215" r="96"/><circle cx="100" cy="215" r="70" stroke-dasharray="2 4"/><path d="M100 100v14M100 316v14M4 215h14M182 215h14"/></g>
+      <path d="${s.d}" fill="#22d3ee" opacity=".35" filter="url(#bf-glow)"/>
+      <path d="${s.d}" fill="url(#bf-grad)"/>
+      <rect width="200" height="440" fill="url(#bf-grid)" clip-path="url(#bf-clip)"/>
+      <path d="M100 82V232" stroke="#a5f3fc" stroke-opacity=".25" stroke-width=".8" clip-path="url(#bf-clip)"/>
+      <path class="sil-line" d="${s.d}"/>
+      <ellipse class="org l${brain}" cx="100" cy="32" rx="10" ry="8"><title>Cérebro · estresse ${W[brain]}</title></ellipse>
+      <g><title>Pulmões · ${LV[lungs].toLowerCase()}</title><ellipse class="org lung l${lungs}" cx="88" cy="124" rx="10" ry="20"/><ellipse class="org lung l${lungs}" cx="112" cy="124" rx="10" ry="20"/></g>
+      <path class="org l${heart}" d="M106 152s-10-6.5-10-13.5a5.2 5.2 0 0 1 10-2.4a5.2 5.2 0 0 1 10 2.4c0 7-10 13.5-10 13.5z"><title>Coração · ${afib?'ritmo irregular':'ritmo regular'}</title></path>
+      <g><title>Rins · risco ${W[kid]}</title><ellipse class="org l${kid}" cx="90" cy="180" rx="5" ry="8"/><ellipse class="org l${kid}" cx="110" cy="180" rx="5" ry="8"/></g>
+      ${hSvg}
+      ${ring(s.watch,'Relógio · FC, SpO₂, HRV, ECG de 1 derivação, temperatura da pele')}${ring(s.patch,'Patch torácico · respiração')}${ring(s.cuff,'Manguito do kit · pressão arterial')}
+    </svg>
+    <ul class="body-leg">
+      ${rows.map(([l,n,t])=>`<li><i class="l${l}"></i><b>${n}</b><small>${t}</small></li>`).join('')}
+      ${hLeg}
+      <li>${ic('radiation','c-warn')}<b>Radiação</b><small><span data-dose="${id}">${fmtDose(S.dose[id])}</span> mSv hoje · missão ${MISSION_DOSE[S.mission]}/600</small></li>
+      <li class="sens-k"><i></i><small>Sensores${H?' (rosa tracejado: conceito)':''}</small></li>
+    </ul>
+  </div>`;
+}
+
+/* ---------- Painel de bordo · chat com a Cosmo ----------
+   Respostas simuladas: a Cosmo lê o estado da demo e responde por palavras-chave.
+   Ela explica e resume, mas não tem botão de ação (ADR-002): quem decide é o oficial médico. */
+function tChips(sel){
+  const c={crew:'Quem precisa de atenção hoje?',resumo:`Resumo: ${CREW[sel].name}`,kit:'Situação do kit médico'};
+  if(HORM[sel]) c.horm=`Saúde hormonal: ${CREW[sel].name}`;
+  return c;
+}
+
+/* ---------- Saúde hormonal (ADR-013 e ADR-014) ----------
+   O calendário do ciclo fica no relógio de cada tripulante e é privado por padrão.
+   O painel vê só o que a pessoa compartilhou pelo relógio (sintomas e pedido de cuidado
+   leve), nunca o método nem a fase. O calendário da Elena fica no relógio dela. */
+const HORM={
+  sarah:{shared:()=>!!(S.evt.cycle&&['told','shared'].includes(S.evt.cycle.phase))},
+  elena:{shared:()=>false}
+};
+function hormAnswer(id){
+  const H=HORM[id], n=CREW[id].name;
+  if(!H.shared()) return `${n} não compartilhou nada sobre o ciclo com você. O calendário fica no relógio dela; método e fase não aparecem no painel, e nada sai sem o consentimento dela.`;
+  return `${n} compartilhou: pode ter cólica, inchaço ou humor mais baixo nos próximos dois dias, e pediu cuidado leve. O estado segue ótimo e isso não é diagnóstico. Método e fase não aparecem no painel. Analgésico do kit só se ela pedir.`;
+}
+function tabletAnswer(k,sel){
+  const v=vOf(sel), a=assess(v), e=S.emerg;
+  if(k==='crew') return 'Elena: hidratação baixa e duas noites curtas; vale conversar hoje. Sarah: estresse moderado e hidratação abaixo da meta. Kenji e você: estáveis.';
+  if(k==='kit') return 'O₂ portátil em 92%, 18 eletrodos de ECG, 6 bolsas de soro, desfibrilador testado ontem. Antiarrítmicos: estoque para 2 tratamentos completos.';
+  if(k==='resumo') return sel==='sarah'
+    ? `Sarah está ${LV[a.level].toLowerCase()}: FC ${FMT.hr(v)} bpm, SpO₂ ${FMT.spo2(v)}%, PA ${FMT.bp(v)}, homeostase ${a.homeo}%. ${e?'Evento cardíaco às '+e.clock.slice(0,5)+'; acompanhar ECG de 12 derivações.':'Sem eventos cardíacos nos últimos 7 dias.'}${HORM.sarah.shared()?' Ela compartilhou: pode ter cólica, inchaço ou humor mais baixo, e pediu cuidado leve.'+cycleGround()+' Isso não é diagnóstico.':''}`
+    : `${CREW[sel].name}: ${LV[a.level].toLowerCase()}, FC ${FMT.hr(v)} bpm, SpO₂ ${FMT.spo2(v)}%, homeostase ${a.homeo}%. ${COP_SUM[sel]}`;
+  if(k==='horm') return HORM[sel]?hormAnswer(sel):`O perfil de ${CREW[sel].name} não tem contexto hormonal registrado.`;
+  return null;
+}
+function tChatReply(q,sel){
+  const t=q.toLowerCase(), e=S.emerg, m=M();
+  const who=CREW_IDS.find(id=>t.includes(id)||t.includes(CREW[id].name.toLowerCase()));
+  if(/kit|rem[eé]dio|estoque|medica/.test(t)) return tabletAnswer('kit',sel);
+  if(/protocolo|por ?qu[eê]|explica/.test(t)){
+    if(e&&e.phase==='proposed') return 'Sugeri o protocolo porque o relógio da Sarah mostra intervalos RR irregulares, sem onda P, FC acima de 150 e SpO₂ abaixo de 90% há mais de 40 s. Confiança de 87%. A confirmação é sua, no card do protocolo.';
+    if(e) return `O protocolo está em andamento desde as ${(e.confClock||e.clock).slice(0,5)}. Acompanhe os passos no card da Sarah.`;
+    return 'Não há nenhum protocolo em andamento agora.';
+  }
+  if(/houston|terra|sinal/.test(t)) return S.scenario==='blackout'
+    ? `Houston está fora de alcance: ${m.bo.why.toLowerCase()}. O contato volta em ${m.bo.back}. Eu continuo funcionando com os modelos locais da nave.`
+    : `Houston está a ${m.oneWayTxt} de distância, via ${m.linkFull}. O que você decidir aqui chega lá com esse atraso.`;
+  if(/ciclo|horm[oô]n|menstrua|p[ií]lula|\bdiu\b|ovula|fase l[uú]tea|estrog/.test(t)){
+    const id=who||sel;
+    return HORM[id]?hormAnswer(id):`O perfil de ${CREW[id].name} não tem contexto hormonal registrado.`;
+  }
+  if(who) return tabletAnswer('resumo',who);
+  if(/aten[cç]|quem|prioridade|hoje/.test(t)) return tabletAnswer('crew',sel);
+  if(/resumo|como (est|t[aá])/.test(t)) return tabletAnswer('resumo',sel);
+  return 'Neste protótipo eu respondo sobre a tripulação, o kit médico, Houston e protocolos em andamento. Tente citar um nome, como "Como está a Elena?".';
+}
+function tAskCosmo(text){
+  text=String(text||'').trim(); if(!text||S.tTyping) return;
+  S.tChat.push({who:'me',text}); S.tTyping=true; bump();
+  later(700,()=>{S.tTyping=false; S.tChat.push({who:'cosmo',text:tChatReply(text,S.tSel||'sarah')}); if(S.tChat.length>40) S.tChat.splice(0,S.tChat.length-40); bump();});
+}
+function tChatHTML(sel){
+  const TQ=tChips(sel);
+  return `<aside class="t-chat" aria-label="Chat com a Cosmo"><div class="tc-in">
+    <div class="tc-head"><b>${ic('orbit','c-acc')}Cosmo · copiloto médico</b><span class="chip ok" title="Roda no computador da nave, sem internet">IA local</span></div>
+    <div class="tc-thread" data-thread role="log" aria-live="polite">${S.tChat.map(x=>`<div class="tc-msg ${x.who}">${esc(x.text)}</div>`).join('')}${S.tTyping?'<div class="tc-typing">Cosmo está digitando…</div>':''}</div>
+    <div class="tc-foot">
+      <div class="cop-chips">${Object.keys(TQ).map(k=>`<button data-act="tc-ask" data-arg="${k}"${S.tTyping?' disabled':''}>${esc(TQ[k])}</button>`).join('')}</div>
+      <form class="tc-form" data-form="tc"><input data-keep="tc" type="text" autocomplete="off" maxlength="200" placeholder="Pergunte sobre a tripulação…" aria-label="Mensagem para a Cosmo"><button class="tc-send" type="submit" aria-label="Enviar"${S.tTyping?' disabled':''}>${ic('send')}</button></form>
+      <p class="tc-note">${ic('shield','c-acc')}A Cosmo sugere; quem decide é você.</p>
+    </div>
+  </div></aside>`;
 }
 
 /* ================= Render: console de Houston ================= */
@@ -1520,7 +1730,10 @@ const RENDER={'watch-round':()=>watchHTML('round'),'watch-sq':()=>watchHTML('sq'
 function fullRender(){
   const ae=document.activeElement, fa=ae&&ae.dataset?ae.dataset.act:null, fg=ae&&ae.dataset?ae.dataset.arg:null;
   const host=ae&&ae.closest?ae.closest('[data-render]'):null, hostKey=host?host.dataset.render:null;
+  // Campos de texto ([data-keep]) mantêm o que foi digitado, o foco e o cursor entre re-renders.
+  const keep={}; document.querySelectorAll('[data-keep]').forEach(i=>{keep[i.dataset.keep]={v:i.value,f:i===ae,a:i.selectionStart,b:i.selectionEnd};});
   document.querySelectorAll('[data-render]').forEach(el=>{el.innerHTML=RENDER[el.dataset.render]();});
+  document.querySelectorAll('[data-keep]').forEach(i=>{const k=keep[i.dataset.keep]; if(!k) return; i.value=k.v; if(k.f){i.focus({preventScroll:true}); try{i.setSelectionRange(k.a,k.b);}catch(e){}}});
   document.querySelectorAll('[data-thread]').forEach(t=>{t.scrollTop=t.scrollHeight;});
   renderControls(); renderTimeline(); updateLive();
   if(fa){
@@ -1666,11 +1879,20 @@ document.addEventListener('click',ev=>{
     case 't-remind': remind(g); break;
     case 't-explain': S.tExplain=!S.tExplain; break;
     case 't-ask': S.tAsk=S.tAsk===g?null:g; break;
+    case 'tc-ask': tAskCosmo(tChips(S.tSel||'sarah')[g]); break;
     case 'd-ask': S.hAsk=S.hAsk===g?null:g; break;
     case 'evt': injectEvent(g); break;
     default: evtAction(a);
   }
   bump(); lastKey=''; tick();
+});
+document.addEventListener('submit',ev=>{
+  const f=ev.target.closest('[data-form="tc"]'); if(!f) return;
+  ev.preventDefault();
+  const i=f.querySelector('input'), text=i.value;
+  if(!text.trim()||S.tTyping) return;
+  i.value=''; i.focus({preventScroll:true});
+  tAskCosmo(text); lastKey=''; tick();
 });
 function readHash(){const h=(location.hash||'').slice(1);if(VIEWS.some(v=>v[0]===h)){VIEW=h;return true;}return false;}
 window.addEventListener('hashchange',()=>{if(readHash()){lastKey='';tick();}});
