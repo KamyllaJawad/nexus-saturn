@@ -19,6 +19,7 @@ const co2Alto = computed(() => props.status.co2 > LIMITE_CO2)
             <p class="subtitulo">{{ status.subtitulo ?? 'Oficial médico da tripulação' }}</p>
         </div>
         <div class="chips">
+            <StatusChip v-for="x in status.extras ?? []" :key="x.texto" :variante="x.variante">{{ x.texto }}</StatusChip>
             <StatusChip v-if="status.houstonOnline" :icone="Signal">
                 Houston · {{ status.atrasoHouston }}
             </StatusChip>

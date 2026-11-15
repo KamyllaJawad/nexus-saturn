@@ -8,6 +8,8 @@ export interface StatusNave {
   // Sem médico a bordo o painel é do Marcus como CMO (vem de /api/missao).
   titulo?: string
   subtitulo?: string
+  // Chips extras vindos da API: onde está o médico, prótons, modo noite.
+  extras?: { texto: string; variante: 'normal' | 'ok' | 'warn' | 'crit' }[]
 }
 
 export const statusNaveMock: StatusNave = {

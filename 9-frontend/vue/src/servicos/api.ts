@@ -9,6 +9,7 @@ import type { ChaveSinal, NivelSaude, Orgao, Tripulante } from '@/mocks/tripulac
 import type { StatusNave } from '@/mocks/nave'
 import type { Acao, CardDoTripulante, Decisao } from '@/mocks/decisoes'
 import type { TrechoEcg } from '@/ecg/tocador'
+import type { RegistroTrilha, Trilha } from './trilha'
 
 export const API_BASE: string = import.meta.env.VITE_API_URL ?? ''
 
@@ -39,7 +40,26 @@ export interface ApiTripulante {
   dose_msv_dia: number
   agua_meta: number
   metricas: Record<string, { z: number; faixa: Faixa }>
-  m1: { classe: 'normal' | 'fa' | 'outro' | null; confianca?: number; versao_modelo?: string; motivo?: string } | null
+  m1: {
+    classe: 'normal' | 'fa' | 'outro' | null
+    confianca?: number
+    prob_fa?: number
+    versao_modelo?: string
+    motivo?: string
+  } | null
+  m2?: { qualidade: string; confianca: number; motivo: string | null; versao_modelo: string }
+  isolation_forest?: {
+    anomalo: boolean
+    score: number
+    limiar: number
+    acima_do_limiar: boolean
+    seguidas: number
+    persistencia: number
+    evidencias: string[]
+    versao_modelo: string
+  }
+  sombra?: Record<string, { versao_modelo: string; score: number; limiar: number; anomalo: boolean }>
+  versao_z?: string
   // Campos do passo 4 (s.clinico() e /api/bordo). Opcionais: uma API mais antiga não manda.
   sexo?: 'feminino' | 'masculino' | null
   corpo?: Record<Orgao, Faixa>
@@ -59,10 +79,22 @@ export interface ApiEvento {
   medico_local: 'bordo' | 'terra'
   medico_nome: string
   prazo_restante_s: number | null
+  escalonamentos?: number
   gerado_em: string
-  sugestao: { confianca?: number; versao_modelo?: string; alternativa?: string; evidencias?: string[] } | null
+  sugestao: { texto?: string; confianca?: number; versao_modelo?: string; alternativa?: string; evidencias?: string[] } | null
   decisoes: { acao: string; humano_id: string; decidida_em: string }[]
   dados: Record<string, unknown>
+}
+
+export interface OrdemPermanente {
+  id: string
+  titulo: string
+  dose: string
+  assinada_por_nome: string
+  assinada_em: string
+  depois: string
+  em_vigor: boolean
+  vale_agora: boolean
 }
 
 export interface ApiMissao {
@@ -72,7 +104,22 @@ export interface ApiMissao {
   atraso_txt: string
   blackout: boolean
   cabine: { co2: number; fluxo: string; luz: string }
-  equipe: { local: 'bordo' | 'terra'; medico_nome: string; marcus: { nome: string; papel: string } }
+  equipe: {
+    local: 'bordo' | 'terra'
+    medico_nome: string
+    medico_id?: string
+    resumo?: string
+    marcus: { nome: string; papel: string }
+  }
+  // Usados nos fluxos sem médico a bordo e no blackout.
+  link?: string
+  comprimido?: boolean
+  atraso_real_s?: number
+  atraso_demo_s?: number
+  volta_em?: string
+  motivo_blackout?: string
+  autonomia?: string
+  ordem_permanente?: OrdemPermanente
 }
 
 export interface ApiBordo {
@@ -80,6 +127,8 @@ export interface ApiBordo {
   tripulantes: ApiTripulante[]
   eventos: ApiEvento[]
   avisos_compartilhados: ApiEvento[]
+  sombra?: Record<string, { versao: string; leituras: number; divergem: number }>
+  trilha_cosmo?: Trilha
 }
 
 // ---------------------------------------------------------------- chamadas
@@ -110,6 +159,18 @@ export const buscarEcg = (tid: string) => pedir<TrechoEcg>(`/tripulantes/${encod
 // Esta tela é do oficial médico (ou do CMO, sem médico a bordo), como o bordo/ atual.
 export const EU = 'marcus'
 
+// Decisão com tudo o que a rota aceita: dose e PIN na medicação, detalhe nos demais.
+export function decidirEvento(corpo: {
+  evento_id: string
+  acao: string
+  humano_id?: string
+  dose?: string
+  pin?: string
+  detalhe?: Record<string, unknown>
+}) {
+  return pedir('/decisoes', { humano_id: EU, ...corpo })
+}
+
 export function enviarDecisao(evento_id: string, acao: string, detalhe?: Record<string, unknown>, humano_id = EU) {
   return pedir('/decisoes', { evento_id, humano_id, acao, ...(detalhe ? { detalhe } : {}) })
 }
@@ -117,11 +178,21 @@ export function enviarDecisao(evento_id: string, acao: string, detalhe?: Record<
 export interface RespostaChatApi {
   resposta: string
   fonte: { titulo: string; referencia?: string } | null
+  modo?: string
+  visao?: string
+  trilha?: RegistroTrilha
 }
+
+export interface GrupoPerguntas {
+  grupo: string
+  perguntas: string[]
+}
+export const buscarPerguntas = (superficie: string, tripulante_id: string) =>
+  pedir<GrupoPerguntas[]>(`/cosmo/perguntas?superficie=${superficie}&tripulante_id=${encodeURIComponent(tripulante_id)}`)
 
 export function perguntarApi(
   pergunta: string,
-  superficie: 'bordo' | 'relogio',
+  superficie: 'bordo' | 'relogio' | 'houston',
   tripulante_id?: string,
   signal?: AbortSignal,
 ) {
@@ -269,6 +340,11 @@ export function paraStatus(m: ApiMissao): StatusNave {
     subtitulo: terra
       ? `Sem médico a bordo · decisões médicas com a ${m.equipe.medico_nome}, em Houston`
       : 'Oficial médico da tripulação',
+    extras: [
+      terra ? { texto: `Médico na Terra · ${m.equipe.medico_nome}`, variante: 'warn' } : { texto: 'Médico a bordo', variante: 'ok' },
+      ...(m.cabine.fluxo !== 'normal' ? [{ texto: `Prótons: fluxo ${m.cabine.fluxo}`, variante: 'warn' as const }] : []),
+      ...(m.cabine.luz === 'noite' ? [{ texto: 'Modo noite', variante: 'normal' as const }] : []),
+    ],
   }
 }
 

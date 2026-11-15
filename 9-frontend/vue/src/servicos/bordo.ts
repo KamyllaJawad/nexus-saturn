@@ -5,7 +5,7 @@ import { onUnmounted, ref, shallowRef } from 'vue'
 import { tripulacaoMock, type Tripulante } from '@/mocks/tripulacao'
 import { statusNaveMock, type StatusNave } from '@/mocks/nave'
 import type { Acao } from '@/mocks/decisoes'
-import { buscarBordo, conexao, enviarDecisao, paraStatus, paraTripulante, type ApiBordo } from './api'
+import { buscarBordo, conexao, decidirEvento, enviarDecisao, paraStatus, paraTripulante, type ApiBordo } from './api'
 
 export function usarBordo(intervaloMs = 1000) {
   const tripulantes = ref<Tripulante[]>(tripulacaoMock)
@@ -48,9 +48,21 @@ export function usarBordo(intervaloMs = 1000) {
     return true
   }
 
+  // Decisão completa (dose, PIN, detalhe), usada pelos cartões de evento.
+  async function decidirCorpo(corpo: Parameters<typeof decidirEvento>[0]) {
+    try {
+      erro.value = null
+      await decidirEvento(corpo)
+    } catch (e) {
+      erro.value = (e as Error).message
+    } finally {
+      await carregar()
+    }
+  }
+
   carregar()
   const id = setInterval(carregar, intervaloMs)
   onUnmounted(() => clearInterval(id))
 
-  return { tripulantes, status, bordo, erro, conexao, carregar, decidir }
+  return { tripulantes, status, bordo, erro, conexao, carregar, decidir, decidirCorpo }
 }

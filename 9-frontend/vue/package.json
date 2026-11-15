@@ -10,7 +10,8 @@
     "test:unit": "vitest",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "format": "prettier --write --experimental-cli src/"
+    "format": "prettier --write --experimental-cli src/",
+    "build:api": "vite build --mode api"
   },
   "dependencies": {
     "lucide-vue-next": "^1.0.0",

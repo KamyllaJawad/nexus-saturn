@@ -3,11 +3,12 @@
 
 import { tripulacaoMock, type Tripulante } from '@/mocks/tripulacao'
 import { conexao, perguntarApi } from './api'
+import type { RegistroTrilha } from './trilha'
 import { statusNaveMock } from '@/mocks/nave'
 import { DECISOES, KIT_MEDICO } from '@/mocks/decisoes'
 
 export interface PerguntaCosmo {
-  origem: 'painel' | 'relogio'
+  origem: 'painel' | 'relogio' | 'houston'
   tripulante_id?: string
   mensagem: string
 }
@@ -21,6 +22,10 @@ export interface RespostaCosmo {
   resposta: string
   fontes: Fonte[]
   gerada_em: string
+  // Só com a API: como a Cosmo respondeu, o que ela vê nesta superfície e a trilha.
+  modo?: string
+  visao?: string
+  trilha?: RegistroTrilha
 }
 
 export async function perguntarCosmo(
@@ -28,12 +33,15 @@ export async function perguntarCosmo(
   opcoes: { signal?: AbortSignal; atrasoMs?: number } = {},
 ): Promise<RespostaCosmo> {
   if (conexao.value === 'api') {
-    const superficie = pergunta.origem === 'painel' ? 'bordo' : 'relogio'
+    const superficie = pergunta.origem === 'painel' ? 'bordo' : pergunta.origem
     const r = await perguntarApi(pergunta.mensagem, superficie, pergunta.tripulante_id, opcoes.signal)
     return {
       resposta: r.resposta,
       fontes: r.fonte ? [{ titulo: r.fonte.titulo, trecho: r.fonte.referencia }] : [],
       gerada_em: new Date().toISOString(),
+      modo: r.modo,
+      visao: r.visao,
+      trilha: r.trilha,
     }
   }
 

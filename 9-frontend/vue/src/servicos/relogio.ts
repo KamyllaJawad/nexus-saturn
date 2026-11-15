@@ -12,19 +12,44 @@ export interface ApiRelogio {
     ApiTripulante,
     'tripulante_id' | 'nome' | 'papel' | 'gerada_em' | 'estado' | 'homeostase' | 'qualidade' | 'fc' | 'spo2' | 'hrv'
     | 'agua_ml_dia' | 'agua_meta' | 'dose_msv_dia' | 'metricas' | 'sexo'
-  >
+  > &
+    Partial<Pick<ApiTripulante, 'temp_pele' | 'respiracao' | 'sono_min_noite' | 'estresse'>>
   contagem: { otimos: number; atencao: number; criticos: number }
   pendencias: ApiEvento[]
   acompanhando: ApiEvento[]
   emergencia: boolean
   ciclo: { na_janela: boolean; aviso_dias: number; privado: true } | null
-  link: { missao: string; rotulo: string; blackout: boolean; atraso_txt: string }
-  equipe: { local: 'bordo' | 'terra'; medico_nome: string; marcus: { nome: string } }
+  link: {
+    missao: string
+    rotulo: string
+    blackout: boolean
+    atraso_txt: string
+    link?: string
+    comprimido?: boolean
+    volta_em?: string
+    motivo_blackout?: string
+    fila?: { prioridade: number; estado: string; falta_s?: number; rotulo?: string }[]
+    fila_mb?: number
+  }
+  jogo?: {
+    nivel: number
+    pct: number
+    xp: number
+    missoes: { treino: boolean; agua: boolean; respiracao: boolean }
+    corrida_km: number
+    corrida_meta: number
+    brinde: string | null
+  } | null
+  mensagens?: { texto: string; enviado_em: string; recebido_em: string }[]
+  avisos?: { texto: string }[]
+  equipe: { local: 'bordo' | 'terra'; medico_nome: string; marcus: { nome: string; papel: string } }
 }
 
 export const buscarRelogio = (tid: string) => pedir<ApiRelogio>(`/tripulantes/${encodeURIComponent(tid)}/relogio`)
 export const beberAgua = (tid: string) => pedir('/habitos/agua', { tripulante_id: tid })
 export const registrarRespiracao = (tid: string) => pedir('/habitos/respiracao', { tripulante_id: tid })
+// Elo, sincronia e SOS: recado à família, incentivo, sincronizar o link, SOS prioritário.
+export const enviarDoRelogio = (tid: string, tipo: string) => pedir('/relogio/enviar', { tripulante_id: tid, tipo })
 
 // ---------------------------------------------------------------- mostrador
 const MISSAO_CURTA: Record<string, string> = { leo: 'LEO', gateway: 'Gateway', mars: 'Marte', marsSurf: 'Marte' }
@@ -280,6 +305,7 @@ export function usarRelogio(quem: Ref<string>, intervaloMs = 1000) {
 
   const decidir = (evento_id: string, acao: string) => executar(() => enviarDecisao(evento_id, acao, undefined, quem.value))
   const beber = () => executar(() => beberAgua(quem.value))
+  const enviar = (tipo: string) => executar(() => enviarDoRelogio(quem.value, tipo))
   const respirou = () => executar(() => registrarRespiracao(quem.value))
 
   watch(quem, () => {
@@ -290,5 +316,5 @@ export function usarRelogio(quem: Ref<string>, intervaloMs = 1000) {
   const id = setInterval(carregar, intervaloMs)
   onUnmounted(() => clearInterval(id))
 
-  return { dados, erro, conexao, carregar, decidir, beber, respirou }
+  return { dados, erro, conexao, carregar, decidir, beber, respirou, enviar }
 }

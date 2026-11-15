@@ -28,7 +28,7 @@ const base: ApiRelogio = {
   emergencia: false,
   ciclo: null,
   link: { missao: 'mars', rotulo: 'Trânsito para Marte', blackout: false, atraso_txt: '8 min 20 s' },
-  equipe: { local: 'bordo', medico_nome: 'Dr. Marcus', marcus: { nome: 'Dr. Marcus' } },
+  equipe: { local: 'bordo', medico_nome: 'Dr. Marcus', marcus: { nome: 'Dr. Marcus', papel: 'Oficial médico' } },
 }
 
 const ev = (p: Partial<ApiEvento>): ApiEvento => ({

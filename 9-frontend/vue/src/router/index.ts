@@ -1,21 +1,17 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
-// Rotas com # (/v2/#/bordo): funcionam servidas pelo FastAPI e dentro do iframe da
-// sala de simulação sem precisar de fallback de SPA no servidor.
+// Rotas com # (/#/bordo): funcionam em qualquer hospedagem estática (Vercel) e
+// servidas pelo FastAPI, sem precisar de fallback de SPA no servidor.
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
-    { path: '/', redirect: '/bordo' },
-    {
-      path: '/bordo',
-      name: 'bordo',
-      component: () => import('../views/PainelBordoView.vue'),
-    },
-    {
-      path: '/relogio',
-      name: 'relogio',
-      component: () => import('../views/RelogioView.vue'),
-    },
+    { path: '/', name: 'sala', component: () => import('../views/SalaView.vue') },
+    { path: '/bordo', name: 'bordo', component: () => import('../views/PainelBordoView.vue') },
+    { path: '/relogio', name: 'relogio', component: () => import('../views/RelogioView.vue') },
+    { path: '/houston', name: 'houston', component: () => import('../views/HoustonView.vue') },
+    { path: '/familia', name: 'familia', component: () => import('../views/FamiliaView.vue') },
+    { path: '/dados-ia', name: 'dados-ia', component: () => import('../views/DadosIaView.vue') },
+    { path: '/:qualquer(.*)', redirect: '/' },
   ],
 })
 
