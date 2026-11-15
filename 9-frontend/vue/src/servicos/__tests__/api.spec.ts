@@ -127,6 +127,29 @@ describe('paraTripulante', () => {
   })
 })
 
+describe('paraTripulante com os campos do servidor (passo 4)', () => {
+  it('usa sexo, corpo e saude_hormonal da API em vez do cálculo local', () => {
+    const t = paraTripulante(
+      {
+        ...sarah,
+        sexo: 'feminino',
+        corpo: { cerebro: 'padrao', coracao: 'critico', pulmoes: 'atencao', rins: 'padrao' },
+        saude_hormonal: { compartilhado: true, resumo: 'pediu cuidado leve' },
+      },
+      bordo(),
+    )
+    expect(t.sexo).toBe('f')
+    expect(t.corpo).toEqual({ cerebro: 0, coracao: 2, pulmoes: 1, rins: 0 })
+    expect(t.hormonal).toEqual({ compartilhado: true, resumo: 'pediu cuidado leve' })
+  })
+
+  it('saude_hormonal null (sem médico a bordo) esconde o bloco mesmo com aviso', () => {
+    const aviso = evento({ id: 'av-1', classe: 'aviso', tipo: 'ciclo', estado: 'encerrado' })
+    const t = paraTripulante({ ...sarah, sexo: 'feminino', saude_hormonal: null }, bordo({ avisos_compartilhados: [aviso] }))
+    expect(t.hormonal).toBeUndefined()
+  })
+})
+
 describe('paraStatus', () => {
   it('blackout e médico na Terra mudam o cabeçalho', () => {
     const s = paraStatus({

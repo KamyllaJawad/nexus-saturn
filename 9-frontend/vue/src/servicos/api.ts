@@ -8,6 +8,7 @@ import { ref } from 'vue'
 import type { ChaveSinal, NivelSaude, Orgao, Tripulante } from '@/mocks/tripulacao'
 import type { StatusNave } from '@/mocks/nave'
 import type { Acao, CardDoTripulante, Decisao } from '@/mocks/decisoes'
+import type { TrechoEcg } from '@/ecg/tocador'
 
 export const API_BASE: string = import.meta.env.VITE_API_URL ?? ''
 
@@ -39,6 +40,10 @@ export interface ApiTripulante {
   agua_meta: number
   metricas: Record<string, { z: number; faixa: Faixa }>
   m1: { classe: 'normal' | 'fa' | 'outro' | null; confianca?: number; versao_modelo?: string; motivo?: string } | null
+  // Campos do passo 4 (s.clinico() e /api/bordo). Opcionais: uma API mais antiga não manda.
+  sexo?: 'feminino' | 'masculino' | null
+  corpo?: Record<Orgao, Faixa>
+  saude_hormonal?: { compartilhado: false } | { compartilhado: true; resumo: string } | null
 }
 
 export interface ApiEvento {
@@ -78,7 +83,7 @@ export interface ApiBordo {
 }
 
 // ---------------------------------------------------------------- chamadas
-async function pedir<T>(caminho: string, corpo?: unknown, signal?: AbortSignal): Promise<T> {
+export async function pedir<T>(caminho: string, corpo?: unknown, signal?: AbortSignal): Promise<T> {
   const r = await fetch(
     `${API_BASE}/api${caminho}`,
     corpo === undefined
@@ -99,11 +104,14 @@ async function pedir<T>(caminho: string, corpo?: unknown, signal?: AbortSignal):
 
 export const buscarBordo = () => pedir<ApiBordo>('/bordo')
 
+// 6 s de ECG do relógio: gravação do conjunto de teste do CinC 2017 (FA no cenário de FA).
+export const buscarEcg = (tid: string) => pedir<TrechoEcg>(`/tripulantes/${encodeURIComponent(tid)}/ecg`)
+
 // Esta tela é do oficial médico (ou do CMO, sem médico a bordo), como o bordo/ atual.
 export const EU = 'marcus'
 
-export function enviarDecisao(evento_id: string, acao: string, detalhe?: Record<string, unknown>) {
-  return pedir('/decisoes', { evento_id, humano_id: EU, acao, ...(detalhe ? { detalhe } : {}) })
+export function enviarDecisao(evento_id: string, acao: string, detalhe?: Record<string, unknown>, humano_id = EU) {
+  return pedir('/decisoes', { evento_id, humano_id, acao, ...(detalhe ? { detalhe } : {}) })
 }
 
 export interface RespostaChatApi {
@@ -160,7 +168,7 @@ const NOME_SINAL: Record<string, string> = {
 
 const FINAIS = ['resolvido', 'encerrado']
 
-// Provisório (passo 4 do plano): sexo e órgãos ainda não vêm da API.
+// Reserva para uma API sem os campos do passo 4 (sexo, corpo, saude_hormonal).
 const SEXO: Record<string, 'f' | 'm'> = { sarah: 'f', elena: 'f', marcus: 'm', kenji: 'm' }
 
 // Dose acumulada estimada por perfil de missão, a mesma da demo (1-demo-mvp).
@@ -183,9 +191,8 @@ function destaque(t: ApiTripulante): string | undefined {
   return `${NOME_SINAL[sinal] ?? sinal} ${m.faixa === 'critico' ? 'crítico' : 'em atenção'}`
 }
 
-// Estado de cada órgão na silhueta. Provisório no front até o passo 4 (vem do back),
-// com as mesmas regras do painel atual e da demo.
-function corpo(t: ApiTripulante, faixas: Record<ChaveSinal, NivelSaude>): Record<Orgao, NivelSaude> {
+// Reserva: as mesmas regras de `corpo()` em 8-backend/app/nave/simulador.py.
+function corpoLocal(t: ApiTripulante, faixas: Record<ChaveSinal, NivelSaude>): Record<Orgao, NivelSaude> {
   const fa = t.m1?.classe === 'fa'
   const agua = t.agua_ml_dia / t.agua_meta
   return {
@@ -206,9 +213,7 @@ export function paraTripulante(t: ApiTripulante, b: Pick<ApiBordo, 'missao' | 'a
     hrv: nivelDe(m.hrv),
     agua: nivelDe(m.hidratacao),
   }
-  const sexo = SEXO[t.tripulante_id] ?? 'm'
-  // O aviso do ciclo só chega em /api/bordo se ela autorizou (o filtro é do servidor).
-  const compartilhou = b.avisos_compartilhados.some((e) => e.tipo === 'ciclo' && e.tripulante_id === t.tripulante_id)
+  const sexo = t.sexo ? (t.sexo === 'feminino' ? 'f' : 'm') : (SEXO[t.tripulante_id] ?? 'm')
   return {
     id: t.tripulante_id,
     nome: t.nome,
@@ -229,15 +234,28 @@ export function paraTripulante(t: ApiTripulante, b: Pick<ApiBordo, 'missao' | 'a
     },
     faixas,
     sexo,
-    corpo: corpo(t, faixas),
+    corpo: t.corpo
+      ? {
+          cerebro: NIVEL_FAIXA[t.corpo.cerebro],
+          coracao: NIVEL_FAIXA[t.corpo.coracao],
+          pulmoes: NIVEL_FAIXA[t.corpo.pulmoes],
+          rins: NIVEL_FAIXA[t.corpo.rins],
+        }
+      : corpoLocal(t, faixas),
     radiacao: { hojeMsv: t.dose_msv_dia, missaoMsv: DOSE_MISSAO[b.missao.missao] ?? 0 },
-    hormonal:
-      sexo !== 'f'
-        ? undefined
-        : compartilhou
-          ? { compartilhado: true, resumo: 'pode ter cólica, inchaço ou humor mais baixo e pediu cuidado leve' }
-          : { compartilhado: false },
+    hormonal: hormonal(t, sexo, b),
   }
+}
+
+// O servidor decide (ADR-013 e ADR-014): null quando o painel não pode saber de nada.
+function hormonal(t: ApiTripulante, sexo: 'f' | 'm', b: Pick<ApiBordo, 'avisos_compartilhados'>): Tripulante['hormonal'] {
+  if (t.saude_hormonal !== undefined) return t.saude_hormonal ?? undefined
+  if (sexo !== 'f') return undefined
+  // Reserva: o aviso do ciclo só chega em /api/bordo se ela autorizou.
+  const compartilhou = b.avisos_compartilhados.some((e) => e.tipo === 'ciclo' && e.tripulante_id === t.tripulante_id)
+  return compartilhou
+    ? { compartilhado: true, resumo: 'pode ter cólica, inchaço ou humor mais baixo e pediu cuidado leve' }
+    : { compartilhado: false }
 }
 
 export function paraStatus(m: ApiMissao): StatusNave {

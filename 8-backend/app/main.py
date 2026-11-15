@@ -102,6 +102,19 @@ def _visivel_bordo(e) -> bool:
     return e["consentido"] and e["medico_local"] == "bordo"
 
 
+def _hormonal_bordo(tid: str, compartilhados: list) -> dict | None:
+    """ADR-013 e ADR-014 no painel de bordo. Sem calendário, ou sem médico a bordo
+    (o CMO não vê saúde reprodutiva), não vai nada. Com médico a bordo, o painel sabe
+    só que é privado, até ela compartilhar pelo relógio; aí vê os sintomas e o pedido
+    de cuidado leve. Método e fase nunca saem daqui."""
+    s = sim()
+    if s.medico_local != "bordo" or not s.pessoas[tid]["analise"]["ficha"]["calendario"]:
+        return None
+    if any(e["tipo"] == "ciclo" and e["tripulante_id"] == tid for e in compartilhados):
+        return dict(compartilhado=True, resumo="pode ter cólica, inchaço ou humor mais baixo e pediu cuidado leve")
+    return dict(compartilhado=False)
+
+
 def _pessoa(tid):
     if tid not in TRIPULACAO:
         raise HTTPException(404, "tripulante não existe")
@@ -180,7 +193,8 @@ def bordo():
         evs = list(s.motor.eventos.values())
         visiveis = [e for e in evs if e["classe"] == "evento" and _visivel_bordo(e)]
         compartilhados = [e for e in evs if e["classe"] == "aviso" and _visivel_bordo(e)]
-        return dict(missao=_missao(), tripulantes=[s.clinico(t) for t in ORDEM],
+        tripulantes = [dict(s.clinico(t), saude_hormonal=_hormonal_bordo(t, compartilhados)) for t in ORDEM]
+        return dict(missao=_missao(), tripulantes=tripulantes,
                     eventos=[_ev(e) for e in sorted(visiveis, key=lambda e: (e["estado"] in FINAIS, -e["gerado_t"]))][:12],
                     avisos_compartilhados=[_ev(e) for e in compartilhados][-6:],
                     sombra=ia.placar_sombra(), trilha_cosmo=_trilha_bordo())
@@ -221,7 +235,7 @@ def relogio(tid: str):
         ciclo = a["ciclo"]
         return dict(eu={k: c[k] for k in ("tripulante_id", "nome", "papel", "gerada_em", "estado", "homeostase", "qualidade",
                                           "fc", "spo2", "hrv", "temp_pele", "respiracao", "agua_ml_dia", "agua_meta",
-                                          "sono_min_noite", "estresse", "dose_msv_dia", "metricas")},
+                                          "sono_min_noite", "estresse", "dose_msv_dia", "metricas", "sexo")},
                     contagem=dict(otimos=faixas.count("padrao"), atencao=faixas.count("atencao"), criticos=faixas.count("critico")),
                     pendencias=[_ev(e) for e in sorted(pend, key=lambda e: e["nivel_autonomia"] * -1)],
                     acompanhando=[_ev(e) for e in meus],

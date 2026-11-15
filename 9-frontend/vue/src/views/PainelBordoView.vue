@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import PainelHeader from '../components/PainelHeader.vue'
 import ListaTripulacao from '../components/ListaTripulacao.vue'
 import PacienteHeader from '../components/PacienteHeader.vue'
@@ -10,7 +10,8 @@ import CardDecisao from '../components/CardDecisao.vue'
 import ChatCosmo from '../components/ChatCosmo.vue'
 import { DECISOES, type Acao } from '@/mocks/decisoes'
 import { usarBordo } from '@/servicos/bordo'
-import { paraCard } from '@/servicos/api'
+import { buscarEcg, paraCard } from '@/servicos/api'
+import type { TrechoEcg } from '@/ecg/tocador'
 
 const { tripulantes, status, bordo, erro, conexao, decidir } = usarBordo()
 const selecionado = ref('sarah')
@@ -33,6 +34,25 @@ watch(bordo, (b) => {
     selecionado.value = alerta.tripulante_id
   }
 })
+
+// ECG real do relógio da pessoa selecionada, renovado a cada 5 s (o trecho tem 6 s).
+const trecho = shallowRef<TrechoEcg | null>(null)
+async function carregarEcg() {
+  if (conexao.value !== 'api') return (trecho.value = null)
+  const tid = selecionado.value
+  try {
+    const t = await buscarEcg(tid)
+    if (tid === selecionado.value) trecho.value = t
+  } catch {
+    trecho.value = null
+  }
+}
+watch([selecionado, conexao], () => {
+  trecho.value = null
+  carregarEcg()
+})
+const idEcg = setInterval(carregarEcg, 5000)
+onUnmounted(() => clearInterval(idEcg))
 
 const agora = () => new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
@@ -62,6 +82,7 @@ async function registrarAcao(acao: Acao) {
         :ritmo="tripulante.ritmo"
         :nivel="tripulante.nivel"
         :nome="tripulante.nome"
+        :trecho="trecho"
       />
       <div class="sinais-e-corpo">
         <GradeSinais :tripulante="tripulante" />

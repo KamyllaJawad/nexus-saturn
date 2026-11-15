@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { GeradorEcg, type ClasseRitmo } from '@/ecg/gerador'
+import { TocadorEcg, type TrechoEcg } from '@/ecg/tocador'
 import type { NivelSaude } from '@/mocks/tripulacao'
 
 const props = defineProps<{
@@ -8,6 +9,8 @@ const props = defineProps<{
   ritmo: ClasseRitmo
   nivel: NivelSaude
   nome: string 
+  // Trecho real do relógio (CinC 2017). Sem ele, o desenho é sintético.
+  trecho?: TrechoEcg | null
 }>()
 
 const VARIAVEL_COR = ['--ok', '--warn', '--crit'] as const
@@ -15,6 +18,19 @@ const LARGURA_FALHA = 10
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 const gerador = new GeradorEcg()
+let tocador = new TocadorEcg()
+const origem = ref('')
+
+// Trocar de pessoa recomeça o traçado; um trecho novo da mesma pessoa entra no fim do atual.
+watch(() => props.nome, () => (tocador = new TocadorEcg()))
+watch(
+  () => props.trecho,
+  (t) => {
+    if (t) tocador.carregar(t)
+  },
+  { immediate: true },
+)
+const real = () => !!props.trecho && tocador.pronto
 let cor = '#10b981'
 let idAnimacao = 0
 let ultimoQuadro = 0
@@ -52,7 +68,7 @@ function desenhar(ctx: CanvasRenderingContext2D, el: HTMLCanvasElement) {
   }
   ctx.stroke()
 
-  const { buffer, posicao } = gerador
+  const { buffer, posicao } = real() ? tocador : gerador
   const n = buffer.length
   ctx.strokeStyle = cor
   ctx.lineWidth = 1.7
@@ -82,7 +98,13 @@ function quadro(agora: number) {
   // Limita o salto a 0,1 s: se a aba ficou em segundo plano, não "acelera" ao voltar.
   const dt = Math.min(0.1, (agora - (ultimoQuadro || agora)) / 1000)
   ultimoQuadro = agora
-  gerador.avancar(dt, props.fc, props.ritmo)
+  if (real()) {
+    tocador.avancar(dt)
+    origem.value = `ECG do relógio · CinC 2017 (teste) ${tocador.origem}`
+  } else {
+    gerador.avancar(dt, props.fc, props.ritmo)
+    origem.value = 'ECG ilustrativo (sintético)'
+  }
 
   const el = canvas.value
   const ctx = el?.getContext('2d')
@@ -106,11 +128,13 @@ onUnmounted(() => cancelAnimationFrame(idAnimacao))
       role="img"
       :aria-label="`ECG ao vivo de ${nome}: ${fc} bpm, ritmo ${ritmo === 'fa' ? 'irregular (fibrilação atrial)' : 'regular'}`"
     ></canvas>
+    <small class="origem">{{ origem }}</small>
   </div>
 </template>
 
 <style scoped>
 .ecg {
+  position: relative;
   border-radius: 12px;
   border: 1px solid var(--linha);
   background: #05070e;
@@ -121,5 +145,14 @@ canvas {
   display: block;
   width: 100%;
   height: 110px;
+}
+
+.origem {
+  position: absolute;
+  right: 10px;
+  bottom: 6px;
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--texto-fraco);
 }
 </style>

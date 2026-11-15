@@ -27,6 +27,27 @@ DOSE_BASE = dict(leo=0.0002, gateway=0.0005, mars=0.0008, marsSurf=0.0003)
 CANAIS = [("fc", "relogio-ppg", "bpm"), ("hrv", "relogio-ppg", "ms"), ("spo2", "relogio-oximetro", "%"),
           ("temp_pele", "relogio-termistor", "C"), ("respiracao", "patch-toracico", "irpm")]
 
+_ORDEM_FAIXA = ["padrao", "atencao", "critico"]
+
+
+def corpo(leitura: dict, metricas: dict, m1: dict | None, agua_meta: float) -> dict:
+    """Faixa de cada órgão da silhueta do painel, a partir do que os modelos já
+    classificaram. É resumo visual, não diagnóstico: o front só pinta."""
+    def pior(*faixas):
+        return _ORDEM_FAIXA[max(_ORDEM_FAIXA.index(f or "padrao") for f in faixas)]
+
+    def f(sinal):
+        return (metricas.get(sinal) or {}).get("faixa")
+
+    estresse = leitura["estresse"]
+    agua = leitura["agua_ml_dia"] / agua_meta
+    return dict(
+        cerebro=pior("critico" if estresse >= 70 else "atencao" if estresse >= 50 else "padrao", f("sono")),
+        coracao="critico" if (m1 or {}).get("classe") == "fa" else pior(f("fc"), f("hrv")),
+        pulmoes=pior(f("spo2"), f("respiracao")),
+        rins="critico" if agua < 0.6 else "atencao" if agua < 0.8 else "padrao",
+    )
+
 
 class Simulador:
     def __init__(self, semente=20261114):
@@ -203,7 +224,8 @@ class Simulador:
                                          "pa_sys", "pa_dia", "estresse", "dose_msv_dia")},
                     agua_meta=base["agua_meta"], prontidao=base["prontidao"], metricas=a["m3"]["metricas"],
                     m1=limpa(p["m1"]), m2=limpa(p["m2"]), isolation_forest=a["m3"]["isolation_forest"],
-                    versao_z=a["m3"]["versao_z"], sombra=a["sombra"], ecg_origem=p["ecg_id"])
+                    versao_z=a["m3"]["versao_z"], sombra=a["sombra"], ecg_origem=p["ecg_id"],
+                    sexo=a["ficha"].get("sexo"), corpo=corpo(l, a["m3"]["metricas"], p["m1"], base["agua_meta"]))
 
     def retrato_terra(self):
         """O que a Terra tem agora: o retrato de `atraso` atrás. No blackout, o último que chegou."""
