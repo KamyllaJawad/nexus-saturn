@@ -1,0 +1,43 @@
+{
+  "ativos": {
+    "m1": "arritmia-borda-0.3.joblib",
+    "m2": "qualidade-0.2.joblib",
+    "m3-z": "m3-z-0.1.joblib",
+    "m3-if": "m3-if-0.1.joblib"
+  },
+  "sombra": {},
+  "historico": [
+    {
+      "versao": "arritmia-borda-0.3",
+      "peca": "m1",
+      "estado": "ativo",
+      "lote": "lote-20261114-183708",
+      "treinado_em": "2026-11-14T18:37:38Z",
+      "aprovado_por": "lote inicial (pré-voo)"
+    },
+    {
+      "versao": "qualidade-0.2",
+      "peca": "m2",
+      "estado": "ativo",
+      "lote": "lote-20261114-183708",
+      "treinado_em": "2026-11-14T18:37:38Z",
+      "aprovado_por": "lote inicial (pré-voo)"
+    },
+    {
+      "versao": "m3-z-0.1",
+      "peca": "m3-z",
+      "estado": "ativo",
+      "lote": "lote-20261114-183708",
+      "treinado_em": "2026-11-14T18:37:38Z",
+      "aprovado_por": "lote inicial (pré-voo)"
+    },
+    {
+      "versao": "m3-if-0.1",
+      "peca": "m3-if",
+      "estado": "ativo",
+      "lote": "lote-20261114-183708",
+      "treinado_em": "2026-11-14T18:37:41Z",
+      "aprovado_por": "lote inicial (pré-voo)"
+    }
+  ]
+}

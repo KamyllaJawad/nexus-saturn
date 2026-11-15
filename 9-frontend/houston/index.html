@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AstroHealth · Houston</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../compartilhado/tema.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand" id="brand"><b>Mission Control · Houston</b><small>Console do flight surgeon</small></div>
+  <div class="onde terra" id="onde">Terra · vê o passado</div>
+</header>
+<main class="palco">
+  <div id="banner"></div>
+  <div class="layout">
+    <section class="col">
+      <span class="eyebrow">Tripulação · último dado recebido</span>
+      <div class="crew" id="quem"></div>
+      <div class="card" id="autonomia"></div>
+    </section>
+    <section class="col" id="painel"></section>
+    <section class="col">
+      <div class="card"><h3>Eventos que já chegaram</h3><div id="eventos"></div></div>
+      <div class="card roxo-card" id="privados" hidden><h3>Compartilhado só com você</h3><div id="compartilhados"></div></div>
+      <div class="card"><h3>Recebido da nave</h3><div id="recebido"></div></div>
+      <div class="card"><h3>Cosmo Terra · chat do copiloto</h3><div id="cosmo"></div></div>
+      <div class="card"><h3>Trilha da Cosmo · auditoria</h3><div id="trilha"></div></div>
+      <div class="card"><h3>O que não chega aqui</h3><p class="nota" id="nao-chega">Aviso de saúde mental e do ciclo ficam na nave. Houston não tem botão de protocolo nem de medicação: parecer é revisão, não comando.</p></div>
+    </section>
+  </div>
+</main>
+<p class="rodape">Protótipo experimental com dados simulados. Não é dispositivo médico.</p>
+<p id="erro" class="erro" hidden></p>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

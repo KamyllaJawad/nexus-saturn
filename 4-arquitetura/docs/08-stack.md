@@ -103,28 +103,20 @@ flowchart TB
 | Auditoria | Hash do registro anterior, só inclusão | Transição, sugestão, decisão e escalonamento | Trilha no SQLite, copiada para a Terra em P2 |
 | Link | Fila por prioridade. `chega_em = agora + atraso` do perfil de missão | `evento.atualizado` | P1 a P4. O feed da família sai de um dicionário de estado para frase |
 
-## Estrutura sugerida do código do protótipo
+## Código do protótipo
+
+O serviço da nave mora em [`8-backend/`](../../8-backend/). Demo, mockups e documentos não entram nessa pasta.
 
 ```text
-astrohealth/
-├── nave/
-│   ├── ingestao/          # leituras + qualidade de sinal
-│   ├── detectores/        # arritmia, artefato, linha de base (z e Isolation Forest), calendário do ciclo, prontidão, humor
-│   ├── motor/             # máquina de estados + regras + prazos
-│   ├── cosmo/             # LangChain/CrewAI + ChromaDB + Ollama
-│   ├── auditoria/         # log com hash encadeado (SQLite)
-│   └── gateway_dtn/       # fila por prioridade + simulador de atraso
-├── terra/
-│   ├── servidor/          # recepção, confirmação, filtro de privacidade
-│   └── cosmo_terra/       # copiloto de Houston
-├── apps/                  # relógio, tablet, console, família (web)
+8-backend/
+├── app/
+│   ├── ia.py              # M1, M2 e M3
+│   ├── nave/              # ingestão e motor
+│   └── terra/             # frase da família
 ├── dados/
-│   ├── bronze/            # cru: relógio, sensores, CinC, sintético, ficha
-│   ├── prata/             # tratado: unidade, relógio alinhado, qualidade
-│   ├── ouro/              # uma tabela por modelo
-│   └── treino/            # jobs que gravam modelos/*.joblib
-├── contratos/             # JSON Schemas compartilhados
+│   ├── bronze/
+│   ├── prata/
+│   ├── ouro/
+│   └── treino/
 └── testes/
-    ├── aceitacao/         # Robot Framework, um .robot por fluxo
-    └── unidade/           # pytest
 ```

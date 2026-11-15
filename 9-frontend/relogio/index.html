@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AstroHealth · Relógio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../compartilhado/tema.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand"><b>AstroHealth OS</b><small>Relógio simulado · pulso de quem está selecionado</small></div>
+  <div class="crew linha" id="quem"></div>
+  <div class="onde" id="onde">A bordo · pulso</div>
+</header>
+<main class="palco">
+  <div class="bezel" id="bezel">
+    <div class="w-aviso" id="aviso" hidden></div>
+    <div class="ws" id="tela"></div>
+    <nav class="dots" id="dots" aria-label="Telas do relógio"></nav>
+  </div>
+  <p class="nota" style="text-align:center;margin-top:22px" id="legenda"></p>
+</main>
+<p class="rodape">Protótipo experimental com dados simulados. Não é dispositivo médico.</p>
+<p id="erro" class="erro" hidden></p>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

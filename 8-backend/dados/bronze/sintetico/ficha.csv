@@ -1,0 +1,5 @@
+tripulante_id,sexo,calendario,metodo,ultima_menstruacao,duracao_tipica_dias,trecho_intenso,versao_ficha
+sarah,feminino,true,pilula_combinada_continua,2026-06-02,28,segunda_quinzena,pre-voo-0.1
+elena,feminino,true,nenhum,2026-10-18,28,segunda_quinzena,pre-voo-0.1
+marcus,masculino,false,,,,,pre-voo-0.1
+kenji,masculino,false,,,,,pre-voo-0.1

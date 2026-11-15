@@ -1,0 +1,125 @@
+{
+  "aviso": "Resumos escritos pelo time para a demonstração, a partir de fontes públicas. Não são conduta clínica validada. O protótipo não é dispositivo médico.",
+  "protocolos": [
+    {
+      "id": "fa-aguda",
+      "titulo": "Manejo inicial de fibrilação atrial aguda a bordo",
+      "tipos": ["arritmia"],
+      "palavras": "fibrilação atrial arritmia coração acelerado irregular palpitação ritmo ECG antiarrítmico taquicardia",
+      "trecho": "Interromper o esforço e manter a pessoa sentada em repouso. Oferecer O2 suplementar se a saturação estiver abaixo de 90%. Registrar ECG de 12 derivações para confirmar o ritmo. Deixar o desfibrilador de prontidão e reavaliar em 10 minutos. Controle de frequência ou de ritmo com medicamento é decisão do oficial médico, em passo separado.",
+      "conduta": "Repouso, O2 a 2 L/min e ECG de 12 derivações",
+      "alternativa": "taquicardia sinusal por esforço",
+      "fonte": "2023 ACC/AHA/ACCP/HRS Guideline for the Diagnosis and Management of Atrial Fibrillation (resumo do time, adaptado ao kit médico da nave)"
+    },
+    {
+      "id": "leitura-suspeita",
+      "titulo": "Leitura suspeita do sensor de pulso",
+      "tipos": ["sensor_suspeito"],
+      "palavras": "sensor relógio folgado SpO2 saturação baixa sinal fraco artefato oxímetro dedo kit leitura estranha",
+      "trecho": "Sensores ópticos de pulso perdem contato com o relógio folgado e com movimento. Antes de alarmar, confirmar com a pessoa e repetir a medida com o oxímetro de dedo do kit. Se o kit marcar valor normal, o trecho do relógio fica registrado como artefato.",
+      "conduta": "Perguntar se o relógio está folgado; se continuar, medir com o oxímetro de dedo do kit",
+      "alternativa": "hipoxemia real",
+      "fonte": "ADR-009 do projeto e NASA-STD-3001, Volume 1 (monitoramento médico da tripulação), resumo do time"
+    },
+    {
+      "id": "tempestade-solar",
+      "titulo": "Evento de partículas solares: abrigo da tripulação",
+      "tipos": ["tempestade_solar"],
+      "palavras": "tempestade solar radiação prótons dosímetro abrigo dose mSv partículas",
+      "trecho": "Com o fluxo de prótons subindo, a tripulação vai para a área mais blindada da nave até o fluxo cair. A decisão de abrigo é da comandante. A dose de cada tripulante é acompanhada pelo dosímetro pessoal durante todo o evento.",
+      "conduta": "Acender a rota até o abrigo e levar a decisão à comandante",
+      "alternativa": "aguardar nova leitura do dosímetro",
+      "fonte": "NASA Human Research Program, perigo de radiação espacial (nasa.gov/hrp/hazards), resumo do time"
+    },
+    {
+      "id": "co2-dor-de-cabeca",
+      "titulo": "Dor de cabeça e CO2 da cabine",
+      "tipos": ["dor_de_cabeca"],
+      "palavras": "dor de cabeça CO2 dióxido de carbono cabine ar filtros cefaleia visão SANS ultrassom ocular nervo óptico",
+      "trecho": "Dor de cabeça em mais de um tripulante com CO2 da cabine elevado aponta primeiro para o ar. Pedir à engenharia o ajuste da remoção de CO2 e reavaliar. Para descartar a síndrome neuro-ocular do voo espacial (SANS), o oficial médico pode aprovar um ultrassom ocular guiado; as imagens seguem para laudo na Terra.",
+      "conduta": "Pedir o ajuste do ar à engenharia e avaliar ultrassom ocular guiado",
+      "alternativa": "alteração ocular do voo espacial (SANS)",
+      "fonte": "NASA Human Research Program, riscos de CO2 elevado e de SANS (nasa.gov/hrp/risks), resumo do time"
+    },
+    {
+      "id": "prontidao-eva",
+      "titulo": "Prontidão para atividade extraveicular",
+      "tipos": ["prontidao_eva"],
+      "palavras": "EVA atividade extraveicular prontidão escala fadiga sono reação tarefa crítica",
+      "trecho": "Sono curto e tempo de reação mais lento reduzem a margem de segurança numa EVA. A Cosmo apresenta a prontidão de cada um; tirar ou manter alguém na escala é decisão da comandante.",
+      "conduta": "Levar a prontidão de cada tripulante à comandante",
+      "alternativa": "manter a escala com monitoramento de fadiga reforçado",
+      "fonte": "NASA Human Research Program, risco de erros por fadiga e perda de sono (nasa.gov/hrp/risks), resumo do time"
+    },
+    {
+      "id": "bem-estar",
+      "titulo": "Queda de humor em isolamento",
+      "tipos": ["bem_estar"],
+      "palavras": "humor tristeza saudade isolamento cansaço estresse ansiedade família conversar bem-estar sono voz",
+      "trecho": "Queda de humor é esperada em missões longas. O primeiro apoio é privado: conversa, respiração guiada e contato com a família. O alerta só chega ao oficial médico se a pessoa autorizar; sem consentimento, nada sai do relógio.",
+      "conduta": "Oferecer conversa e respiração; compartilhar só com consentimento",
+      "alternativa": "fadiga por sono curto",
+      "fonte": "NASA Human Research Program, perigo de isolamento e confinamento (nasa.gov/hrp/hazards) e ADR-007 do projeto, resumo do time"
+    },
+    {
+      "id": "modo-noite",
+      "titulo": "Higiene do sono e luz da cabine",
+      "tipos": ["modo_noite"],
+      "palavras": "sono dormir noite luz cabine ritmo circadiano descanso insônia cansada cansado",
+      "trecho": "Luz mais quente e menos avisos antes de dormir ajudam a manter o ritmo circadiano, que não tem o ciclo natural de 24 horas na cabine. É uma ação reversível: pode ser vetada antes e desfeita depois.",
+      "conduta": "Agendar o modo noite com janela de veto",
+      "alternativa": "manter a luz e lembrar mais tarde",
+      "fonte": "NASA Human Research Program, risco de perda de sono e dessincronia circadiana (nasa.gov/hrp/risks), resumo do time"
+    },
+    {
+      "id": "hidratacao",
+      "titulo": "Hidratação e risco renal",
+      "tipos": ["hidratacao"],
+      "palavras": "água hidratação beber sede rins cálculo renal desidratação copo",
+      "trecho": "Em microgravidade o osso libera cálcio, e pouca água aumenta o risco de cálculo renal. Manter a meta diária de água é a contramedida mais simples.",
+      "conduta": "Beber 250 ml agora",
+      "alternativa": "lembrar de novo em 2 horas",
+      "fonte": "NASA Human Research Program, risco de formação de cálculo renal (nasa.gov/hrp/risks), resumo do time"
+    },
+    {
+      "id": "linha-de-base",
+      "titulo": "Combinação de sinais fora do padrão pessoal",
+      "tipos": ["linha_de_base"],
+      "palavras": "padrão linha de base combinação sinais anomalia fora do normal como estou estado homeostase",
+      "trecho": "Uma combinação de sinais pode sair do padrão da pessoa sem que nenhum deles cruze a faixa sozinho. Isso é um aviso de nível 1: informa, não recomenda e não muda o estado clínico. A resposta da pessoa vira rótulo para o próximo treino do modelo.",
+      "conduta": "Informar a pessoa e perguntar como ela está",
+      "alternativa": "variação normal do dia",
+      "fonte": "ADR-012 do projeto (linha de base com z robusto e Isolation Forest)"
+    },
+    {
+      "id": "ciclo",
+      "titulo": "Trecho intenso do calendário do ciclo",
+      "tipos": ["ciclo"],
+      "palavras": "ciclo menstrual cólica inchaço humor calendário pílula supressão menstruação",
+      "trecho": "A ficha de solo marca o trecho em que cólica, inchaço ou humor mais baixo costumam aparecer. O cuidado é leve e a pessoa aceita ou recusa: respirar um minuto, treino mais leve, modo noite mais cedo. Analgésico do kit fica com o oficial médico, em passo separado. A família não recebe esse dado.",
+      "conduta": "Oferecer cuidado leve; contar ao médico só se ela quiser",
+      "alternativa": "variação da linha de base pessoal",
+      "fonte": "ADR-013 do projeto (calendário do ciclo no relógio, com cuidado leve)"
+    },
+    {
+      "id": "kit-medico",
+      "titulo": "Kit médico de bordo",
+      "tipos": [],
+      "palavras": "kit médico estoque medicamento validade oxigênio eletrodos soro desfibrilador farmácia",
+      "trecho": "Estoque simulado da demo: O2 portátil em 92%, 18 eletrodos de ECG, 6 bolsas de soro, desfibrilador testado ontem e antiarrítmico para 2 tratamentos completos, dentro da validade.",
+      "conduta": "Conferir estoque e validade antes de liberar medicação",
+      "alternativa": "",
+      "fonte": "Dados simulados da demo AstroHealth OS"
+    },
+    {
+      "id": "osso",
+      "titulo": "Perda óssea e treino resistivo",
+      "tipos": [],
+      "palavras": "osso densidade óssea DXA treino resistivo músculo carga exercício",
+      "trecho": "Sem carga, o osso perde massa ao longo da missão. O treino resistivo diário é a principal contramedida; a carga da semana é ajustada pelo oficial médico a partir do exame de densidade.",
+      "conduta": "Manter o treino resistivo",
+      "alternativa": "",
+      "fonte": "NASA Human Research Program, risco de fratura e perda óssea (nasa.gov/hrp/risks), resumo do time"
+    }
+  ]
+}

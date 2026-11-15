@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AstroHealth · Dados e IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../compartilhado/tema.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand"><b>Dados e IA</b><small>Do sensor ao modelo · humano no circuito</small></div>
+  <a class="btn sm ghost" href="../">Sala de simulação</a>
+  <div class="onde" id="onde"></div>
+</header>
+<main class="palco">
+  <div class="card"><h3>1 · Caminho do dado</h3><div id="trilho"></div></div>
+  <div class="card"><h3>2 · Modelos em serviço, com a métrica medida</h3><div class="duas" id="modelos"></div></div>
+  <div class="card"><h3>3 · Human-in-the-loop: rótulo → retreino → modo sombra → aprovação médica</h3><div id="hitl"></div></div>
+  <div class="duas" style="margin-top:12px">
+    <div class="card"><h3>4 · Saída ao vivo de <span class="mono">ia.analisar(leitura)</span></h3>
+      <div class="chips" id="quem" style="margin-bottom:8px"></div><pre class="json" id="analise"></pre></div>
+    <div class="card"><h3>5 · Trilha de auditoria com hash encadeado</h3><div id="auditoria"></div></div>
+  </div>
+</main>
+<p class="rodape">Protótipo experimental com dados simulados. Não é dispositivo médico. ECG: PhysioNet/CinC Challenge 2017 (Clifford et al., 2017), licença ODC-By.</p>
+<p id="erro" class="erro" hidden></p>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

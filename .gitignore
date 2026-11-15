@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+# banco da sessão e dado grande: o zip do CinC se baixa de novo, o resto o pipeline refaz
+8-backend/astrohealth.db
+8-backend/dados/bronze/cinc2017/
+8-backend/dados/prata/
+8-backend/dados/ouro/
+8-backend/modelos/candidatos/

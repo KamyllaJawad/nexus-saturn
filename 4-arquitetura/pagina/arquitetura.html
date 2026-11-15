@@ -1524,28 +1524,19 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 </tr>
 </tbody>
 </table></div>
-<h3 id="stack-estrutura-sugerida-do-codigo-do-prototipo">Estrutura sugerida do código do protótipo</h3>
-<pre><code class="language-text">astrohealth/
-├── nave/
-│   ├── ingestao/          # leituras + qualidade de sinal
-│   ├── detectores/        # arritmia, artefato, linha de base (z e Isolation Forest), calendário do ciclo, prontidão, humor
-│   ├── motor/             # máquina de estados + regras + prazos
-│   ├── cosmo/             # LangChain/CrewAI + ChromaDB + Ollama
-│   ├── auditoria/         # log com hash encadeado (SQLite)
-│   └── gateway_dtn/       # fila por prioridade + simulador de atraso
-├── terra/
-│   ├── servidor/          # recepção, confirmação, filtro de privacidade
-│   └── cosmo_terra/       # copiloto de Houston
-├── apps/                  # relógio, tablet, console, família (web)
+<h3 id="stack-codigo-do-prototipo">Código do protótipo</h3>
+<p>O serviço da nave mora em <a href="#../../8-backend/"><code>8-backend/</code></a>. Demo, mockups e documentos não entram nessa pasta.</p>
+<pre><code class="language-text">8-backend/
+├── app/
+│   ├── ia.py              # M1, M2 e M3
+│   ├── nave/              # ingestão e motor
+│   └── terra/             # frase da família
 ├── dados/
-│   ├── bronze/            # cru: relógio, sensores, CinC, sintético, ficha
-│   ├── prata/             # tratado: unidade, relógio alinhado, qualidade
-│   ├── ouro/              # uma tabela por modelo
-│   └── treino/            # jobs que gravam modelos/*.joblib
-├── contratos/             # JSON Schemas compartilhados
+│   ├── bronze/
+│   ├── prata/
+│   ├── ouro/
+│   └── treino/
 └── testes/
-    ├── aceitacao/         # Robot Framework, um .robot por fluxo
-    └── unidade/           # pytest
 </code></pre></section>
 <section id="seguranca" class="secao"><p class="sec-n">09</p><h2>Segurança e privacidade</h2><p>Os maiores riscos são um comando médico falso entrando na rede da nave e dados clínicos chegando a quem não deveria. As ameaças seguem o modelo STRIDE, mais duas específicas de IA.</p>
 <div class="tbl"><table>
@@ -1961,7 +1952,7 @@ footer{max-width:1180px;margin:28px auto 0;font-size:12.5px;color:var(--ink3)}
 </tbody>
 </table></div>
 <p>O artefato sobe para a nave. O lakehouse não sobe. Modelo novo entra em modo sombra e só troca o que está em serviço com aprovação médica, pela <a href="#adr-0010">ADR-010</a>.</p>
-<p>No protótipo as zonas são pastas (<code>dados/bronze</code>, <code>dados/prata</code>, <code>dados/ouro</code>) e os jobs são scripts em <code>dados/treino</code>. A fronteira é a mesma de um lakehouse de produção: bronze imutável, prata tratada, ouro por modelo, artefato versionado. Trocar a pasta por Delta ou Iceberg não muda o contrato da leitura nem o <code>ia.analisar</code>.</p></section>
+<p>No protótipo as zonas são pastas em <code>8-backend/dados/</code> (<code>bronze</code>, <code>prata</code>, <code>ouro</code>, <code>treino</code>). A fronteira é a mesma de um lakehouse de produção: bronze imutável, prata tratada, ouro por modelo, artefato versionado. Trocar a pasta por Delta ou Iceberg não muda o contrato da leitura nem o <code>ia.analisar</code>.</p></section>
 <section id="adrs" class="secao"><p class="sec-n">11</p><h2>Decisões de arquitetura</h2><p>Decisões no formato MADR, todas aceitas. Abra cada uma para ver contexto, alternativas e consequências.</p><div class="adr-ctl"><button type="button" id="abrir-adrs">Abrir todas</button></div><details class="adr" id="adr-0001"><summary><span class="adr-n">ADR-001</span><span class="adr-t">IA na borda primeiro; a Terra só apoia</span></summary><div class="adr-b"><ul>
 <li><strong>Status:</strong> aceita</li>
 <li><strong>Data:</strong> 2026-11-11</li>

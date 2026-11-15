@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AstroHealth OS · Sala de simulação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="compartilhado/tema.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand"><b>AstroHealth OS</b><small>Sala de simulação · o relógio é simulado, os modelos e as decisões são reais</small></div>
+  <a class="btn sm" href="dados-ia/">Dados e IA · human-in-the-loop</a>
+  <div class="onde" id="onde"></div>
+</header>
+<main class="palco">
+  <div class="card">
+    <div class="controles">
+      <div class="grupo"><span class="eyebrow">Perfil de missão (muda o atraso)</span><div class="chips" id="missoes"></div></div>
+      <div class="grupo"><span class="eyebrow">Médico da missão (hipótese)</span><div class="chips" id="equipe"></div></div>
+      <div class="grupo"><span class="eyebrow">Link com a Terra</span><div class="chips">
+        <button class="chip-btn" data-acao="cenario" data-arg="blackout">Blackout</button>
+        <button class="chip-btn" data-acao="cenario" data-arg="sinal_volta">O sinal volta</button></div></div>
+      <div class="grupo"><span class="eyebrow">Sinal do relógio (quem detecta são os modelos)</span><div class="chips">
+        <button class="chip-btn" data-acao="cenario" data-arg="fa|sarah">Fibrilação atrial · Sarah</button>
+        <button class="chip-btn" data-acao="cenario" data-arg="sensor_solto|sarah">Relógio folgado · Sarah</button>
+        <button class="chip-btn" data-acao="cenario" data-arg="combinacao|kenji">Combinação fora do padrão · Kenji</button>
+        <button class="chip-btn" data-acao="cenario" data-arg="ciclo|sarah">Ciclo · Sarah (supressão)</button>
+        <button class="chip-btn" data-acao="cenario" data-arg="ciclo|elena">Ciclo · Elena (sem método)</button>
+        <button class="chip-btn" data-acao="cenario" data-arg="ciclo|kenji">Mesmo desvio · Kenji (sem calendário)</button>
+        <button class="chip-btn" data-acao="cenario" data-arg="rotina">Voltar à rotina</button></div></div>
+      <div class="grupo"><span class="eyebrow">Eventos de bordo</span><div class="chips">
+        <button class="chip-btn" data-acao="cenario" data-arg="tempestade_solar">Tempestade solar</button>
+        <button class="chip-btn" data-acao="cenario" data-arg="humor|sarah">Queda de humor</button>
+        <button class="chip-btn" data-acao="cenario" data-arg="eva">Prontidão EVA</button>
+        <button class="chip-btn" data-acao="cenario" data-arg="dor_de_cabeca|sarah">Dor de cabeça + CO₂</button>
+        <button class="chip-btn" data-acao="cenario" data-arg="modo_noite|sarah">Hora de dormir</button>
+        <button class="btn sm ghost" data-acao="reiniciar">Reiniciar a simulação</button></div></div>
+    </div>
+    <p class="nota" id="estado" style="margin-top:10px"></p>
+  </div>
+  <div class="grade">
+    <div class="moldura"><header><span>A bordo · Relógio</span><a href="relogio/" target="_blank">abrir em aba</a></header><iframe src="relogio/" title="Relógio"></iframe></div>
+    <div class="moldura"><header><span id="cap-bordo">A bordo · Painel do oficial médico</span><a href="bordo/" target="_blank">abrir em aba</a></header><iframe src="bordo/" title="Painel de bordo"></iframe></div>
+    <div class="moldura"><header><span>Na Terra · Celular da família</span><a href="familia/" target="_blank">abrir em aba</a></header><iframe src="familia/" title="Família"></iframe></div>
+    <div class="moldura"><header><span id="cap-houston">Na Terra · Console de Houston</span><a href="houston/" target="_blank">abrir em aba</a></header><iframe src="houston/" title="Houston"></iframe></div>
+  </div>
+</main>
+<p class="rodape">Protótipo experimental com dados simulados. Não é dispositivo médico.</p>
+<p id="erro" class="erro" hidden></p>
+<script type="module">
+import { TIPO, ajustarEquipe, api, erro, esc, hora, ligarAcoes, nome, pintar, repetir } from "./compartilhado/api.js";
+
+ligarAcoes({
+  cenario: (arg) => { const [cenario, tripulante_id] = arg.split("|"); return api("/simulador/cenario", { cenario, tripulante_id: tripulante_id || null }).then(ver); },
+  reiniciar: () => api("/simulador/reiniciar", {}).then(ver),
+}, erro);
+
+const FASE = { rotina: "rotina", fa: "fibrilação atrial", fa_o2: "fibrilação atrial, com O₂ do CMO", fa_tratada: "em recuperação", sensor_solto: "relógio folgado", combinacao: "combinação fora do padrão", ciclo: "desvio leve (trecho do ciclo)" };
+
+async function ver() {
+  const [s, m] = await Promise.all([api("/simulador/estado"), api("/missao")]);
+  ajustarEquipe(m.equipe);
+  const terra = m.equipe.local === "terra";
+  document.querySelector("#onde").innerHTML = `Hora da nave ${hora(s.hora_nave, true)}<br>${esc(m.rotulo)} · atraso ${esc(m.atraso_txt)}`;
+  pintar(document.querySelector("#equipe"), `<button class="chip-btn" data-acao="cenario" data-arg="medico_bordo" aria-pressed="${!terra}">Dr. Marcus a bordo</button>
+    <button class="chip-btn" data-acao="cenario" data-arg="medico_terra" aria-pressed="${terra}">Só na Terra · Dra. Rivera</button>`);
+  document.querySelector("#cap-bordo").textContent = terra ? "A bordo · Painel do CMO (sem médico a bordo)" : "A bordo · Painel do oficial médico";
+  document.querySelector("#cap-houston").textContent = terra ? "Na Terra · Console da Dra. Rivera (médica responsável)" : "Na Terra · Console de Houston";
+  pintar(document.querySelector("#missoes"), Object.entries(m.perfis).map(([k, r]) => `<button class="chip-btn" data-acao="cenario" data-arg="${k}" aria-pressed="${k === s.missao}">${esc(r)}</button>`).join(""));
+  const fases = Object.entries(s.fases).filter(([, f]) => f !== "rotina").map(([t, f]) => `${nome(t)}: ${FASE[f] || f}`).join(" · ") || "todos em rotina";
+  const abertos = s.abertos.map((e) => `${TIPO[e.tipo]} (${nome(e.tripulante_id)}) → decide ${nome(e.responsavel_id)}`).join(" · ") || "nenhum";
+  document.querySelector("#estado").innerHTML = `<b>Médico:</b> ${esc(m.equipe.resumo)}<br><b>Sinal injetado:</b> ${esc(fases)}. <b>Link:</b> ${s.blackout ? '<span class="c-warn">sem sinal</span>' : "ativo"}${m.comprimido ? " (na demo, 1 min de atraso = 1 s)" : ""}. <b>Aguardando humano:</b> ${esc(abertos)}. <b>ECG:</b> ${s.banco_ecg.em_uso.normal} gravações normais e ${s.banco_ecg.em_uso.fa} de FA do teste do CinC 2017.`;
+}
+repetir(ver, 1000);
+</script>
+</body>
+</html>

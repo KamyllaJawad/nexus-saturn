@@ -106,4 +106,4 @@ O treino é em lote. A leitura de 1 Hz na nave não atualiza peso nenhum. O moto
 
 O artefato sobe para a nave. O lakehouse não sobe. Modelo novo entra em modo sombra e só troca o que está em serviço com aprovação médica, pela [ADR-010](../adr/0010-modelos-em-modo-sombra.md).
 
-No protótipo as zonas são pastas (`dados/bronze`, `dados/prata`, `dados/ouro`) e os jobs são scripts em `dados/treino`. A fronteira é a mesma de um lakehouse de produção: bronze imutável, prata tratada, ouro por modelo, artefato versionado. Trocar a pasta por Delta ou Iceberg não muda o contrato da leitura nem o `ia.analisar`.
+No protótipo as zonas são pastas em `8-backend/dados/` (`bronze`, `prata`, `ouro`, `treino`). A fronteira é a mesma de um lakehouse de produção: bronze imutável, prata tratada, ouro por modelo, artefato versionado. Trocar a pasta por Delta ou Iceberg não muda o contrato da leitura nem o `ia.analisar`.

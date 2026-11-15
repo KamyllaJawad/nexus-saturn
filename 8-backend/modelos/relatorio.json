@@ -1,0 +1,248 @@
+{
+  "lote": {
+    "id": "lote-20261114-183708",
+    "criado_em": "2026-11-14T18:37:08Z",
+    "vitais": {
+      "bronze": 11520,
+      "prata": 11520,
+      "ouro": 11394,
+      "suspeitas": 2,
+      "origem": "sintetico"
+    },
+    "ecg": {
+      "origem": "cinc",
+      "gravacoes": 8528,
+      "classes": {
+        "fa": 738,
+        "normal": 5050,
+        "outro": 2456,
+        "ruidoso": 284
+      },
+      "split": {
+        "treino": 5969,
+        "validacao": 1279,
+        "teste": 1280
+      },
+      "ouro_m1": 8244,
+      "ouro_m2": 10528,
+      "banco_simulador": {
+        "normal": 60,
+        "fa": 30
+      }
+    }
+  },
+  "modelos": {
+    "m1": {
+      "versao": "arritmia-borda-0.3",
+      "algoritmo": "RandomForestClassifier(300, balanced)",
+      "metricas": {
+        "f1_fa": 0.693,
+        "f1_fa_ic95": [
+          0.615,
+          0.753
+        ],
+        "f1_fa_validacao": 0.761,
+        "precisao_fa": 0.684,
+        "recall_fa": 0.703,
+        "limiar_fa": 0.48,
+        "acuracia": 0.797,
+        "por_classe": {
+          "fa": {
+            "precisao": 0.684,
+            "recall": 0.703,
+            "f1": 0.693,
+            "n": 111
+          },
+          "normal": {
+            "precisao": 0.859,
+            "recall": 0.889,
+            "f1": 0.874,
+            "n": 758
+          },
+          "outro": {
+            "precisao": 0.693,
+            "recall": 0.637,
+            "f1": 0.664,
+            "n": 369
+          }
+        },
+        "matriz_confusao": {
+          "rotulos": [
+            "fa",
+            "normal",
+            "outro"
+          ],
+          "valores": [
+            [
+              78,
+              4,
+              29
+            ],
+            [
+              9,
+              674,
+              75
+            ],
+            [
+              27,
+              107,
+              235
+            ]
+          ]
+        },
+        "importancias": {
+          "mad_delta_rr": 0.12,
+          "pnn20_rel": 0.09,
+          "razao_sd": 0.089,
+          "fc_media": 0.082,
+          "entropia_delta_rr": 0.082,
+          "rr_irregular_limpo": 0.072,
+          "entropia_amostral": 0.057,
+          "pnn50": 0.048,
+          "rr_min_max": 0.047,
+          "rr_irregular_30s": 0.045,
+          "cv_limpo": 0.044,
+          "sd1": 0.039,
+          "rmssd": 0.035,
+          "cv_rr": 0.033,
+          "sd2": 0.033,
+          "fracao_viradas": 0.031,
+          "sdnn": 0.029,
+          "fracao_fora_da_mediana": 0.023
+        },
+        "meta": "F1 da classe FA >= 0,75 no teste",
+        "bateu_meta": false,
+        "n_treino": 5770,
+        "n_validacao": 1236,
+        "n_teste": 1238,
+        "rotulos_humanos": 0
+      }
+    },
+    "m2": {
+      "versao": "qualidade-0.2",
+      "algoritmo": "random_forest",
+      "metricas": {
+        "recall_suspeito": 0.919,
+        "precisao_suspeito": 0.894,
+        "f1_suspeito": 0.906,
+        "falso_suspeito_em_bom": 0.031,
+        "limiar": 0.43,
+        "estimador_escolhido": "random_forest",
+        "comparacao": {
+          "regressao_logistica": {
+            "limiar": 0.37,
+            "precisao_validacao": 0.868
+          },
+          "random_forest": {
+            "limiar": 0.43,
+            "precisao_validacao": 0.901
+          }
+        },
+        "matriz_confusao": {
+          "rotulos": [
+            "bom",
+            "suspeito"
+          ],
+          "valores": [
+            [
+              1200,
+              38
+            ],
+            [
+              28,
+              319
+            ]
+          ]
+        },
+        "meta": "recall de suspeito >= 0,9 no teste",
+        "bateu_meta": true,
+        "n_treino": 7367,
+        "n_teste": 1585,
+        "rotulos_humanos": 0
+      }
+    },
+    "m3-z": {
+      "versao": "m3-z-0.1",
+      "algoritmo": "mediana e MAD por tripulante",
+      "metricas": {
+        "sinais": [
+          "fc",
+          "hrv",
+          "spo2",
+          "temp_pele",
+          "respiracao"
+        ],
+        "n_por_tripulante": {
+          "sarah": 2754,
+          "marcus": 2880,
+          "elena": 2880,
+          "kenji": 2880
+        }
+      }
+    },
+    "m3-if": {
+      "versao": "m3-if-0.1",
+      "algoritmo": "RobustScaler + IsolationForest(200) por tripulante, 5 sinais + desvio conjunto, persistência de 5 leituras",
+      "metricas": {
+        "por_tripulante": {
+          "sarah": {
+            "n_treino": 2754,
+            "limiar": 0.576,
+            "alarmes_fora_da_amostra_por_dia": 0.52,
+            "recall_desvio_em_2_sinais": 0.79,
+            "recall_desvio_em_3_sinais": 1.0,
+            "recall_desvio_em_4_sinais": 1.0,
+            "rotulos_humanos": {
+              "normal": 0,
+              "anomalia": 0
+            }
+          },
+          "marcus": {
+            "n_treino": 2880,
+            "limiar": 0.574,
+            "alarmes_fora_da_amostra_por_dia": 1.0,
+            "recall_desvio_em_2_sinais": 0.823,
+            "recall_desvio_em_3_sinais": 1.0,
+            "recall_desvio_em_4_sinais": 1.0,
+            "rotulos_humanos": {
+              "normal": 0,
+              "anomalia": 0
+            }
+          },
+          "elena": {
+            "n_treino": 2880,
+            "limiar": 0.587,
+            "alarmes_fora_da_amostra_por_dia": 1.0,
+            "recall_desvio_em_2_sinais": 0.763,
+            "recall_desvio_em_3_sinais": 1.0,
+            "recall_desvio_em_4_sinais": 1.0,
+            "rotulos_humanos": {
+              "normal": 0,
+              "anomalia": 0
+            }
+          },
+          "kenji": {
+            "n_treino": 2880,
+            "limiar": 0.589,
+            "alarmes_fora_da_amostra_por_dia": 1.0,
+            "recall_desvio_em_2_sinais": 0.783,
+            "recall_desvio_em_3_sinais": 1.0,
+            "recall_desvio_em_4_sinais": 1.0,
+            "rotulos_humanos": {
+              "normal": 0,
+              "anomalia": 0
+            }
+          }
+        },
+        "persistencia": 5,
+        "episodios_excluidos": {
+          "total": 5,
+          "acima_do_limiar": 5
+        },
+        "meta": "no máximo 1 alarme por pessoa por dia simulado; >= 90% dos desvios combinados em 3 ou mais sinais",
+        "bateu_meta": true,
+        "limitacao": "Desvio em só 2 sinais fica dentro da nuvem normal da pessoa; o número medido está em recall_desvio_em_2_sinais."
+      }
+    }
+  }
+}

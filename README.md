@@ -15,6 +15,19 @@ O hackathon é no sábado 14/11 e no domingo 15/11, com entrega às 15h de domin
 | `5-plano-do-time/` | CSV com as 25 tarefas para 3 pessoas, as partes só simuladas e o script que cria as issues no GitHub. |
 | `6-origem/` | As telas do Stitch que deram origem ao projeto. |
 | `7-pitch/` | Guia, mapa de uso e parcerias em potencial para quem monta o pitch. |
+| `8-backend/` | API da nave (FastAPI + SQLite). Separada da demo, dos mockups e dos documentos. |
+| `9-frontend/` | Relógio, painel de bordo e console de Houston. Cada um lê a API e mostra só o que aquela superfície pode ver. |
+
+## Rodar o MVP funcional
+
+```bash
+python -m venv .venv
+.venv\Scripts\python -m pip install -r 8-backend/requirements.txt
+cd 8-backend
+..\.venv\Scripts\python -m uvicorn app.main:app --port 8000
+```
+
+Abra <http://127.0.0.1:8000/>: a sala de simulação injeta os cenários e mostra relógio, painel de bordo, família e Houston lado a lado; **Dados e IA** mostra os modelos e o human-in-the-loop. O relógio é simulado; os modelos, o motor de decisões e a auditoria rodam de verdade. Para treinar de novo, métricas medidas e limitações, veja [`8-backend/README.md`](8-backend/README.md).
 
 ## Versões online (editáveis)
 
@@ -34,6 +47,6 @@ Os links são privados até serem compartilhados pelo menu Share de cada um.
 | --- | --- | --- |
 | Pessoa 1 | Dados e IA: contratos JSON, sintéticos, CinC 2017, M1, M2 e M3 (z robusto e Isolation Forest) em `ia.py`, protocolos e Cosmo | 19 h |
 | Pessoa 2 | Telas, copiadas da demo: relógio, painel de bordo, celular da família e Houston | 19 h |
-| Pessoa 3 | Back-end: FastAPI + SQLite, simulador, regras de decisão, atraso nave ↔ Terra, feed da família e testes | 17 h |
+| Pessoa 3 | Back-end em `8-backend/`: FastAPI + SQLite, simulador, regras de decisão, atraso nave ↔ Terra, feed da família e testes | 17 h |
 
 Todos os dados das telas são simulados. Não é dispositivo médico.

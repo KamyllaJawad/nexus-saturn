@@ -1,0 +1,32 @@
+{
+  "id": "lote-20261114-183708",
+  "criado_em": "2026-11-14T18:37:08Z",
+  "vitais": {
+    "bronze": 11520,
+    "prata": 11520,
+    "ouro": 11394,
+    "suspeitas": 2,
+    "origem": "sintetico"
+  },
+  "ecg": {
+    "origem": "cinc",
+    "gravacoes": 8528,
+    "classes": {
+      "fa": 738,
+      "normal": 5050,
+      "outro": 2456,
+      "ruidoso": 284
+    },
+    "split": {
+      "treino": 5969,
+      "validacao": 1279,
+      "teste": 1280
+    },
+    "ouro_m1": 8244,
+    "ouro_m2": 10528,
+    "banco_simulador": {
+      "normal": 60,
+      "fa": 30
+    }
+  }
+}
