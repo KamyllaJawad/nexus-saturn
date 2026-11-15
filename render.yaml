@@ -1,0 +1,15 @@
+# Blueprint do Render: a API do AstroHealth OS (8-backend) num serviço web com Docker.
+# No Render: New > Blueprint > este repositório. O site em Vue fica na Vercel e
+# aponta para a URL deste serviço em VITE_API_URL.
+services:
+  - type: web
+    name: astrohealth-api
+    runtime: docker
+    dockerfilePath: ./8-backend/Dockerfile
+    dockerContext: ./8-backend
+    plan: free
+    healthCheckPath: /api/missao
+    autoDeploy: true
+    envVars:
+      - key: COSMO_OLLAMA
+        value: "0"

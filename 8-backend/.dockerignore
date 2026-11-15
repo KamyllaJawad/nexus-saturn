@@ -1,0 +1,5 @@
+astrohealth.db
+**/__pycache__
+.pytest_cache
+dados/bronze/cinc2017
+modelos/candidatos
